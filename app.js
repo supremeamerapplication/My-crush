@@ -1,0 +1,661 @@
+// Twitter Clone App with Appwrite Backend
+
+class TwitterClone {
+    constructor() {
+        this.tweets = [];
+        this.users = [];
+        this.currentUser = null;
+        this.maxChars = 280;
+        
+        // Appwrite Configuration
+        this.appwrite = {
+            endpoint: 'https://cloud.appwrite.io/v1',
+            projectId: 'YOUR_PROJECT_ID', // Replace with your Appwrite project ID
+            databaseId: 'twitter_clone',
+            collections: {
+                users: 'users',
+                tweets: 'tweets',
+                likes: 'likes',
+                follows: 'follows'
+            }
+        };
+        
+        this.init();
+    }
+
+    async init() {
+        try {
+            await this.initializeAppwrite();
+            await this.checkAuthStatus();
+            this.setupEventListeners();
+            this.updateUI();
+        } catch (error) {
+            console.error('Initialization error:', error);
+            this.showError('Failed to initialize app');
+        }
+    }
+
+    async initializeAppwrite() {
+        // Initialize Appwrite client
+        this.client = new Appwrite.Client();
+        this.client
+            .setEndpoint(this.appwrite.endpoint)
+            .setProject(this.appwrite.projectId);
+
+        // Initialize Appwrite services
+        this.account = new Appwrite.Account(this.client);
+        this.databases = new Appwrite.Databases(this.client);
+        this.realtime = new Appwrite.Realtime(this.client);
+
+        console.log('Appwrite initialized');
+    }
+
+    async checkAuthStatus() {
+        try {
+            const user = await this.account.get();
+            this.currentUser = user;
+            this.showApp();
+            await this.loadUserProfile();
+            await this.loadFeed();
+        } catch (error) {
+            this.showAuthModal();
+        }
+    }
+
+    async login(email, password) {
+        try {
+            const session = await this.account.createEmailPasswordSession(email, password);
+            const user = await this.account.get();
+            this.currentUser = user;
+            this.showApp();
+            await this.loadUserProfile();
+            await this.loadFeed();
+            this.showToast('Successfully signed in!');
+            return true;
+        } catch (error) {
+            this.showError('Login failed: ' + error.message);
+            return false;
+        }
+    }
+
+    async signup(name, username, email, password) {
+        try {
+            // Create user account
+            const user = await this.account.create('unique()', email, password, name);
+            
+            // Create user profile in database
+            await this.databases.createDocument(
+                this.appwrite.databaseId,
+                this.appwrite.collections.users,
+                'unique()',
+                {
+                    userId: user.$id,
+                    name: name,
+                    username: username.toLowerCase(),
+                    email: email,
+                    avatar: this.generateDefaultAvatar(name),
+                    bio: '',
+                    location: '',
+                    website: '',
+                    joinDate: new Date().toISOString(),
+                    followersCount: 0,
+                    followingCount: 0,
+                    tweetsCount: 0
+                }
+            );
+
+            // Create session
+            await this.account.createEmailPasswordSession(email, password);
+            this.currentUser = user;
+            this.showApp();
+            await this.loadUserProfile();
+            this.showToast('Account created successfully!');
+            return true;
+        } catch (error) {
+            this.showError('Signup failed: ' + error.message);
+            return false;
+        }
+    }
+
+    async logout() {
+        try {
+            await this.account.deleteSession('current');
+            this.currentUser = null;
+            this.tweets = [];
+            this.showAuthModal();
+            this.showToast('Successfully signed out');
+        } catch (error) {
+            this.showError('Logout failed: ' + error.message);
+        }
+    }
+
+    async loadUserProfile() {
+        if (!this.currentUser) return;
+
+        try {
+            const response = await this.databases.listDocuments(
+                this.appwrite.databaseId,
+                this.appwrite.collections.users,
+                [`userId=${this.currentUser.$id}`]
+            );
+
+            if (response.documents.length > 0) {
+                this.userProfile = response.documents[0];
+                this.updateProfileUI();
+            }
+        } catch (error) {
+            console.error('Error loading user profile:', error);
+        }
+    }
+
+    async loadFeed() {
+        if (!this.currentUser) return;
+
+        try {
+            const feedContainer = document.getElementById('feedContainer');
+            feedContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading tweets...</div>';
+
+            // Get tweets from users you follow + your own tweets
+            const response = await this.databases.listDocuments(
+                this.appwrite.databaseId,
+                this.appwrite.collections.tweets,
+                [
+                    'orderDesc("createdAt")',
+                    'limit(50)'
+                ]
+            );
+
+            this.tweets = response.documents;
+            this.renderTweets(this.tweets);
+            
+            // Set up real-time updates
+            this.setupRealtimeUpdates();
+
+        } catch (error) {
+            console.error('Error loading feed:', error);
+            this.showError('Failed to load feed');
+        }
+    }
+
+    async postTweet(content) {
+        if (!this.currentUser || !content.trim()) return;
+
+        try {
+            const tweet = {
+                content: content,
+                authorId: this.currentUser.$id,
+                authorName: this.userProfile?.name || this.currentUser.name,
+                authorUsername: this.userProfile?.username || 'user',
+                authorAvatar: this.userProfile?.avatar || this.generateDefaultAvatar(this.currentUser.name),
+                likes: 0,
+                retweets: 0,
+                replies: 0,
+                isLiked: false,
+                isRetweeted: false,
+                media: null,
+                createdAt: new Date().toISOString()
+            };
+
+            const response = await this.databases.createDocument(
+                this.appwrite.databaseId,
+                this.appwrite.collections.tweets,
+                'unique()',
+                tweet
+            );
+
+            // Add to local tweets array
+            this.tweets.unshift(response);
+            this.renderTweets([response], true);
+            this.clearComposer();
+            this.showToast('Tweet posted successfully!');
+
+            // Update user's tweet count
+            await this.updateUserTweetCount();
+
+        } catch (error) {
+            console.error('Error posting tweet:', error);
+            this.showError('Failed to post tweet');
+        }
+    }
+
+    async likeTweet(tweetId) {
+        if (!this.currentUser) return;
+
+        try {
+            const tweet = this.tweets.find(t => t.$id === tweetId);
+            if (!tweet) return;
+
+            // Check if already liked
+            const existingLike = await this.databases.listDocuments(
+                this.appwrite.databaseId,
+                this.appwrite.collections.likes,
+                [`userId=${this.currentUser.$id}`, `tweetId=${tweetId}`]
+            );
+
+            if (existingLike.documents.length > 0) {
+                // Unlike
+                await this.databases.deleteDocument(
+                    this.appwrite.databaseId,
+                    this.appwrite.collections.likes,
+                    existingLike.documents[0].$id
+                );
+                tweet.likes = parseInt(tweet.likes) - 1;
+                tweet.isLiked = false;
+            } else {
+                // Like
+                await this.databases.createDocument(
+                    this.appwrite.databaseId,
+                    this.appwrite.collections.likes,
+                    'unique()',
+                    {
+                        userId: this.currentUser.$id,
+                        tweetId: tweetId,
+                        createdAt: new Date().toISOString()
+                    }
+                );
+                tweet.likes = parseInt(tweet.likes) + 1;
+                tweet.isLiked = true;
+            }
+
+            // Update tweet in database
+            await this.databases.updateDocument(
+                this.appwrite.databaseId,
+                this.appwrite.collections.tweets,
+                tweetId,
+                { likes: tweet.likes }
+            );
+
+            this.updateTweetUI(tweetId);
+
+        } catch (error) {
+            console.error('Error liking tweet:', error);
+        }
+    }
+
+    setupRealtimeUpdates() {
+        // Subscribe to new tweets
+        this.realtime.subscribe(`databases.${this.appwrite.databaseId}.collections.${this.appwrite.collections.tweets}.documents`, (response) => {
+            if (response.event === 'database.documents.create') {
+                const newTweet = response.payload;
+                if (newTweet.authorId !== this.currentUser.$id) {
+                    this.tweets.unshift(newTweet);
+                    this.renderTweets([newTweet], true);
+                }
+            }
+        });
+
+        // Subscribe to tweet updates (likes)
+        this.realtime.subscribe(`databases.${this.appwrite.databaseId}.collections.${this.appwrite.collections.tweets}.documents`, (response) => {
+            if (response.event === 'database.documents.update') {
+                const updatedTweet = response.payload;
+                const existingIndex = this.tweets.findIndex(t => t.$id === updatedTweet.$id);
+                if (existingIndex !== -1) {
+                    this.tweets[existingIndex] = updatedTweet;
+                    this.updateTweetUI(updatedTweet.$id);
+                }
+            }
+        });
+    }
+
+    setupEventListeners() {
+        // Auth events
+        document.getElementById('loginBtn').addEventListener('click', () => this.handleLogin());
+        document.getElementById('signupBtn').addEventListener('click', () => this.handleSignup());
+        document.getElementById('showSignup').addEventListener('click', () => this.showSignupForm());
+        document.getElementById('showLogin').addEventListener('click', () => this.showLoginForm());
+        document.getElementById('closeAuthModal').addEventListener('click', () => this.showAuthModal());
+        document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+
+        // Tweet composer
+        const tweetTextarea = document.getElementById('tweetTextarea');
+        const tweetBtn = document.getElementById('tweetBtn');
+
+        tweetTextarea.addEventListener('input', (e) => {
+            this.updateCharCount(e.target.value.length);
+        });
+
+        tweetBtn.addEventListener('click', () => {
+            this.postTweet(tweetTextarea.value);
+        });
+
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            this.toggleTheme();
+        });
+
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showPage(item.dataset.page);
+                
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                item.classList.add('active');
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter' && tweetTextarea.value.trim()) {
+                this.postTweet(tweetTextarea.value);
+            }
+        });
+    }
+
+    async handleLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        if (!email || !password) {
+            this.showError('Please fill in all fields');
+            return;
+        }
+
+        await this.login(email, password);
+    }
+
+    async handleSignup() {
+        const name = document.getElementById('signupName').value;
+        const username = document.getElementById('signupUsername').value;
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        
+        if (!name || !username || !email || !password) {
+            this.showError('Please fill in all fields');
+            return;
+        }
+
+        if (username.length < 3) {
+            this.showError('Username must be at least 3 characters');
+            return;
+        }
+
+        if (password.length < 6) {
+            this.showError('Password must be at least 6 characters');
+            return;
+        }
+
+        await this.signup(name, username, email, password);
+    }
+
+    showAuthModal() {
+        document.getElementById('authModal').classList.add('active');
+        document.getElementById('appContainer').classList.add('hidden');
+        this.showLoginForm();
+    }
+
+    showApp() {
+        document.getElementById('authModal').classList.remove('active');
+        document.getElementById('appContainer').classList.remove('hidden');
+    }
+
+    showLoginForm() {
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('signupForm').classList.add('hidden');
+    }
+
+    showSignupForm() {
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('signupForm').classList.remove('hidden');
+    }
+
+    showPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => {
+            page.classList.remove('active');
+        });
+        document.getElementById(pageId).classList.add('active');
+        
+        switch(pageId) {
+            case 'homePage':
+                this.loadFeed();
+                break;
+            case 'profilePage':
+                this.loadProfile();
+                break;
+        }
+    }
+
+    updateCharCount(length) {
+        const charCount = document.getElementById('charCount');
+        const tweetBtn = document.getElementById('tweetBtn');
+        
+        charCount.textContent = this.maxChars - length;
+        
+        charCount.classList.remove('warning', 'error');
+        if (length > 260) charCount.classList.add('warning');
+        if (length > this.maxChars) charCount.classList.add('error');
+        
+        tweetBtn.disabled = length === 0 || length > this.maxChars;
+    }
+
+    clearComposer() {
+        const textarea = document.getElementById('tweetTextarea');
+        textarea.value = '';
+        this.updateCharCount(0);
+    }
+
+    renderTweets(tweets, prepend = false) {
+        const feedContainer = document.getElementById('feedContainer');
+        
+        if (tweets.length === 0) {
+            feedContainer.innerHTML = '<div class="p-3 text-center">No tweets yet. Be the first to tweet!</div>';
+            return;
+        }
+
+        const tweetsHTML = this.generateTweetHTML(tweets);
+        
+        if (prepend) {
+            feedContainer.innerHTML = tweetsHTML + feedContainer.innerHTML;
+        } else {
+            feedContainer.innerHTML = tweetsHTML;
+        }
+        
+        this.attachTweetEventListeners();
+    }
+
+    generateTweetHTML(tweets) {
+        return tweets.map(tweet => `
+            <div class="tweet" data-tweet-id="${tweet.$id}">
+                <div style="display: flex; gap: 12px;">
+                    <img src="${tweet.authorAvatar}" alt="${tweet.authorName}" class="avatar">
+                    <div style="flex: 1;">
+                        <div class="tweet-header">
+                            <span class="user-name">${tweet.authorName}</span>
+                            <span class="user-handle">@${tweet.authorUsername}</span>
+                            <span>·</span>
+                            <span class="tweet-time">${this.formatTime(tweet.createdAt)}</span>
+                        </div>
+                        <div class="tweet-content">${this.formatTweetContent(tweet.content)}</div>
+                        <div class="tweet-actions">
+                            <button class="tweet-action comment-action" data-action="comment">
+                                <i class="far fa-comment"></i>
+                                <span>${tweet.replies || 0}</span>
+                            </button>
+                            <button class="tweet-action retweet-action ${tweet.isRetweeted ? 'retweeted' : ''}" data-action="retweet">
+                                <i class="fas fa-retweet"></i>
+                                <span>${tweet.retweets || 0}</span>
+                            </button>
+                            <button class="tweet-action like-action ${tweet.isLiked ? 'liked' : ''}" data-action="like">
+                                <i class="${tweet.isLiked ? 'fas' : 'far'} fa-heart"></i>
+                                <span>${tweet.likes || 0}</span>
+                            </button>
+                            <button class="tweet-action" data-action="share">
+                                <i class="far fa-share-square"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    attachTweetEventListeners() {
+        document.querySelectorAll('.like-action').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const tweetId = btn.closest('.tweet').dataset.tweetId;
+                this.likeTweet(tweetId);
+            });
+        });
+    }
+
+    updateTweetUI(tweetId) {
+        const tweetElement = document.querySelector(`[data-tweet-id="${tweetId}"]`);
+        if (!tweetElement) return;
+
+        const tweet = this.tweets.find(t => t.$id === tweetId);
+        if (!tweet) return;
+
+        const likeBtn = tweetElement.querySelector('.like-action');
+        const likeCount = likeBtn.querySelector('span');
+        const likeIcon = likeBtn.querySelector('i');
+
+        likeBtn.classList.toggle('liked', tweet.isLiked);
+        likeIcon.className = tweet.isLiked ? 'fas fa-heart' : 'far fa-heart';
+        likeCount.textContent = tweet.likes || 0;
+    }
+
+    updateProfileUI() {
+        if (!this.userProfile) return;
+
+        document.getElementById('userName').textContent = this.userProfile.name;
+        document.getElementById('userAvatar').src = this.userProfile.avatar;
+        document.getElementById('profileName').textContent = this.userProfile.name;
+        document.getElementById('profileHandle').textContent = '@' + this.userProfile.username;
+        document.getElementById('profileAvatar').src = this.userProfile.avatar;
+        document.getElementById('tweetsCount').textContent = this.userProfile.tweetsCount || 0;
+        document.getElementById('followingCount').textContent = this.userProfile.followingCount || 0;
+        document.getElementById('followersCount').textContent = this.userProfile.followersCount || 0;
+    }
+
+    async updateUserTweetCount() {
+        if (!this.userProfile) return;
+
+        try {
+            const newCount = (this.userProfile.tweetsCount || 0) + 1;
+            await this.databases.updateDocument(
+                this.appwrite.databaseId,
+                this.appwrite.collections.users,
+                this.userProfile.$id,
+                { tweetsCount: newCount }
+            );
+            this.userProfile.tweetsCount = newCount;
+            this.updateProfileUI();
+        } catch (error) {
+            console.error('Error updating tweet count:', error);
+        }
+    }
+
+    generateDefaultAvatar(name) {
+        // Generate a simple avatar based on name initials
+        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+        const colors = ['#1da1f2', '#17bf63', '#f91880', '#794bc4', '#ffad1f'];
+        const color = colors[initials.charCodeAt(0) % colors.length];
+        
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=${color.replace('#', '')}&color=fff&size=128`;
+    }
+
+    formatTweetContent(content) {
+        return content
+            .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" style="color: var(--twitter-blue);">$1</a>')
+            .replace(/#(\w+)/g, '<span style="color: var(--twitter-blue);">#$1</span>')
+            .replace(/@(\w+)/g, '<span style="color: var(--twitter-blue);">@$1</span>');
+    }
+
+    formatTime(timestamp) {
+        const now = new Date();
+        const tweetTime = new Date(timestamp);
+        const diffMs = now - tweetTime;
+        const diffMins = Math.floor(diffMs / (1000 * 60));
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        
+        if (diffMins < 1) return 'now';
+        if (diffMins < 60) return `${diffMins}m`;
+        if (diffHours < 24) return `${diffHours}h`;
+        if (diffDays < 7) return `${diffDays}d`;
+        
+        return tweetTime.toLocaleDateString();
+    }
+
+    toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        const themeIcon = document.querySelector('#themeToggle i');
+        themeIcon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--twitter-blue);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 20px;
+            z-index: 10000;
+            animation: slideUp 0.3s ease;
+        `;
+        
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideDown 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    showError(message) {
+        this.showToast(message, 'error');
+    }
+
+    updateUI() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        
+        const themeIcon = document.querySelector('#themeToggle i');
+        themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+}
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// Initialize the app when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.twitterApp = new TwitterClone();
+});

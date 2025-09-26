@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Twitter Clone - A modern social media platform">
+    <meta name="theme-color" content="#1da1f2">
+    <title>My crush</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@10.0.0"></script>
+    <style>
+        /* Twitter-like CSS */
+        :root {
+            --twitter-blue: #1da1f2;
+            --twitter-blue-hover: #1a91da;
+            --twitter-blue-light: rgba(29, 161, 242, 0.1);
+            --text-primary: #0f1419;
+            --text-secondary: #536471;
+            --border-color: #eff3f4;
+            --bg-color: #ffffff;
+            --bg-secondary: #f7f9fa;
+            --hover-color: #f7f7f7;
+            --success-color: #00ba7c;
+            --error-color: #f91880;
+            --retweet-color: #00ba7c;
+            --like-color: #f91880;
+        }
+
+        [data-theme="dark"] {
+            --text-primary: #e7e9ea;
+            --text-secondary: #71767b;
+            --border-color: #2f3336;
+            --bg-color: #000000;
+            --bg-secondary: #16181c;
+            --hover-color: #181818;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.4;
+            padding-bottom: 60px;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--twitter-blue);
+        }
+
+        /* Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active {
+            color: var(--twitter-blue);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            margin-bottom: 2px;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Auth Pages */
+        .auth-page {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--twitter-blue);
+        }
+
+        .auth-toggle {
+            margin-top: 20px;
+            color: var(--text-secondary);
+        }
+
+        .auth-link {
+            color: var(--twitter-blue);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Tweet Composer */
+        .tweet-composer {
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px;
+        }
+
+        .composer-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .composer-textarea {
+            width: 100%;
+            border: none;
+            resize: none;
+            font-size: 1.2rem;
+            background: transparent;
+            color: var(--text-primary);
+            min-height: 60px;
+        }
+
+        .composer-textarea::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .composer-textarea:focus {
+            outline: none;
+        }
+
+        .composer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-left: 52px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--twitter-blue);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--twitter-blue-light);
+        }
+
+        .tweet-btn {
+            background: var(--twitter-blue);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .tweet-btn:disabled {
+            background: var(--twitter-blue-light);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .tweet-btn:not(:disabled):hover {
+            background: var(--twitter-blue-hover);
+        }
+
+        .char-count {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-right: 12px;
+        }
+
+        .char-count.warning {
+            color: #ffad1f;
+        }
+
+        .char-count.error {
+            color: var(--error-color);
+        }
+
+        /* Tweet */
+        .tweet {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .tweet:hover {
+            background: var(--hover-color);
+        }
+
+        .tweet-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .user-name {
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .user-handle, .tweet-time {
+            color: var(--text-secondary);
+        }
+
+        .tweet-content {
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .tweet-actions {
+            display: flex;
+            justify-content: space-between;
+            max-width: 425px;
+        }
+
+        .tweet-action {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .tweet-action:hover {
+            background: var(--twitter-blue-light);
+            color: var(--twitter-blue);
+        }
+
+        .comment-action:hover {
+            color: var(--twitter-blue);
+            background: rgba(29, 161, 242, 0.1);
+        }
+
+        .retweet-action:hover {
+            color: var(--retweet-color);
+            background: rgba(0, 186, 124, 0.1);
+        }
+
+        .like-action:hover {
+            color: var(--like-color);
+            background: rgba(249, 24, 128, 0.1);
+        }
+
+        .retweet-action.retweeted {
+            color: var(--retweet-color);
+        }
+
+        .like-action.liked {
+            color: var(--like-color);
+        }
+
+        /* Media */
+        .tweet-media {
+            margin: 12px 0;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .tweet-media img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--hover-color);
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-secondary);
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .bottom-nav {
+                display: none;
+            }
+            
+            body {
+                padding-bottom: 0;
+            }
+        }
+
+        /* Dark mode improvements */
+        [data-theme="dark"] .skeleton {
+            background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-2 { margin-top: 8px; }
+        .mb-2 { margin-bottom: 8px; }
+        .p-3 { padding: 12px; }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 20px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        .btn-primary {
+            background: var(--twitter-blue);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--twitter-blue-hover);
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Modal -->
+    <div class="modal active" id="authModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Join My Crush</div>
+                <button class="modal-close" id="closeAuthModal">&times;</button>
+            </div>
+            <div class="auth-page">
+                <div class="auth-form">
+                    <div id="loginForm">
+                        <h2>Sign in to Twitter Clone</h2>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password">
+                        </div>
+                        <button class="btn btn-primary" id="loginBtn">Sign In</button>
+                        <div class="auth-toggle">
+                            Don't have an account? <a class="auth-link" id="showSignup">Sign up</a>
+                        </div>
+                    </div>
+
+                    <div id="signupForm" class="hidden">
+                        <h2>Create your account</h2>
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" id="signupName" placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-input" id="signupUsername" placeholder="Choose a username">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" id="signupEmail" placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" id="signupPassword" placeholder="Create a password">
+                        </div>
+                        <button class="btn btn-primary" id="signupBtn">Create Account</button>
+                        <div class="auth-toggle">
+                            Already have an account? <a class="auth-link" id="showLogin">Sign in</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App (hidden until authenticated) -->
+    <div id="appContainer" class="hidden">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fab fa-twitter"></i>
+            </div>
+            <div class="header-actions">
+                <span id="userName" style="margin-right: 15px;"></span>
+                <button id="themeToggle" class="action-btn">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="logoutBtn" class="action-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container">
+            <!-- Home Page -->
+            <section id="homePage" class="page active">
+                <!-- Tweet Composer -->
+                <div class="tweet-composer">
+                    <div class="composer-header">
+                        <img src="" alt="Profile" class="avatar" id="userAvatar">
+                        <textarea class="composer-textarea" placeholder="What's happening?" 
+                                 id="tweetTextarea" maxlength="280"></textarea>
+                    </div>
+                    <div class="composer-actions">
+                        <div class="action-buttons">
+                            <button class="action-btn" id="mediaBtn">
+                                <i class="fas fa-image"></i>
+                            </button>
+                            <button class="action-btn" id="gifBtn">
+                                <i class="fas fa-film"></i>
+                            </button>
+                            <button class="action-btn" id="emojiBtn">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <span class="char-count" id="charCount">280</span>
+                            <button class="tweet-btn" id="tweetBtn" disabled>Tweet</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feed -->
+                <div id="feedContainer">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading tweets...
+                    </div>
+                </div>
+            </section>
+
+            <!-- Search Page -->
+            <section id="searchPage" class="page">
+                <div class="p-3">
+                    <div class="composer-header">
+                        <div style="position: relative; width: 100%;">
+                            <i class="fas fa-search" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+                            <input type="text" class="composer-textarea" placeholder="Search Twitter" 
+                                  style="padding-left: 40px; border-radius: 20px; background: var(--bg-secondary); border: 1px solid var(--border-color);">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <h3>Trends for you</h3>
+                        <div id="trendsContainer">
+                            <!-- Trends will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notifications Page -->
+            <section id="notificationsPage" class="page">
+                <div class="p-3 text-center">
+                    <h3>Notifications</h3>
+                    <p class="mt-2">No notifications yet</p>
+                </div>
+            </section>
+
+            <!-- Messages Page -->
+            <section id="messagesPage" class="page">
+                <div class="p-3 text-center">
+                    <h3>Messages</h3>
+                    <p class="mt-2">Your messages will appear here</p>
+                </div>
+            </section>
+
+            <!-- Profile Page -->
+            <section id="profilePage" class="page">
+                <div class="p-3 text-center">
+                    <img src="" alt="Profile" class="avatar" style="width: 80px; height: 80px;" id="profileAvatar">
+                    <h3 class="mt-2" id="profileName">User Name</h3>
+                    <p class="user-handle" id="profileHandle">@username</p>
+                    
+                    <div style="display: flex; justify-content: center; gap: 20px; margin: 16px 0;">
+                        <div>
+                            <strong id="tweetsCount">0</strong>
+                            <div>Tweets</div>
+                        </div>
+                        <div>
+                            <strong id="followingCount">0</strong>
+                            <div>Following</div>
+                        </div>
+                        <div>
+                            <strong id="followersCount">0</strong>
+                            <div>Followers</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a class="nav-item active" data-page="homePage">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <span>Home</span>
+            </a>
+            <a class="nav-item" data-page="searchPage">
+                <div class="nav-icon"><i class="fas fa-search"></i></div>
+                <span>Search</span>
+            </a>
+            <a class="nav-item" data-page="notificationsPage">
+                <div class="nav-icon"><i class="fas fa-bell"></i></div>
+                <span>Notifications</span>
+            </a>
+            <a class="nav-item" data-page="messagesPage">
+                <div class="nav-icon"><i class="fas fa-envelope"></i></div>
+                <span>Messages</span>
+            </a>
+            <a class="nav-item" data-page="profilePage">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>

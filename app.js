@@ -1,4 +1,4 @@
-// Twitter Clone App with Appwrite Backend
+l// Twitter Clone App with Appwrite Backend
 
 class TwitterClone {
     constructor() {
@@ -10,7 +10,7 @@ class TwitterClone {
         // Appwrite Configuration
         this.appwrite = {
             endpoint: 'https://cloud.appwrite.io/v1',
-            projectId: 'YOUR_PROJECT_ID', // Replace with your Appwrite project ID
+            projectId: '68d703b100171300608e', // Replace with your Appwrite project ID
             databaseId: 'twitter_clone',
             collections: {
                 users: 'users',

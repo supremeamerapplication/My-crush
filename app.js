@@ -1,4 +1,4 @@
-l// Twitter Clone App with Appwrite Backend
+
 
 class TwitterClone {
     constructor() {

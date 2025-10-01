@@ -1,16 +1,15 @@
-
-
 class TwitterClone {
     constructor() {
         this.tweets = [];
         this.users = [];
         this.currentUser = null;
         this.maxChars = 280;
+        this.usingAppwrite = false;
         
         // Appwrite Configuration
         this.appwrite = {
-            endpoint: 'https://nyc.cloud.appwrite.io/v1',
-            projectId: '68d703340006625f81ab', // Replace with your Appwrite project ID
+            endpoint: 'https://cloud.appwrite.io/v1',
+            projectId: '68d703340006625f81ab',
             databaseId: '68d703b100171300608e',
             collections: {
                 users: 'users',
@@ -25,53 +24,155 @@ class TwitterClone {
 
     async init() {
         try {
+            console.log('🚀 Starting Twitter Clone initialization...');
+            
+            // Check if Appwrite SDK is available
+            if (typeof Appwrite === 'undefined') {
+                throw new Error('Appwrite SDK not loaded. Please check the script tag.');
+            }
+            
+            console.log('📦 Appwrite SDK loaded successfully');
+            
             await this.initializeAppwrite();
             await this.checkAuthStatus();
             this.setupEventListeners();
             this.updateUI();
+            
+            console.log('✅ App initialized successfully');
         } catch (error) {
-            console.error('Initialization error:', error);
-            this.showError('Failed to initialize app');
+            console.error('❌ Initialization error:', error);
+            this.showError('Failed to initialize app: ' + error.message);
+            // Show auth modal even if initialization fails
+            this.showAuthModal();
         }
     }
 
     async initializeAppwrite() {
-        // Initialize Appwrite client
-        this.client = new Appwrite.Client();
-        this.client
-            .setEndpoint(this.appwrite.endpoint)
-            .setProject(this.appwrite.projectId);
+        try {
+            console.log('🔧 Initializing Appwrite...');
+            
+            // Check if Appwrite classes are available
+            if (!Appwrite.Client || !Appwrite.Account || !Appwrite.Databases) {
+                throw new Error('Appwrite SDK classes not available');
+            }
 
-        // Initialize Appwrite services
-        this.account = new Appwrite.Account(this.client);
-        this.databases = new Appwrite.Databases(this.client);
-        this.realtime = new Appwrite.Realtime(this.client);
+            // Initialize Appwrite client
+            this.client = new Appwrite.Client();
+            this.client
+                .setEndpoint(this.appwrite.endpoint)
+                .setProject(this.appwrite.projectId);
 
-        console.log('Appwrite initialized');
+            // Initialize Appwrite services
+            this.account = new Appwrite.Account(this.client);
+            this.databases = new Appwrite.Databases(this.client);
+            this.realtime = new Appwrite.Realtime(this.client);
+
+            console.log('🔌 Testing Appwrite connection...');
+            
+            // Test connection by making a simple API call
+            try {
+                await this.account.get();
+                this.usingAppwrite = true;
+                console.log('✅ Appwrite connected successfully');
+            } catch (authError) {
+                // If we get here, the connection works but no user is logged in
+                this.usingAppwrite = true;
+                console.log('✅ Appwrite connected (no active session)');
+            }
+
+        } catch (error) {
+            console.error('❌ Appwrite initialization failed:', error);
+            console.log('🔄 Switching to local storage mode...');
+            this.usingAppwrite = false;
+            this.setupLocalStorage();
+            this.showToast('Running in offline mode');
+        }
+    }
+
+    setupLocalStorage() {
+        console.log('💾 Setting up local storage fallback...');
+        
+        // Initialize local storage data structure
+        if (!localStorage.getItem('twitterUsers')) {
+            localStorage.setItem('twitterUsers', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('twitterTweets')) {
+            localStorage.setItem('twitterTweets', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('twitterLikes')) {
+            localStorage.setItem('twitterLikes', JSON.stringify([]));
+        }
+        
+        this.users = JSON.parse(localStorage.getItem('twitterUsers') || '[]');
+        this.tweets = JSON.parse(localStorage.getItem('twitterTweets') || '[]');
+        
+        console.log('✅ Local storage initialized with', this.users.length, 'users and', this.tweets.length, 'tweets');
     }
 
     async checkAuthStatus() {
         try {
-            const user = await this.account.get();
-            this.currentUser = user;
-            this.showApp();
-            await this.loadUserProfile();
-            await this.loadFeed();
+            if (this.usingAppwrite) {
+                console.log('🔐 Checking Appwrite auth status...');
+                const user = await this.account.get();
+                this.currentUser = user;
+                console.log('✅ User authenticated:', user.name);
+                
+                this.showApp();
+                await this.loadUserProfile();
+                await this.loadFeed();
+            } else {
+                // Check local storage for user session
+                const currentUserId = localStorage.getItem('currentUserId');
+                if (currentUserId) {
+                    const users = JSON.parse(localStorage.getItem('twitterUsers') || '[]');
+                    this.currentUser = users.find(u => u.userId === currentUserId);
+                    if (this.currentUser) {
+                        console.log('✅ Local user found:', this.currentUser.name);
+                        this.showApp();
+                        this.loadUserProfile();
+                        this.loadFeed();
+                    } else {
+                        this.showAuthModal();
+                    }
+                } else {
+                    this.showAuthModal();
+                }
+            }
         } catch (error) {
+            console.log('🔐 No active session, showing auth modal');
             this.showAuthModal();
         }
     }
 
     async login(email, password) {
         try {
-            const session = await this.account.createEmailPasswordSession(email, password);
-            const user = await this.account.get();
-            this.currentUser = user;
-            this.showApp();
-            await this.loadUserProfile();
-            await this.loadFeed();
-            this.showToast('Successfully signed in!');
-            return true;
+            if (this.usingAppwrite) {
+                const session = await this.account.createEmailPasswordSession(email, password);
+                const user = await this.account.get();
+                this.currentUser = user;
+                this.showApp();
+                await this.loadUserProfile();
+                await this.loadFeed();
+                this.showToast('Successfully signed in!');
+                return true;
+            } else {
+                // Local storage login
+                const users = JSON.parse(localStorage.getItem('twitterUsers') || '[]');
+                const user = users.find(u => u.email === email && u.password === password);
+                
+                if (user) {
+                    this.currentUser = user;
+                    localStorage.setItem('currentUserId', user.userId);
+                    this.showApp();
+                    this.loadUserProfile();
+                    this.loadFeed();
+                    this.showToast('Successfully signed in!');
+                    return true;
+                } else {
+                    this.showError('Invalid email or password');
+                    return false;
+                }
+            }
         } catch (error) {
             this.showError('Login failed: ' + error.message);
             return false;
@@ -80,19 +181,58 @@ class TwitterClone {
 
     async signup(name, username, email, password) {
         try {
-            // Create user account
-            const user = await this.account.create('unique()', email, password, name);
-            
-            // Create user profile in database
-            await this.databases.createDocument(
-                this.appwrite.databaseId,
-                this.appwrite.collections.users,
-                'unique()',
-                {
-                    userId: user.$id,
+            if (this.usingAppwrite) {
+                // Create user account
+                const user = await this.account.create('unique()', email, password, name);
+                
+                // Create user profile in database
+                await this.databases.createDocument(
+                    this.appwrite.databaseId,
+                    this.appwrite.collections.users,
+                    'unique()',
+                    {
+                        userId: user.$id,
+                        name: name,
+                        username: username.toLowerCase(),
+                        email: email,
+                        avatar: this.generateDefaultAvatar(name),
+                        bio: '',
+                        location: '',
+                        website: '',
+                        joinDate: new Date().toISOString(),
+                        followersCount: 0,
+                        followingCount: 0,
+                        tweetsCount: 0
+                    }
+                );
+
+                // Create session
+                await this.account.createEmailPasswordSession(email, password);
+                this.currentUser = user;
+                this.showApp();
+                await this.loadUserProfile();
+                this.showToast('Account created successfully!');
+                return true;
+            } else {
+                // Local storage signup
+                const users = JSON.parse(localStorage.getItem('twitterUsers') || '[]');
+                
+                // Check if username or email already exists
+                if (users.find(u => u.username === username.toLowerCase())) {
+                    this.showError('Username already taken');
+                    return false;
+                }
+                if (users.find(u => u.email === email)) {
+                    this.showError('Email already registered');
+                    return false;
+                }
+                
+                const newUser = {
+                    userId: 'user_' + Date.now(),
                     name: name,
                     username: username.toLowerCase(),
                     email: email,
+                    password: password, // Note: In real app, hash passwords!
                     avatar: this.generateDefaultAvatar(name),
                     bio: '',
                     location: '',
@@ -101,16 +241,18 @@ class TwitterClone {
                     followersCount: 0,
                     followingCount: 0,
                     tweetsCount: 0
-                }
-            );
-
-            // Create session
-            await this.account.createEmailPasswordSession(email, password);
-            this.currentUser = user;
-            this.showApp();
-            await this.loadUserProfile();
-            this.showToast('Account created successfully!');
-            return true;
+                };
+                
+                users.push(newUser);
+                localStorage.setItem('twitterUsers', JSON.stringify(users));
+                localStorage.setItem('currentUserId', newUser.userId);
+                
+                this.currentUser = newUser;
+                this.showApp();
+                this.loadUserProfile();
+                this.showToast('Account created successfully!');
+                return true;
+            }
         } catch (error) {
             this.showError('Signup failed: ' + error.message);
             return false;
@@ -119,13 +261,21 @@ class TwitterClone {
 
     async logout() {
         try {
-            await this.account.deleteSession('current');
+            if (this.usingAppwrite) {
+                await this.account.deleteSession('current');
+            }
+            
             this.currentUser = null;
+            localStorage.removeItem('currentUserId');
             this.tweets = [];
             this.showAuthModal();
             this.showToast('Successfully signed out');
         } catch (error) {
-            this.showError('Logout failed: ' + error.message);
+            console.error('Logout error:', error);
+            // Force logout anyway
+            this.currentUser = null;
+            localStorage.removeItem('currentUserId');
+            this.showAuthModal();
         }
     }
 
@@ -133,14 +283,21 @@ class TwitterClone {
         if (!this.currentUser) return;
 
         try {
-            const response = await this.databases.listDocuments(
-                this.appwrite.databaseId,
-                this.appwrite.collections.users,
-                [`userId=${this.currentUser.$id}`]
-            );
+            if (this.usingAppwrite) {
+                const response = await this.databases.listDocuments(
+                    this.appwrite.databaseId,
+                    this.appwrite.collections.users,
+                    [`userId=${this.currentUser.$id}`]
+                );
 
-            if (response.documents.length > 0) {
-                this.userProfile = response.documents[0];
+                if (response.documents.length > 0) {
+                    this.userProfile = response.documents[0];
+                    this.updateProfileUI();
+                }
+            } else {
+                // Load from local storage
+                const users = JSON.parse(localStorage.getItem('twitterUsers') || '[]');
+                this.userProfile = users.find(u => u.userId === this.currentUser.userId);
                 this.updateProfileUI();
             }
         } catch (error) {
@@ -155,25 +312,34 @@ class TwitterClone {
             const feedContainer = document.getElementById('feedContainer');
             feedContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading tweets...</div>';
 
-            // Get tweets from users you follow + your own tweets
-            const response = await this.databases.listDocuments(
-                this.appwrite.databaseId,
-                this.appwrite.collections.tweets,
-                [
-                    'orderDesc("createdAt")',
-                    'limit(50)'
-                ]
-            );
+            if (this.usingAppwrite) {
+                const response = await this.databases.listDocuments(
+                    this.appwrite.databaseId,
+                    this.appwrite.collections.tweets,
+                    [
+                        'orderDesc("createdAt")',
+                        'limit(50)'
+                    ]
+                );
 
-            this.tweets = response.documents;
-            this.renderTweets(this.tweets);
-            
-            // Set up real-time updates
-            this.setupRealtimeUpdates();
+                this.tweets = response.documents;
+                this.renderTweets(this.tweets);
+                this.setupRealtimeUpdates();
+            } else {
+                // Load from local storage
+                this.tweets = JSON.parse(localStorage.getItem('twitterTweets') || '[]');
+                // Sort by date (newest first)
+                this.tweets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                this.renderTweets(this.tweets);
+            }
 
         } catch (error) {
             console.error('Error loading feed:', error);
             this.showError('Failed to load feed');
+            
+            // Fallback to empty feed
+            const feedContainer = document.getElementById('feedContainer');
+            feedContainer.innerHTML = '<div class="p-3 text-center">No tweets yet. Be the first to tweet!</div>';
         }
     }
 
@@ -181,9 +347,9 @@ class TwitterClone {
         if (!this.currentUser || !content.trim()) return;
 
         try {
-            const tweet = {
+            const tweetData = {
                 content: content,
-                authorId: this.currentUser.$id,
+                authorId: this.usingAppwrite ? this.currentUser.$id : this.currentUser.userId,
                 authorName: this.userProfile?.name || this.currentUser.name,
                 authorUsername: this.userProfile?.username || 'user',
                 authorAvatar: this.userProfile?.avatar || this.generateDefaultAvatar(this.currentUser.name),
@@ -196,21 +362,35 @@ class TwitterClone {
                 createdAt: new Date().toISOString()
             };
 
-            const response = await this.databases.createDocument(
-                this.appwrite.databaseId,
-                this.appwrite.collections.tweets,
-                'unique()',
-                tweet
-            );
+            if (this.usingAppwrite) {
+                const response = await this.databases.createDocument(
+                    this.appwrite.databaseId,
+                    this.appwrite.collections.tweets,
+                    'unique()',
+                    tweetData
+                );
 
-            // Add to local tweets array
-            this.tweets.unshift(response);
-            this.renderTweets([response], true);
+                this.tweets.unshift(response);
+                this.renderTweets([response], true);
+                await this.updateUserTweetCount();
+            } else {
+                // Local storage
+                const tweet = {
+                    ...tweetData,
+                    $id: 'tweet_' + Date.now()
+                };
+                
+                const tweets = JSON.parse(localStorage.getItem('twitterTweets') || '[]');
+                tweets.unshift(tweet);
+                localStorage.setItem('twitterTweets', JSON.stringify(tweets));
+                
+                this.tweets.unshift(tweet);
+                this.renderTweets([tweet], true);
+                this.updateUserTweetCount();
+            }
+
             this.clearComposer();
             this.showToast('Tweet posted successfully!');
-
-            // Update user's tweet count
-            await this.updateUserTweetCount();
 
         } catch (error) {
             console.error('Error posting tweet:', error);
@@ -225,45 +405,77 @@ class TwitterClone {
             const tweet = this.tweets.find(t => t.$id === tweetId);
             if (!tweet) return;
 
-            // Check if already liked
-            const existingLike = await this.databases.listDocuments(
-                this.appwrite.databaseId,
-                this.appwrite.collections.likes,
-                [`userId=${this.currentUser.$id}`, `tweetId=${tweetId}`]
-            );
-
-            if (existingLike.documents.length > 0) {
-                // Unlike
-                await this.databases.deleteDocument(
+            if (this.usingAppwrite) {
+                const existingLike = await this.databases.listDocuments(
                     this.appwrite.databaseId,
                     this.appwrite.collections.likes,
-                    existingLike.documents[0].$id
+                    [`userId=${this.currentUser.$id}`, `tweetId=${tweetId}`]
                 );
-                tweet.likes = parseInt(tweet.likes) - 1;
-                tweet.isLiked = false;
-            } else {
-                // Like
-                await this.databases.createDocument(
+
+                if (existingLike.documents.length > 0) {
+                    // Unlike
+                    await this.databases.deleteDocument(
+                        this.appwrite.databaseId,
+                        this.appwrite.collections.likes,
+                        existingLike.documents[0].$id
+                    );
+                    tweet.likes = parseInt(tweet.likes) - 1;
+                    tweet.isLiked = false;
+                } else {
+                    // Like
+                    await this.databases.createDocument(
+                        this.appwrite.databaseId,
+                        this.appwrite.collections.likes,
+                        'unique()',
+                        {
+                            userId: this.currentUser.$id,
+                            tweetId: tweetId,
+                            createdAt: new Date().toISOString()
+                        }
+                    );
+                    tweet.likes = parseInt(tweet.likes) + 1;
+                    tweet.isLiked = true;
+                }
+
+                await this.databases.updateDocument(
                     this.appwrite.databaseId,
-                    this.appwrite.collections.likes,
-                    'unique()',
-                    {
-                        userId: this.currentUser.$id,
+                    this.appwrite.collections.tweets,
+                    tweetId,
+                    { likes: tweet.likes }
+                );
+            } else {
+                // Local storage like
+                const likes = JSON.parse(localStorage.getItem('twitterLikes') || '[]');
+                const existingLikeIndex = likes.findIndex(like => 
+                    like.userId === this.currentUser.userId && like.tweetId === tweetId
+                );
+
+                if (existingLikeIndex > -1) {
+                    // Unlike
+                    likes.splice(existingLikeIndex, 1);
+                    tweet.likes = parseInt(tweet.likes) - 1;
+                    tweet.isLiked = false;
+                } else {
+                    // Like
+                    likes.push({
+                        userId: this.currentUser.userId,
                         tweetId: tweetId,
                         createdAt: new Date().toISOString()
-                    }
-                );
-                tweet.likes = parseInt(tweet.likes) + 1;
-                tweet.isLiked = true;
-            }
+                    });
+                    tweet.likes = parseInt(tweet.likes) + 1;
+                    tweet.isLiked = true;
+                }
 
-            // Update tweet in database
-            await this.databases.updateDocument(
-                this.appwrite.databaseId,
-                this.appwrite.collections.tweets,
-                tweetId,
-                { likes: tweet.likes }
-            );
+                localStorage.setItem('twitterLikes', JSON.stringify(likes));
+                
+                // Update tweet in local storage
+                const tweets = JSON.parse(localStorage.getItem('twitterTweets') || '[]');
+                const tweetIndex = tweets.findIndex(t => t.$id === tweetId);
+                if (tweetIndex > -1) {
+                    tweets[tweetIndex] = tweet;
+                    localStorage.setItem('twitterTweets', JSON.stringify(tweets));
+                }
+            }
 
             this.updateTweetUI(tweetId);
 
@@ -273,28 +485,34 @@ class TwitterClone {
     }
 
     setupRealtimeUpdates() {
-        // Subscribe to new tweets
-        this.realtime.subscribe(`databases.${this.appwrite.databaseId}.collections.${this.appwrite.collections.tweets}.documents`, (response) => {
-            if (response.event === 'database.documents.create') {
-                const newTweet = response.payload;
-                if (newTweet.authorId !== this.currentUser.$id) {
-                    this.tweets.unshift(newTweet);
-                    this.renderTweets([newTweet], true);
-                }
-            }
-        });
+        if (!this.usingAppwrite) return;
 
-        // Subscribe to tweet updates (likes)
-        this.realtime.subscribe(`databases.${this.appwrite.databaseId}.collections.${this.appwrite.collections.tweets}.documents`, (response) => {
-            if (response.event === 'database.documents.update') {
-                const updatedTweet = response.payload;
-                const existingIndex = this.tweets.findIndex(t => t.$id === updatedTweet.$id);
-                if (existingIndex !== -1) {
-                    this.tweets[existingIndex] = updatedTweet;
-                    this.updateTweetUI(updatedTweet.$id);
+        try {
+            // Subscribe to new tweets
+            this.realtime.subscribe(`databases.${this.appwrite.databaseId}.collections.${this.appwrite.collections.tweets}.documents`, (response) => {
+                if (response.event === 'database.documents.create') {
+                    const newTweet = response.payload;
+                    if (newTweet.authorId !== this.currentUser.$id) {
+                        this.tweets.unshift(newTweet);
+                        this.renderTweets([newTweet], true);
+                    }
                 }
-            }
-        });
+            });
+
+            // Subscribe to tweet updates (likes)
+            this.realtime.subscribe(`databases.${this.appwrite.databaseId}.collections.${this.appwrite.collections.tweets}.documents`, (response) => {
+                if (response.event === 'database.documents.update') {
+                    const updatedTweet = response.payload;
+                    const existingIndex = this.tweets.findIndex(t => t.$id === updatedTweet.$id);
+                    if (existingIndex !== -1) {
+                        this.tweets[existingIndex] = updatedTweet;
+                        this.updateTweetUI(updatedTweet.$id);
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error setting up realtime updates:', error);
+        }
     }
 
     setupEventListeners() {
@@ -310,18 +528,25 @@ class TwitterClone {
         const tweetTextarea = document.getElementById('tweetTextarea');
         const tweetBtn = document.getElementById('tweetBtn');
 
-        tweetTextarea.addEventListener('input', (e) => {
-            this.updateCharCount(e.target.value.length);
-        });
+        if (tweetTextarea) {
+            tweetTextarea.addEventListener('input', (e) => {
+                this.updateCharCount(e.target.value.length);
+            });
+        }
 
-        tweetBtn.addEventListener('click', () => {
-            this.postTweet(tweetTextarea.value);
-        });
+        if (tweetBtn) {
+            tweetBtn.addEventListener('click', () => {
+                this.postTweet(tweetTextarea.value);
+            });
+        }
 
         // Theme toggle
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            this.toggleTheme();
-        });
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                this.toggleTheme();
+            });
+        }
 
         // Navigation
         document.querySelectorAll('.nav-item').forEach(item => {
@@ -338,10 +563,12 @@ class TwitterClone {
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'Enter' && tweetTextarea.value.trim()) {
+            if (e.ctrlKey && e.key === 'Enter' && tweetTextarea && tweetTextarea.value.trim()) {
                 this.postTweet(tweetTextarea.value);
             }
         });
+
+        console.log('✅ Event listeners setup complete');
     }
 
     async handleLogin() {
@@ -381,31 +608,48 @@ class TwitterClone {
     }
 
     showAuthModal() {
-        document.getElementById('authModal').classList.add('active');
-        document.getElementById('appContainer').classList.add('hidden');
+        const authModal = document.getElementById('authModal');
+        const appContainer = document.getElementById('appContainer');
+        
+        if (authModal) authModal.classList.add('active');
+        if (appContainer) appContainer.classList.add('hidden');
+        
         this.showLoginForm();
     }
 
     showApp() {
-        document.getElementById('authModal').classList.remove('active');
-        document.getElementById('appContainer').classList.remove('hidden');
+        const authModal = document.getElementById('authModal');
+        const appContainer = document.getElementById('appContainer');
+        
+        if (authModal) authModal.classList.remove('active');
+        if (appContainer) appContainer.classList.remove('hidden');
     }
 
     showLoginForm() {
-        document.getElementById('loginForm').classList.remove('hidden');
-        document.getElementById('signupForm').classList.add('hidden');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        
+        if (loginForm) loginForm.classList.remove('hidden');
+        if (signupForm) signupForm.classList.add('hidden');
     }
 
     showSignupForm() {
-        document.getElementById('loginForm').classList.add('hidden');
-        document.getElementById('signupForm').classList.remove('hidden');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        
+        if (loginForm) loginForm.classList.add('hidden');
+        if (signupForm) signupForm.classList.remove('hidden');
     }
 
     showPage(pageId) {
         document.querySelectorAll('.page').forEach(page => {
             page.classList.remove('active');
         });
-        document.getElementById(pageId).classList.add('active');
+        
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) {
+            targetPage.classList.add('active');
+        }
         
         switch(pageId) {
             case 'homePage':
@@ -421,6 +665,8 @@ class TwitterClone {
         const charCount = document.getElementById('charCount');
         const tweetBtn = document.getElementById('tweetBtn');
         
+        if (!charCount || !tweetBtn) return;
+        
         charCount.textContent = this.maxChars - length;
         
         charCount.classList.remove('warning', 'error');
@@ -432,12 +678,15 @@ class TwitterClone {
 
     clearComposer() {
         const textarea = document.getElementById('tweetTextarea');
-        textarea.value = '';
-        this.updateCharCount(0);
+        if (textarea) {
+            textarea.value = '';
+            this.updateCharCount(0);
+        }
     }
 
     renderTweets(tweets, prepend = false) {
         const feedContainer = document.getElementById('feedContainer');
+        if (!feedContainer) return;
         
         if (tweets.length === 0) {
             feedContainer.innerHTML = '<div class="p-3 text-center">No tweets yet. Be the first to tweet!</div>';
@@ -459,7 +708,7 @@ class TwitterClone {
         return tweets.map(tweet => `
             <div class="tweet" data-tweet-id="${tweet.$id}">
                 <div style="display: flex; gap: 12px;">
-                    <img src="${tweet.authorAvatar}" alt="${tweet.authorName}" class="avatar">
+                    <img src="${tweet.authorAvatar}" alt="${tweet.authorName}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=1da1f2&color=fff&size=128'">
                     <div style="flex: 1;">
                         <div class="tweet-header">
                             <span class="user-name">${tweet.authorName}</span>
@@ -520,14 +769,27 @@ class TwitterClone {
     updateProfileUI() {
         if (!this.userProfile) return;
 
-        document.getElementById('userName').textContent = this.userProfile.name;
-        document.getElementById('userAvatar').src = this.userProfile.avatar;
-        document.getElementById('profileName').textContent = this.userProfile.name;
-        document.getElementById('profileHandle').textContent = '@' + this.userProfile.username;
-        document.getElementById('profileAvatar').src = this.userProfile.avatar;
-        document.getElementById('tweetsCount').textContent = this.userProfile.tweetsCount || 0;
-        document.getElementById('followingCount').textContent = this.userProfile.followingCount || 0;
-        document.getElementById('followersCount').textContent = this.userProfile.followersCount || 0;
+        const elements = {
+            'userName': this.userProfile.name,
+            'userAvatar': this.userProfile.avatar,
+            'profileName': this.userProfile.name,
+            'profileHandle': '@' + this.userProfile.username,
+            'profileAvatar': this.userProfile.avatar,
+            'tweetsCount': this.userProfile.tweetsCount || 0,
+            'followingCount': this.userProfile.followingCount || 0,
+            'followersCount': this.userProfile.followersCount || 0
+        };
+
+        Object.entries(elements).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) {
+                if (id.includes('Avatar')) {
+                    element.src = value;
+                } else {
+                    element.textContent = value;
+                }
+            }
+        });
     }
 
     async updateUserTweetCount() {
@@ -535,12 +797,24 @@ class TwitterClone {
 
         try {
             const newCount = (this.userProfile.tweetsCount || 0) + 1;
-            await this.databases.updateDocument(
-                this.appwrite.databaseId,
-                this.appwrite.collections.users,
-                this.userProfile.$id,
-                { tweetsCount: newCount }
-            );
+            
+            if (this.usingAppwrite) {
+                await this.databases.updateDocument(
+                    this.appwrite.databaseId,
+                    this.appwrite.collections.users,
+                    this.userProfile.$id,
+                    { tweetsCount: newCount }
+                );
+            } else {
+                // Update local storage
+                const users = JSON.parse(localStorage.getItem('twitterUsers') || '[]');
+                const userIndex = users.findIndex(u => u.userId === this.userProfile.userId);
+                if (userIndex > -1) {
+                    users[userIndex].tweetsCount = newCount;
+                    localStorage.setItem('twitterUsers', JSON.stringify(users));
+                }
+            }
+            
             this.userProfile.tweetsCount = newCount;
             this.updateProfileUI();
         } catch (error) {
@@ -549,7 +823,6 @@ class TwitterClone {
     }
 
     generateDefaultAvatar(name) {
-        // Generate a simple avatar based on name initials
         const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
         const colors = ['#1da1f2', '#17bf63', '#f91880', '#794bc4', '#ffad1f'];
         const color = colors[initials.charCodeAt(0) % colors.length];
@@ -559,7 +832,9 @@ class TwitterClone {
 
     formatTweetContent(content) {
         return content
-            .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" style="color: var(--twitter-blue);">$1</a>')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: var(--twitter-blue);">$1</a>')
             .replace(/#(\w+)/g, '<span style="color: var(--twitter-blue);">#$1</span>')
             .replace(/@(\w+)/g, '<span style="color: var(--twitter-blue);">@$1</span>');
     }
@@ -588,22 +863,30 @@ class TwitterClone {
         localStorage.setItem('theme', newTheme);
         
         const themeIcon = document.querySelector('#themeToggle i');
-        themeIcon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        if (themeIcon) {
+            themeIcon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
     }
 
     showToast(message, type = 'success') {
+        // Remove existing toasts
+        document.querySelectorAll('.custom-toast').forEach(toast => toast.remove());
+        
         const toast = document.createElement('div');
+        toast.className = 'custom-toast';
         toast.style.cssText = `
             position: fixed;
             bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--twitter-blue);
+            background: ${type === 'error' ? '#f91880' : 'var(--twitter-blue)'};
             color: white;
             padding: 12px 24px;
             border-radius: 20px;
             z-index: 10000;
             animation: slideUp 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         `;
         
         toast.textContent = message;
@@ -624,7 +907,21 @@ class TwitterClone {
         document.documentElement.setAttribute('data-theme', savedTheme);
         
         const themeIcon = document.querySelector('#themeToggle i');
-        themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        if (themeIcon) {
+            themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+    }
+
+    // Method to debug connection issues
+    async debugConnection() {
+        console.group('🔍 Debug Information');
+        console.log('Using Appwrite:', this.usingAppwrite);
+        console.log('Current User:', this.currentUser);
+        console.log('Appwrite Endpoint:', this.appwrite.endpoint);
+        console.log('Appwrite Project ID:', this.appwrite.projectId);
+        console.log('Local Storage Users:', JSON.parse(localStorage.getItem('twitterUsers') || '[]').length);
+        console.log('Local Storage Tweets:', JSON.parse(localStorage.getItem('twitterTweets') || '[]').length);
+        console.groupEnd();
     }
 }
 
@@ -652,10 +949,27 @@ style.textContent = `
             transform: translateX(-50%) translateY(20px);
         }
     }
+    
+    .custom-toast {
+        /* Styles are applied inline */
+    }
 `;
 document.head.appendChild(style);
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('📄 DOM Content Loaded - Initializing Twitter Clone');
     window.twitterApp = new TwitterClone();
+    
+    // Add debug method to global scope for testing
+    window.debugTwitter = () => {
+        if (window.twitterApp) {
+            window.twitterApp.debugConnection();
+        }
+    };
 });
+
+// Export for module use if needed
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = TwitterClone;
+}

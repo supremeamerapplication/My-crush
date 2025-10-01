@@ -8,7 +8,7 @@ class TwitterClone {
         
         // Appwrite Configuration
         this.appwrite = {
-            endpoint: 'https://cloud.appwrite.io/v1',
+            endpoint: 'https://nyc.cloud.appwrite.io/v1',
             projectId: '68d703340006625f81ab',
             databaseId: '68d703b100171300608e',
             collections: {

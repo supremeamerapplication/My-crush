@@ -892,6 +892,21 @@
 
             async signup(name, username, email, password) {
                 try {
+                    // Validate input
+                    if (!name || !username || !email || !password) {
+                        throw new Error('All fields are required');
+                    }
+
+                    if (username.length < 3) {
+                        throw new Error('Username must be at least 3 characters');
+                    }
+
+                    if (password.length < 6) {
+                        throw new Error('Password must be at least 6 characters');
+                    }
+
+                    console.log('Creating user account...');
+                    
                     const { data, error } = await this.supabase.auth.signUp({
                         email: email,
                         password: password,
@@ -903,13 +918,50 @@
                         }
                     });
                     
-                    if (error) throw error;
+                    if (error) {
+                        console.error('Auth error:', error);
+                        throw error;
+                    }
                     
+                    console.log('User created, waiting for profile...', data.user.id);
+                    
+                    // Wait a moment for the trigger to create the profile
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    // Check if profile was created
+                    const { data: profile, error: profileError } = await this.supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', data.user.id)
+                        .single();
+
+                    if (profileError || !profile) {
+                        console.warn('Profile not created automatically, creating manually...');
+                        // Create profile manually
+                        const { error: manualError } = await this.supabase
+                            .from('profiles')
+                            .insert({
+                                id: data.user.id,
+                                name: name,
+                                username: username.toLowerCase(),
+                                email: email,
+                                avatar: this.generateDefaultAvatar(name)
+                            });
+
+                        if (manualError) {
+                            console.error('Manual profile creation failed:', manualError);
+                            throw new Error('Failed to create user profile');
+                        }
+                    }
+
                     this.currentUser = data.user;
                     this.showApp();
-                    this.showToast('Account created! Welcome to PrimeMar!');
+                    await this.loadUserProfile();
+                    this.showToast('Account created successfully! Welcome to PrimeMar!');
                     return true;
+                    
                 } catch (error) {
+                    console.error('Signup error details:', error);
                     this.showError('Signup failed: ' + error.message);
                     return false;
                 }
@@ -1167,6 +1219,13 @@
                 `).join('');
 
                 container.innerHTML = storiesHTML;
+            }
+
+            generateDefaultAvatar(name) {
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+                const colors = ['#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#f59e0b'];
+                const color = colors[initials.charCodeAt(0) % colors.length];
+                return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=${color.replace('#', '')}&color=fff&size=128`;
             }
 
             updateProfileUI() {

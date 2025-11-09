@@ -1,3 +1,12 @@
+
+project id:qsiwjjqxpegfmgkmtjje
+
+pro url:https://qsiwjjqxpegfmgkmtjje.supabase.co
+anon key:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzaXdqanF4cGVnZm1na210amplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1NDU2MTYsImV4cCI6MjA3ODEyMTYxNn0.iZ5YLVdeZP0VOm_Qu8XBOfBa9hmyEqHl520q5hZd1z8
+
+
+
+
 -- Storage policies
 CREATE POLICY "Avatar images are publicly accessible" ON storage.objects
     FOR SELECT USING (bucket_id = 'avatars');

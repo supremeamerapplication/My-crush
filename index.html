@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* PrimeMar CSS */
         :root {
             --primary-color: #3b82f6;
             --primary-hover: #2563eb;
@@ -51,7 +50,6 @@
             padding-bottom: 60px;
         }
 
-        /* Header */
         .header {
             position: sticky;
             top: 0;
@@ -77,7 +75,6 @@
             font-size: 1.8rem;
         }
 
-        /* Navigation */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -112,7 +109,6 @@
             margin-bottom: 2px;
         }
 
-        /* Main Content */
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -126,7 +122,6 @@
             display: block;
         }
 
-        /* Auth Pages */
         .auth-page {
             padding: 40px 20px;
             text-align: center;
@@ -176,7 +171,6 @@
             cursor: pointer;
         }
 
-        /* Post Composer */
         .post-composer {
             border-bottom: 1px solid var(--border-color);
             padding: 16px;
@@ -276,7 +270,6 @@
             color: var(--error-color);
         }
 
-        /* Stories */
         .stories-container {
             display: flex;
             gap: 12px;
@@ -329,7 +322,6 @@
             font-size: 0.8rem;
         }
 
-        /* Post */
         .post {
             padding: 16px;
             border-bottom: 1px solid var(--border-color);
@@ -422,7 +414,6 @@
             color: var(--error-color);
         }
 
-        /* Modals */
         .modal {
             display: none;
             position: fixed;
@@ -477,7 +468,6 @@
             background: var(--hover-color);
         }
 
-        /* Loading */
         .loading {
             display: flex;
             justify-content: center;
@@ -497,23 +487,19 @@
             100% { background-position: -200% 0; }
         }
 
-        /* Responsive */
         @media (min-width: 768px) {
             .bottom-nav {
                 display: none;
             }
-
             body {
                 padding-bottom: 0;
             }
         }
 
-        /* Dark mode improvements */
         [data-theme="dark"] .skeleton {
             background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
         }
 
-        /* Utility classes */
         .hidden {
             display: none !important;
         }
@@ -542,7 +528,6 @@
             background: var(--primary-hover);
         }
 
-        /* Profile Page */
         .profile-header {
             position: relative;
             height: 200px;
@@ -579,7 +564,6 @@
             color: var(--text-secondary);
         }
 
-        /* Search Page */
         .search-input-container {
             position: relative;
             padding: 16px;
@@ -603,7 +587,6 @@
             color: var(--text-secondary);
         }
 
-        /* Notifications */
         .notification {
             display: flex;
             gap: 12px;
@@ -834,8 +817,11 @@
         </nav>
     </div>
 
-    <!-- Scripts -->
     <script>
+        // Your Supabase Configuration
+        const SUPABASE_URL = 'https://qsiwjjqxpegfmgkmtjje.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzaXdqanF4cGVnZm1na210amplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1NDU2MTYsImV4cCI6MjA3ODEyMTYxNn0.iZ5YLVdeZP0VOm_Qu8XBOfBa9hmyEqHl520q5hZd1z8';
+
         class PrimeMar {
             constructor() {
                 this.posts = [];
@@ -846,10 +832,9 @@
                 this.maxChars = 280;
                 this.supabase = null;
                 
-                // Supabase Configuration
                 this.supabaseConfig = {
-                    url: 'https://your-project.supabase.co',
-                    key: 'your-anon-key'
+                    url: SUPABASE_URL,
+                    key: SUPABASE_ANON_KEY
                 };
                 
                 this.init();
@@ -857,73 +842,29 @@
 
             async init() {
                 try {
-                    console.log('🚀 Starting PrimeMar initialization...');
+                    console.log('🚀 Starting PrimeMar...');
                     
-                    // Check if Supabase is available
-                    if (typeof createClient === 'undefined') {
-                        throw new Error('Supabase SDK not loaded. Please check the script tag.');
-                    }
+                    // Initialize Supabase
+                    this.supabase = supabase.createClient(this.supabaseConfig.url, this.supabaseConfig.key);
                     
-                    console.log('📦 Supabase SDK loaded successfully');
-                    
-                    await this.initializeSupabase();
-                    await this.checkAuthStatus();
-                    this.setupEventListeners();
-                    this.updateUI();
-                    
-                    console.log('✅ App initialized successfully');
-                } catch (error) {
-                    console.error('❌ Initialization error:', error);
-                    this.showError('Failed to initialize app: ' + error.message);
-                    // Show auth modal even if initialization fails
-                    this.showAuthModal();
-                }
-            }
-
-            async initializeSupabase() {
-                try {
-                    console.log('🔧 Initializing Supabase...');
-                    
-                    // Initialize Supabase client
-                    this.supabase = createClient(this.supabaseConfig.url, this.supabaseConfig.key);
-                    
-                    // Test connection
-                    const { data, error } = await this.supabase.auth.getSession();
-                    
-                    if (error) {
-                        console.error('❌ Supabase connection failed:', error);
-                        throw new Error('Could not connect to database');
-                    }
-                    
-                    console.log('✅ Supabase connected successfully');
-                    
-                } catch (error) {
-                    console.error('❌ Supabase initialization failed:', error);
-                    throw error;
-                }
-            }
-
-            async checkAuthStatus() {
-                try {
-                    console.log('🔐 Checking Supabase auth status...');
-                    const { data: { session }, error } = await this.supabase.auth.getSession();
-                    
-                    if (error) throw error;
+                    // Check auth status
+                    const { data: { session } } = await this.supabase.auth.getSession();
                     
                     if (session) {
                         this.currentUser = session.user;
-                        console.log('✅ User authenticated:', session.user.email);
-                        
                         await this.loadUserProfile();
                         this.showApp();
                         await this.loadFeed();
                         await this.loadStories();
-                        await this.loadNotifications();
                     } else {
                         this.showAuthModal();
                     }
+                    
+                    this.setupEventListeners();
+                    this.updateUI();
+                    
                 } catch (error) {
-                    console.log('🔐 No active session, showing auth modal');
+                    console.error('Initialization error:', error);
                     this.showAuthModal();
                 }
             }
@@ -941,9 +882,7 @@
                     this.showApp();
                     await this.loadUserProfile();
                     await this.loadFeed();
-                    await this.loadStories();
-                    await this.loadNotifications();
-                    this.showToast('Successfully signed in!');
+                    this.showToast('Welcome back!');
                     return true;
                 } catch (error) {
                     this.showError('Login failed: ' + error.message);
@@ -953,7 +892,6 @@
 
             async signup(name, username, email, password) {
                 try {
-                    // Create user account
                     const { data, error } = await this.supabase.auth.signUp({
                         email: email,
                         password: password,
@@ -967,30 +905,9 @@
                     
                     if (error) throw error;
                     
-                    // Create user profile in database
-                    const { error: profileError } = await this.supabase
-                        .from('profiles')
-                        .insert({
-                            id: data.user.id,
-                            name: name,
-                            username: username.toLowerCase(),
-                            email: email,
-                            avatar: this.generateDefaultAvatar(name),
-                            bio: '',
-                            location: '',
-                            website: '',
-                            join_date: new Date().toISOString(),
-                            followers_count: 0,
-                            following_count: 0,
-                            posts_count: 0
-                        });
-                    
-                    if (profileError) throw profileError;
-                    
                     this.currentUser = data.user;
                     this.showApp();
-                    await this.loadUserProfile();
-                    this.showToast('Account created successfully!');
+                    this.showToast('Account created! Welcome to PrimeMar!');
                     return true;
                 } catch (error) {
                     this.showError('Signup failed: ' + error.message);
@@ -999,238 +916,101 @@
             }
 
             async logout() {
-                try {
-                    const { error } = await this.supabase.auth.signOut();
-                    if (error) throw error;
-                    
-                    this.currentUser = null;
-                    this.posts = [];
-                    this.stories = [];
-                    this.notifications = [];
-                    this.showAuthModal();
-                    this.showToast('Successfully signed out');
-                } catch (error) {
-                    console.error('Logout error:', error);
-                    // Force logout anyway
-                    this.currentUser = null;
-                    this.showAuthModal();
-                }
+                await this.supabase.auth.signOut();
+                this.currentUser = null;
+                this.showAuthModal();
+                this.showToast('Signed out successfully');
             }
 
             async loadUserProfile() {
                 if (!this.currentUser) return;
 
-                try {
-                    const { data, error } = await this.supabase
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', this.currentUser.id)
-                        .single();
+                const { data, error } = await this.supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', this.currentUser.id)
+                    .single();
 
-                    if (error) throw error;
-                    
+                if (!error && data) {
                     this.userProfile = data;
                     this.updateProfileUI();
-                } catch (error) {
-                    console.error('Error loading user profile:', error);
                 }
             }
 
             async loadFeed() {
-                if (!this.currentUser) return;
+                const feedContainer = document.getElementById('feedContainer');
+                feedContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading posts...</div>';
 
-                try {
-                    const feedContainer = document.getElementById('feedContainer');
-                    feedContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading posts...</div>';
+                const { data, error } = await this.supabase
+                    .from('posts')
+                    .select(`
+                        *,
+                        profiles:author_id (name, username, avatar)
+                    `)
+                    .order('created_at', { ascending: false })
+                    .limit(50);
 
-                    const { data, error } = await this.supabase
-                        .from('posts')
-                        .select(`
-                            *,
-                            profiles:author_id (name, username, avatar)
-                        `)
-                        .order('created_at', { ascending: false })
-                        .limit(50);
-
-                    if (error) throw error;
-                    
+                if (!error && data) {
                     this.posts = data;
                     this.renderPosts(this.posts);
-                    this.setupRealtimeUpdates();
-
-                } catch (error) {
-                    console.error('Error loading feed:', error);
-                    this.showError('Failed to load feed');
-                    
-                    // Fallback to empty feed
-                    const feedContainer = document.getElementById('feedContainer');
+                } else {
                     feedContainer.innerHTML = '<div class="p-3 text-center">No posts yet. Be the first to post!</div>';
                 }
             }
 
             async loadStories() {
-                if (!this.currentUser) return;
+                const { data, error } = await this.supabase
+                    .from('profiles')
+                    .select('id, name, username, avatar')
+                    .limit(8);
 
-                try {
-                    const { data, error } = await this.supabase
-                        .from('profiles')
-                        .select('id, name, username, avatar')
-                        .limit(10);
-
-                    if (error) throw error;
-                    
+                if (!error && data) {
                     this.stories = data;
                     this.renderStories();
-                } catch (error) {
-                    console.error('Error loading stories:', error);
-                }
-            }
-
-            async loadNotifications() {
-                if (!this.currentUser) return;
-
-                try {
-                    const { data, error } = await this.supabase
-                        .from('notifications')
-                        .select('*')
-                        .eq('user_id', this.currentUser.id)
-                        .order('created_at', { ascending: false })
-                        .limit(20);
-
-                    if (error) throw error;
-                    
-                    this.notifications = data;
-                    this.renderNotifications();
-                } catch (error) {
-                    console.error('Error loading notifications:', error);
                 }
             }
 
             async post(content) {
-                if (!this.currentUser || !content.trim()) return;
+                if (!content.trim()) return;
 
-                try {
-                    const { data, error } = await this.supabase
-                        .from('posts')
-                        .insert({
-                            author_id: this.currentUser.id,
-                            content: content,
-                            likes: 0,
-                            comments: 0,
-                            shares: 0,
-                            media: null
-                        })
-                        .select(`
-                            *,
-                            profiles:author_id (name, username, avatar)
-                        `)
-                        .single();
+                const { data, error } = await this.supabase
+                    .from('posts')
+                    .insert({
+                        author_id: this.currentUser.id,
+                        content: content
+                    })
+                    .select(`
+                        *,
+                        profiles:author_id (name, username, avatar)
+                    `)
+                    .single();
 
-                    if (error) throw error;
-                    
+                if (!error && data) {
                     this.posts.unshift(data);
                     this.renderPosts([data], true);
-                    await this.updateUserPostCount();
                     this.clearComposer();
-                    this.showToast('Post published successfully!');
-
-                } catch (error) {
-                    console.error('Error posting:', error);
-                    this.showError('Failed to publish post');
+                    this.showToast('Post published!');
                 }
             }
 
             async likePost(postId) {
-                if (!this.currentUser) return;
+                const { data: existingLike } = await this.supabase
+                    .from('likes')
+                    .select('id')
+                    .eq('user_id', this.currentUser.id)
+                    .eq('post_id', postId)
+                    .single();
 
-                try {
-                    // Check if already liked
-                    const { data: existingLike, error: checkError } = await this.supabase
-                        .from('likes')
-                        .select('id')
-                        .eq('user_id', this.currentUser.id)
-                        .eq('post_id', postId)
-                        .single();
-
-                    if (checkError && checkError.code !== 'PGRST116') throw checkError;
-
-                    if (existingLike) {
-                        // Unlike
-                        await this.supabase
-                            .from('likes')
-                            .delete()
-                            .eq('id', existingLike.id);
-                        
-                        // Decrement like count
-                        await this.supabase.rpc('decrement_likes', { post_id: postId });
-                    } else {
-                        // Like
-                        await this.supabase
-                            .from('likes')
-                            .insert({
-                                user_id: this.currentUser.id,
-                                post_id: postId
-                            });
-                        
-                        // Increment like count
-                        await this.supabase.rpc('increment_likes', { post_id: postId });
-                        
-                        // Create notification for post owner
-                        const post = this.posts.find(p => p.id === postId);
-                        if (post && post.author_id !== this.currentUser.id) {
-                            await this.supabase
-                                .from('notifications')
-                                .insert({
-                                    user_id: post.author_id,
-                                    type: 'like',
-                                    source_user_id: this.currentUser.id,
-                                    post_id: postId,
-                                    message: `${this.userProfile.name} liked your post`
-                                });
-                        }
-                    }
-
-                    // Refresh the post data
-                    await this.loadFeed();
-
-                } catch (error) {
-                    console.error('Error liking post:', error);
+                if (existingLike) {
+                    await this.supabase.from('likes').delete().eq('id', existingLike.id);
+                } else {
+                    await this.supabase.from('likes').insert({
+                        user_id: this.currentUser.id,
+                        post_id: postId
+                    });
                 }
-            }
-
-            setupRealtimeUpdates() {
-                if (!this.supabase) return;
-
-                try {
-                    // Subscribe to new posts
-                    this.supabase
-                        .channel('posts')
-                        .on('postgres_changes', 
-                            { event: 'INSERT', schema: 'public', table: 'posts' }, 
-                            (payload) => {
-                                const newPost = payload.new;
-                                if (newPost.author_id !== this.currentUser.id) {
-                                    this.posts.unshift(newPost);
-                                    this.renderPosts([newPost], true);
-                                }
-                            }
-                        )
-                        .subscribe();
-
-                    // Subscribe to post updates (likes)
-                    this.supabase
-                        .channel('likes')
-                        .on('postgres_changes', 
-                            { event: '*', schema: 'public', table: 'likes' }, 
-                            () => {
-                                this.loadFeed(); // Refresh feed to update like counts
-                            }
-                        )
-                        .subscribe();
-
-                } catch (error) {
-                    console.error('Error setting up realtime updates:', error);
-                }
+                
+                await this.loadFeed();
             }
 
             setupEventListeners() {
@@ -1246,67 +1026,32 @@
                 const postTextarea = document.getElementById('postTextarea');
                 const postBtn = document.getElementById('postBtn');
 
-                if (postTextarea) {
-                    postTextarea.addEventListener('input', (e) => {
-                        this.updateCharCount(e.target.value.length);
-                    });
-                }
+                postTextarea.addEventListener('input', (e) => {
+                    this.updateCharCount(e.target.value.length);
+                });
 
-                if (postBtn) {
-                    postBtn.addEventListener('click', () => {
-                        this.post(postTextarea.value);
-                    });
-                }
-
-                // Theme toggle
-                const themeToggle = document.getElementById('themeToggle');
-                if (themeToggle) {
-                    themeToggle.addEventListener('click', () => {
-                        this.toggleTheme();
-                    });
-                }
+                postBtn.addEventListener('click', () => {
+                    this.post(postTextarea.value);
+                });
 
                 // Navigation
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.addEventListener('click', (e) => {
                         e.preventDefault();
                         this.showPage(item.dataset.page);
-                        
-                        document.querySelectorAll('.nav-item').forEach(nav => {
-                            nav.classList.remove('active');
-                        });
+                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                         item.classList.add('active');
                     });
                 });
 
-                // Keyboard shortcuts
-                document.addEventListener('keydown', (e) => {
-                    if (e.ctrlKey && e.key === 'Enter' && postTextarea && postTextarea.value.trim()) {
-                        this.post(postTextarea.value);
-                    }
-                });
-
-                // Search functionality
-                const searchInput = document.getElementById('searchInput');
-                if (searchInput) {
-                    searchInput.addEventListener('input', (e) => {
-                        this.handleSearch(e.target.value);
-                    });
-                }
-
-                console.log('✅ Event listeners setup complete');
+                // Theme toggle
+                document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
             }
 
             async handleLogin() {
                 const email = document.getElementById('loginEmail').value;
                 const password = document.getElementById('loginPassword').value;
-                
-                if (!email || !password) {
-                    this.showError('Please fill in all fields');
-                    return;
-                }
-
-                await this.login(email, password);
+                if (email && password) await this.login(email, password);
             }
 
             async handleSignup() {
@@ -1314,189 +1059,55 @@
                 const username = document.getElementById('signupUsername').value;
                 const email = document.getElementById('signupEmail').value;
                 const password = document.getElementById('signupPassword').value;
-                
-                if (!name || !username || !email || !password) {
-                    this.showError('Please fill in all fields');
-                    return;
-                }
-
-                if (username.length < 3) {
-                    this.showError('Username must be at least 3 characters');
-                    return;
-                }
-
-                if (password.length < 6) {
-                    this.showError('Password must be at least 6 characters');
-                    return;
-                }
-
-                await this.signup(name, username, email, password);
+                if (name && username && email && password) await this.signup(name, username, email, password);
             }
 
             showAuthModal() {
-                const authModal = document.getElementById('authModal');
-                const appContainer = document.getElementById('appContainer');
-                
-                if (authModal) authModal.classList.add('active');
-                if (appContainer) appContainer.classList.add('hidden');
-                
+                document.getElementById('authModal').classList.add('active');
+                document.getElementById('appContainer').classList.add('hidden');
                 this.showLoginForm();
             }
 
             showApp() {
-                const authModal = document.getElementById('authModal');
-                const appContainer = document.getElementById('appContainer');
-                
-                if (authModal) authModal.classList.remove('active');
-                if (appContainer) appContainer.classList.remove('hidden');
+                document.getElementById('authModal').classList.remove('active');
+                document.getElementById('appContainer').classList.remove('hidden');
             }
 
             showLoginForm() {
-                const loginForm = document.getElementById('loginForm');
-                const signupForm = document.getElementById('signupForm');
-                
-                if (loginForm) loginForm.classList.remove('hidden');
-                if (signupForm) signupForm.classList.add('hidden');
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('signupForm').classList.add('hidden');
             }
 
             showSignupForm() {
-                const loginForm = document.getElementById('loginForm');
-                const signupForm = document.getElementById('signupForm');
-                
-                if (loginForm) loginForm.classList.add('hidden');
-                if (signupForm) signupForm.classList.remove('hidden');
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('signupForm').classList.remove('hidden');
             }
 
             showPage(pageId) {
-                document.querySelectorAll('.page').forEach(page => {
-                    page.classList.remove('active');
-                });
-                
-                const targetPage = document.getElementById(pageId);
-                if (targetPage) {
-                    targetPage.classList.add('active');
-                }
-                
-                switch(pageId) {
-                    case 'homePage':
-                        this.loadFeed();
-                        break;
-                    case 'profilePage':
-                        this.loadProfile();
-                        break;
-                    case 'notificationsPage':
-                        this.loadNotifications();
-                        break;
-                }
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+                document.getElementById(pageId).classList.add('active');
+                if (pageId === 'homePage') this.loadFeed();
             }
 
             updateCharCount(length) {
                 const charCount = document.getElementById('charCount');
                 const postBtn = document.getElementById('postBtn');
-                
-                if (!charCount || !postBtn) return;
-                
                 charCount.textContent = this.maxChars - length;
-                
-                charCount.classList.remove('warning', 'error');
-                if (length > 260) charCount.classList.add('warning');
-                if (length > this.maxChars) charCount.classList.add('error');
-                
+                charCount.classList.toggle('error', length > this.maxChars);
                 postBtn.disabled = length === 0 || length > this.maxChars;
             }
 
             clearComposer() {
-                const textarea = document.getElementById('postTextarea');
-                if (textarea) {
-                    textarea.value = '';
-                    this.updateCharCount(0);
-                }
+                document.getElementById('postTextarea').value = '';
+                this.updateCharCount(0);
             }
 
             renderPosts(posts, prepend = false) {
                 const feedContainer = document.getElementById('feedContainer');
-                if (!feedContainer) return;
-                
-                if (posts.length === 0) {
-                    feedContainer.innerHTML = '<div class="p-3 text-center">No posts yet. Be the first to post!</div>';
-                    return;
-                }
-
-                const postsHTML = this.generatePostHTML(posts);
-                
-                if (prepend) {
-                    feedContainer.innerHTML = postsHTML + feedContainer.innerHTML;
-                } else {
-                    feedContainer.innerHTML = postsHTML;
-                }
-                
-                this.attachPostEventListeners();
-            }
-
-            renderStories() {
-                const storiesContainer = document.getElementById('storiesContainer');
-                if (!storiesContainer) return;
-                
-                if (this.stories.length === 0) {
-                    storiesContainer.innerHTML = '<div class="p-3 text-center">No stories available</div>';
-                    return;
-                }
-
-                // Add user's own story first with add button
-                let storiesHTML = `
-                    <div class="story add-story">
-                        <div class="story-avatar">
-                            <img src="${this.userProfile.avatar}" alt="${this.userProfile.name}" class="avatar">
-                            <div class="add-story-icon">
-                                <i class="fas fa-plus"></i>
-                            </div>
-                        </div>
-                        <div class="story-username">Your Story</div>
-                    </div>
-                `;
-                
-                // Add other stories
-                storiesHTML += this.stories
-                    .filter(story => story.id !== this.currentUser.id)
-                    .map(story => `
-                        <div class="story">
-                            <div class="story-avatar">
-                                <img src="${story.avatar}" alt="${story.name}" class="avatar">
-                            </div>
-                            <div class="story-username">${story.username}</div>
-                        </div>
-                    `).join('');
-                
-                storiesContainer.innerHTML = storiesHTML;
-            }
-
-            renderNotifications() {
-                const notificationsContainer = document.getElementById('notificationsContainer');
-                if (!notificationsContainer) return;
-                
-                if (this.notifications.length === 0) {
-                    notificationsContainer.innerHTML = '<div class="p-3 text-center">No notifications yet</div>';
-                    return;
-                }
-
-                const notificationsHTML = this.notifications.map(notification => `
-                    <div class="notification">
-                        <img src="${this.generateDefaultAvatar('User')}" alt="User" class="notification-avatar">
-                        <div class="notification-content">
-                            <div>${notification.message}</div>
-                            <div class="notification-time">${this.formatTime(notification.created_at)}</div>
-                        </div>
-                    </div>
-                `).join('');
-                
-                notificationsContainer.innerHTML = notificationsHTML;
-            }
-
-            generatePostHTML(posts) {
-                return posts.map(post => `
+                const postsHTML = posts.map(post => `
                     <div class="post" data-post-id="${post.id}">
                         <div style="display: flex; gap: 12px;">
-                            <img src="${post.profiles.avatar}" alt="${post.profiles.name}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff&size=128'">
+                            <img src="${post.profiles.avatar}" alt="${post.profiles.name}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(post.profiles.name)}&background=3b82f6&color=fff&size=128'">
                             <div style="flex: 1;">
                                 <div class="post-header">
                                     <span class="user-name">${post.profiles.name}</span>
@@ -1505,35 +1116,24 @@
                                     <span class="post-time">${this.formatTime(post.created_at)}</span>
                                 </div>
                                 <div class="post-content">${this.formatPostContent(post.content)}</div>
-                                ${post.media ? `
-                                    <div class="post-media">
-                                        <img src="${post.media}" alt="Post media">
-                                    </div>
-                                ` : ''}
                                 <div class="post-actions">
-                                    <button class="post-action comment-action" data-action="comment">
-                                        <i class="far fa-comment"></i>
-                                        <span>${post.comments || 0}</span>
-                                    </button>
-                                    <button class="post-action retweet-action" data-action="retweet">
-                                        <i class="fas fa-retweet"></i>
-                                        <span>${post.shares || 0}</span>
-                                    </button>
-                                    <button class="post-action like-action" data-action="like">
-                                        <i class="far fa-heart"></i>
-                                        <span>${post.likes || 0}</span>
-                                    </button>
-                                    <button class="post-action" data-action="share">
-                                        <i class="far fa-share-square"></i>
-                                    </button>
+                                    <button class="post-action comment-action"><i class="far fa-comment"></i><span>${post.comments || 0}</span></button>
+                                    <button class="post-action retweet-action"><i class="fas fa-retweet"></i><span>${post.shares || 0}</span></button>
+                                    <button class="post-action like-action" data-action="like"><i class="far fa-heart"></i><span>${post.likes || 0}</span></button>
+                                    <button class="post-action"><i class="far fa-share-square"></i></button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `).join('');
-            }
 
-            attachPostEventListeners() {
+                if (prepend) {
+                    feedContainer.innerHTML = postsHTML + feedContainer.innerHTML;
+                } else {
+                    feedContainer.innerHTML = postsHTML;
+                }
+
+                // Add like event listeners
                 document.querySelectorAll('.like-action').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -1543,66 +1143,48 @@
                 });
             }
 
+            renderStories() {
+                const container = document.getElementById('storiesContainer');
+                if (!this.stories.length) return;
+
+                let storiesHTML = `
+                    <div class="story add-story">
+                        <div class="story-avatar">
+                            <img src="${this.userProfile?.avatar || 'https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff&size=128'}" class="avatar">
+                            <div class="add-story-icon"><i class="fas fa-plus"></i></div>
+                        </div>
+                        <div class="story-username">Your Story</div>
+                    </div>
+                `;
+
+                storiesHTML += this.stories.map(story => `
+                    <div class="story">
+                        <div class="story-avatar">
+                            <img src="${story.avatar}" alt="${story.name}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(story.name)}&background=3b82f6&color=fff&size=128'">
+                        </div>
+                        <div class="story-username">${story.username}</div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = storiesHTML;
+            }
+
             updateProfileUI() {
                 if (!this.userProfile) return;
-
-                const elements = {
-                    'userName': this.userProfile.name,
-                    'userAvatar': this.userProfile.avatar,
-                    'profileName': this.userProfile.name,
-                    'profileHandle': '@' + this.userProfile.username,
-                    'profileAvatar': this.userProfile.avatar,
-                    'profileBio': this.userProfile.bio || 'This is a sample bio. Update your profile to add your own bio!',
-                    'postsCount': this.userProfile.posts_count || 0,
-                    'followingCount': this.userProfile.following_count || 0,
-                    'followersCount': this.userProfile.followers_count || 0
-                };
-
-                Object.entries(elements).forEach(([id, value]) => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        if (id.includes('Avatar')) {
-                            element.src = value;
-                        } else {
-                            element.textContent = value;
-                        }
-                    }
-                });
-            }
-
-            async updateUserPostCount() {
-                if (!this.userProfile) return;
-
-                try {
-                    const newCount = (this.userProfile.posts_count || 0) + 1;
-                    
-                    const { error } = await this.supabase
-                        .from('profiles')
-                        .update({ posts_count: newCount })
-                        .eq('id', this.currentUser.id);
-
-                    if (error) throw error;
-                    
-                    this.userProfile.posts_count = newCount;
-                    this.updateProfileUI();
-                } catch (error) {
-                    console.error('Error updating post count:', error);
-                }
-            }
-
-            generateDefaultAvatar(name) {
-                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-                const colors = ['#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#f59e0b'];
-                const color = colors[initials.charCodeAt(0) % colors.length];
-                
-                return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=${color.replace('#', '')}&color=fff&size=128`;
+                document.getElementById('userName').textContent = this.userProfile.name;
+                document.getElementById('userAvatar').src = this.userProfile.avatar;
+                document.getElementById('profileName').textContent = this.userProfile.name;
+                document.getElementById('profileHandle').textContent = '@' + this.userProfile.username;
+                document.getElementById('profileAvatar').src = this.userProfile.avatar;
+                document.getElementById('postsCount').textContent = this.userProfile.posts_count || 0;
+                document.getElementById('followingCount').textContent = this.userProfile.following_count || 0;
+                document.getElementById('followersCount').textContent = this.userProfile.followers_count || 0;
             }
 
             formatPostContent(content) {
                 return content
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: var(--primary-color);">$1</a>')
+                    .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" style="color: var(--primary-color);">$1</a>')
                     .replace(/#(\w+)/g, '<span style="color: var(--primary-color);">#$1</span>')
                     .replace(/@(\w+)/g, '<span style="color: var(--primary-color);">@$1</span>');
             }
@@ -1613,91 +1195,32 @@
                 const diffMs = now - postTime;
                 const diffMins = Math.floor(diffMs / (1000 * 60));
                 const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                
                 if (diffMins < 1) return 'now';
                 if (diffMins < 60) return `${diffMins}m`;
                 if (diffHours < 24) return `${diffHours}h`;
-                if (diffDays < 7) return `${diffDays}d`;
-                
                 return postTime.toLocaleDateString();
             }
 
             toggleTheme() {
                 const currentTheme = document.documentElement.getAttribute('data-theme');
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                
                 document.documentElement.setAttribute('data-theme', newTheme);
                 localStorage.setItem('theme', newTheme);
-                
-                const themeIcon = document.querySelector('#themeToggle i');
-                if (themeIcon) {
-                    themeIcon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-                }
-            }
-
-            async handleSearch(query) {
-                if (query.length < 2) return;
-                
-                try {
-                    const { data, error } = await this.supabase
-                        .from('profiles')
-                        .select('id, name, username, avatar')
-                        .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
-                        .limit(10);
-
-                    if (error) throw error;
-                    
-                    // Update search results UI
-                    const trendsContainer = document.getElementById('trendsContainer');
-                    if (trendsContainer) {
-                        if (data.length > 0) {
-                            trendsContainer.innerHTML = data.map(user => `
-                                <div class="notification">
-                                    <img src="${user.avatar}" alt="${user.name}" class="notification-avatar">
-                                    <div class="notification-content">
-                                        <div class="user-name">${user.name}</div>
-                                        <div class="user-handle">@${user.username}</div>
-                                    </div>
-                                </div>
-                            `).join('');
-                        } else {
-                            trendsContainer.innerHTML = '<div class="p-3 text-center">No users found</div>';
-                        }
-                    }
-                } catch (error) {
-                    console.error('Search error:', error);
-                }
+                document.querySelector('#themeToggle i').className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
             }
 
             showToast(message, type = 'success') {
-                // Remove existing toasts
-                document.querySelectorAll('.custom-toast').forEach(toast => toast.remove());
-                
                 const toast = document.createElement('div');
-                toast.className = 'custom-toast';
                 toast.style.cssText = `
-                    position: fixed;
-                    bottom: 80px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: ${type === 'error' ? '#ef4444' : 'var(--primary-color)'};
-                    color: white;
-                    padding: 12px 24px;
-                    border-radius: 20px;
-                    z-index: 10000;
-                    animation: slideUp 0.3s ease;
-                    font-weight: 500;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+                    background: ${type === 'error' ? '#ef4444' : '#3b82f6'}; color: white;
+                    padding: 12px 24px; border-radius: 20px; z-index: 10000;
+                    animation: slideUp 0.3s ease; font-weight: 500;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 `;
-                
                 toast.textContent = message;
                 document.body.appendChild(toast);
-                
-                setTimeout(() => {
-                    toast.style.animation = 'slideDown 0.3s ease';
-                    setTimeout(() => toast.remove(), 300);
-                }, 3000);
+                setTimeout(() => toast.remove(), 3000);
             }
 
             showError(message) {
@@ -1707,23 +1230,7 @@
             updateUI() {
                 const savedTheme = localStorage.getItem('theme') || 'light';
                 document.documentElement.setAttribute('data-theme', savedTheme);
-                
-                const themeIcon = document.querySelector('#themeToggle i');
-                if (themeIcon) {
-                    themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-                }
-            }
-
-            // Method to debug connection issues
-            async debugConnection() {
-                console.group('🔍 Debug Information');
-                console.log('Using Supabase:', !!this.supabase);
-                console.log('Current User:', this.currentUser);
-                console.log('Supabase URL:', this.supabaseConfig.url);
-                console.log('User Profile:', this.userProfile);
-                console.log('Posts Count:', this.posts.length);
-                console.log('Stories Count:', this.stories.length);
-                console.groupEnd();
+                document.querySelector('#themeToggle i').className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
             }
         }
 
@@ -1731,44 +1238,15 @@
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideUp {
-                from {
-                    opacity: 0;
-                    transform: translateX(-50%) translateY(20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateX(-50%) translateY(0);
-                }
-            }
-            
-            @keyframes slideDown {
-                from {
-                    opacity: 1;
-                    transform: translateX(-50%) translateY(0);
-                }
-                to {
-                    opacity: 0;
-                    transform: translateX(-50%) translateY(20px);
-                }
-            }
-            
-            .custom-toast {
-                /* Styles are applied inline */
+                from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+                to { opacity: 1; transform: translateX(-50%) translateY(0); }
             }
         `;
         document.head.appendChild(style);
 
-        // Initialize the app when DOM is loaded
+        // Initialize app
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('📄 DOM Content Loaded - Initializing PrimeMar');
             window.primeMarApp = new PrimeMar();
-            
-            // Add debug method to global scope for testing
-            window.debugPrimeMar = () => {
-                if (window.primeMarApp) {
-                    window.primeMarApp.debugConnection();
-                }
-            };
         });
     </script>
 </body>

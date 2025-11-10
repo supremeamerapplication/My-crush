@@ -1,0 +1,253 @@
+.post-composer {
+    border-bottom: 1px solid var(--border-color);
+    padding: 16px;
+}
+
+.composer-header {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.composer-textarea {
+    width: 100%;
+    border: none;
+    resize: none;
+    font-size: 1.2rem;
+    background: transparent;
+    color: var(--text-primary);
+    min-height: 60px;
+}
+
+.composer-textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+.composer-textarea:focus {
+    outline: none;
+}
+
+.composer-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding-left: 52px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.action-btn:hover {
+    background: var(--primary-light);
+}
+
+.post-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.post-btn:disabled {
+    background: var(--primary-light);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.post-btn:not(:disabled):hover {
+    background: var(--primary-hover);
+}
+
+.char-count {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-right: 12px;
+}
+
+.char-count.warning {
+    color: #f59e0b;
+}
+
+.char-count.error {
+    color: var(--error-color);
+}
+
+.stories-container {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.story {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.story-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    padding: 2px;
+    background: var(--story-ring);
+}
+
+.story-username {
+    font-size: 0.7rem;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.add-story {
+    position: relative;
+}
+
+.add-story-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.post {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s ease;
+}
+
+.post:hover {
+    background: var(--hover-color);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.user-name {
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.user-handle, .post-time {
+    color: var(--text-secondary);
+}
+
+.post-content {
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.post-media {
+    margin: 12px 0;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.post-media img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+}
+
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    max-width: 425px;
+}
+
+.post-action {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.post-action:hover {
+    background: var(--primary-light);
+    color: var(--primary-color);
+}
+
+.comment-action:hover {
+    color: var(--primary-color);
+    background: var(--primary-light);
+}
+
+.retweet-action:hover {
+    color: var(--success-color);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.like-action:hover {
+    color: var(--error-color);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.retweet-action.retweeted {
+    color: var(--success-color);
+}
+
+.like-action.liked {
+    color: var(--error-color);
+}
+
+.post-action.active {
+    color: var(--primary-color);
+}
+
+.post-action.like-action.active {
+    color: var(--error-color);
+}
+
+.post-action.retweet-action.active {
+    color: var(--success-color);
+}

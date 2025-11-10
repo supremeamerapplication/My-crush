@@ -360,7 +360,7 @@
             overflow: hidden;
         }
 
-        .post-media img {
+        .post-media img, .post-media video {
             width: 100%;
             max-height: 400px;
             object-fit: cover;
@@ -1102,6 +1102,93 @@
             from { opacity: 1; transform: translateX(0); }
             to { opacity: 0; transform: translateX(100%); }
         }
+
+        /* Media Upload Styles */
+        .media-preview {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .media-preview-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .media-preview-item img, .media-preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        /* Media Modal */
+        .media-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .media-modal.active {
+            display: flex;
+        }
+
+        .media-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .media-modal-content img, .media-modal-content video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Media Upload Button */
+        .media-upload-btn {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .media-upload-btn input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -1190,9 +1277,12 @@
                     </div>
                     <div class="composer-actions">
                         <div class="action-buttons">
-                            <button class="action-btn" id="mediaBtn">
-                                <i class="fas fa-image"></i>
-                            </button>
+                            <div class="media-upload-btn">
+                                <button class="action-btn" id="mediaBtn">
+                                    <i class="fas fa-image"></i>
+                                </button>
+                                <input type="file" id="mediaInput" accept="image/*,video/*" multiple style="display: none;">
+                            </div>
                             <button class="action-btn" id="gifBtn">
                                 <i class="fas fa-film"></i>
                             </button>
@@ -1205,6 +1295,7 @@
                             <button class="post-btn" id="postBtn" disabled>Post</button>
                         </div>
                     </div>
+                    <div class="media-preview" id="mediaPreview"></div>
                 </div>
 
                 <!-- Stories -->
@@ -1474,6 +1565,14 @@
         </div>
     </div>
 
+    <!-- Media Modal -->
+    <div class="media-modal" id="mediaModal">
+        <div class="media-modal-content" id="mediaModalContent">
+            <!-- Media will be displayed here -->
+        </div>
+        <button class="modal-close" id="closeMediaModal" style="position: absolute; top: 20px; right: 20px; color: white; background: rgba(0,0,0,0.5);">&times;</button>
+    </div>
+
     <script>
         // Your Supabase Configuration
         const SUPABASE_URL = 'https://qsiwjjqxpegfmgkmtjje.supabase.co';
@@ -1503,6 +1602,7 @@
                 this.retweetedPosts = new Set();
                 this.userAlerts = new Set();
                 this.activePostForShare = null;
+                this.mediaFiles = [];
                 
                 this.supabaseConfig = {
                     url: SUPABASE_URL,
@@ -2598,6 +2698,20 @@
                         this.handleShareAction(action);
                     });
                 });
+
+                // Media upload
+                document.getElementById('mediaBtn').addEventListener('click', () => {
+                    document.getElementById('mediaInput').click();
+                });
+
+                document.getElementById('mediaInput').addEventListener('change', (e) => {
+                    this.handleMediaUpload(e.target.files);
+                });
+
+                // Media modal
+                document.getElementById('closeMediaModal').addEventListener('click', () => {
+                    document.getElementById('mediaModal').classList.remove('active');
+                });
             }
 
             async handleSearch(query) {
@@ -2882,6 +2996,8 @@
             clearComposer() {
                 document.getElementById('postTextarea').value = '';
                 this.updateCharCount(0);
+                this.mediaFiles = [];
+                document.getElementById('mediaPreview').innerHTML = '';
             }
 
             renderPosts(posts, prepend = false) {
@@ -2890,6 +3006,25 @@
                     const isLiked = this.likedPosts.has(post.id);
                     const isRetweeted = this.retweetedPosts.has(post.id);
                     const isOwnPost = post.author_id === this.currentUser.id;
+
+                    // Handle media content
+                    let mediaHTML = '';
+                    if (post.media && post.media.length > 0) {
+                        mediaHTML = post.media.map(media => {
+                            const isVideo = media.type === 'video';
+                            return `
+                                <div class="post-media" data-media="${media.url}">
+                                    ${isVideo ? 
+                                        `<video controls>
+                                            <source src="${media.url}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                         </video>` :
+                                        `<img src="${media.url}" alt="Post image">`
+                                    }
+                                </div>
+                            `;
+                        }).join('');
+                    }
 
                     return `
                         <div class="post" data-post-id="${post.id}">
@@ -2903,6 +3038,7 @@
                                         <span class="post-time">${this.formatTime(post.created_at)}</span>
                                     </div>
                                     <div class="post-content">${this.formatPostContent(post.content)}</div>
+                                    ${mediaHTML}
                                     <div class="post-actions">
                                         <button class="post-action comment-action">
                                             <i class="far fa-comment"></i>
@@ -2970,6 +3106,14 @@
                         if (post) {
                             this.followUserFromPost(post.author_id);
                         }
+                    });
+                });
+
+                // Add media click handlers
+                document.querySelectorAll('.post-media').forEach(media => {
+                    media.addEventListener('click', (e) => {
+                        const mediaUrl = media.dataset.media;
+                        this.showMediaModal(mediaUrl);
                     });
                 });
             }
@@ -3141,13 +3285,21 @@
             }
 
             async post(content) {
-                if (!content.trim()) return;
+                if (!content.trim() && this.mediaFiles.length === 0) return;
+
+                // In a real app, you'd upload media files to Supabase Storage first
+                // For this example, we'll just store the file data locally
+                const mediaData = this.mediaFiles.map(file => ({
+                    url: URL.createObjectURL(file),
+                    type: file.type.startsWith('video/') ? 'video' : 'image'
+                }));
 
                 const { data, error } = await this.supabase
                     .from('posts')
                     .insert({
                         author_id: this.currentUser.id,
-                        content: content
+                        content: content,
+                        media: mediaData
                     })
                     .select(`
                         *,
@@ -3163,6 +3315,78 @@
                 } else {
                     this.showError('Failed to publish post');
                 }
+            }
+
+            handleMediaUpload(files) {
+                if (!files || files.length === 0) return;
+                
+                const previewContainer = document.getElementById('mediaPreview');
+                
+                Array.from(files).forEach(file => {
+                    // Check file type
+                    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+                        this.showError('Please select only images or videos');
+                        return;
+                    }
+                    
+                    // Check file size (max 10MB)
+                    if (file.size > 10 * 1024 * 1024) {
+                        this.showError('File size must be less than 10MB');
+                        return;
+                    }
+                    
+                    this.mediaFiles.push(file);
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const isVideo = file.type.startsWith('video/');
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'media-preview-item';
+                        previewItem.innerHTML = `
+                            ${isVideo ? 
+                                `<video>
+                                    <source src="${e.target.result}" type="${file.type}">
+                                 </video>` :
+                                `<img src="${e.target.result}" alt="Preview">`
+                            }
+                            <button class="media-remove-btn" data-filename="${file.name}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        previewContainer.appendChild(previewItem);
+                        
+                        // Add remove button handler
+                        previewItem.querySelector('.media-remove-btn').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.removeMediaFile(file.name);
+                            previewItem.remove();
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            removeMediaFile(filename) {
+                this.mediaFiles = this.mediaFiles.filter(file => file.name !== filename);
+            }
+
+            showMediaModal(mediaUrl) {
+                const isVideo = mediaUrl.includes('.mp4') || mediaUrl.includes('.webm') || mediaUrl.includes('.ogg');
+                
+                if (isVideo) {
+                    document.getElementById('mediaModalContent').innerHTML = `
+                        <video controls autoplay style="width: 100%; height: 100%;">
+                            <source src="${mediaUrl}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    `;
+                } else {
+                    document.getElementById('mediaModalContent').innerHTML = `
+                        <img src="${mediaUrl}" alt="Media" style="width: 100%; height: 100%; object-fit: contain;">
+                    `;
+                }
+                
+                document.getElementById('mediaModal').classList.add('active');
             }
 
             updateProfileUI() {

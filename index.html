@@ -6,53 +6,1307 @@
     <meta name="description" content="PrimeMar - A modern social media platform">
     <meta name="theme-color" content="#3b82f6">
     <title>PrimeMar</title>
-    
-    <!-- CSS Files -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/auth.css">
-    <link rel="stylesheet" href="css/home.css">
-    <link rel="stylesheet" href="css/messages.css">
-    <link rel="stylesheet" href="css/profile.css">
-    <link rel="stylesheet" href="css/settings.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: rgba(59, 130, 246, 0.1);
+            --text-primary: #0f1419;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --bg-color: #ffffff;
+            --bg-secondary: #f8fafc;
+            --hover-color: #f1f5f9;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --instagram-color: #e1306c;
+            --facebook-color: #1877f2;
+            --twitter-color: #1da1f2;
+            --story-ring: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+        }
+
+        [data-theme="dark"] {
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --bg-color: #0f172a;
+            --bg-secondary: #1e293b;
+            --hover-color: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.4;
+            padding-bottom: 60px;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            margin-bottom: 2px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .auth-page {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .auth-toggle {
+            margin-top: 20px;
+            color: var(--text-secondary);
+        }
+
+        .auth-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .post-composer {
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px;
+        }
+
+        .composer-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .composer-textarea {
+            width: 100%;
+            border: none;
+            resize: none;
+            font-size: 1.2rem;
+            background: transparent;
+            color: var(--text-primary);
+            min-height: 60px;
+        }
+
+        .composer-textarea::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .composer-textarea:focus {
+            outline: none;
+        }
+
+        .composer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-left: 52px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-light);
+        }
+
+        .post-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .post-btn:disabled {
+            background: var(--primary-light);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .post-btn:not(:disabled):hover {
+            background: var(--primary-hover);
+        }
+
+        .char-count {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-right: 12px;
+        }
+
+        .char-count.warning {
+            color: #f59e0b;
+        }
+
+        .char-count.error {
+            color: var(--error-color);
+        }
+
+        .stories-container {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .story {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .story-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            padding: 2px;
+            background: var(--story-ring);
+        }
+
+        .story-username {
+            font-size: 0.7rem;
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .add-story {
+            position: relative;
+        }
+
+        .add-story-icon {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .post {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .post:hover {
+            background: var(--hover-color);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .user-name {
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .user-handle, .post-time {
+            color: var(--text-secondary);
+        }
+
+        .post-content {
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .post-media {
+            margin: 12px 0;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .post-media img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            max-width: 425px;
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .post-action:hover {
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .comment-action:hover {
+            color: var(--primary-color);
+            background: var(--primary-light);
+        }
+
+        .retweet-action:hover {
+            color: var(--success-color);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .like-action:hover {
+            color: var(--error-color);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .retweet-action.retweeted {
+            color: var(--success-color);
+        }
+
+        .like-action.liked {
+            color: var(--error-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--hover-color);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-secondary);
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        @media (min-width: 768px) {
+            .bottom-nav {
+                display: none;
+            }
+            body {
+                padding-bottom: 0;
+            }
+        }
+
+        [data-theme="dark"] .skeleton {
+            background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-2 { margin-top: 8px; }
+        .mb-2 { margin-bottom: 8px; }
+        .p-3 { padding: 12px; }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 20px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .profile-header {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            border-radius: 0 0 16px 16px;
+        }
+
+        .profile-avatar {
+            position: absolute;
+            bottom: -50px;
+            left: 20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--bg-color);
+            object-fit: cover;
+        }
+
+        .profile-info {
+            padding: 60px 20px 20px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 16px 0;
+            padding: 16px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-bio {
+            margin: 16px 0;
+            color: var(--text-secondary);
+        }
+
+        .search-input-container {
+            position: relative;
+            padding: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 40px;
+            border-radius: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .notification {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .notification-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-time {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+    </style>
 </head>
 <body>
     <!-- Auth Modal -->
-    <div id="auth-container"></div>
+    <div class="modal active" id="authModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Join PrimeMar</div>
+                <button class="modal-close" id="closeAuthModal">&times;</button>
+            </div>
+            <div class="auth-page">
+                <div class="auth-form">
+                    <div id="loginForm">
+                        <h2>Sign in to PrimeMar</h2>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password">
+                        </div>
+                        <button class="btn btn-primary" id="loginBtn">Sign In</button>
+                        <div class="auth-toggle">
+                            Don't have an account? <a class="auth-link" id="showSignup">Sign up</a>
+                        </div>
+                    </div>
 
-    <!-- Main App -->
+                    <div id="signupForm" class="hidden">
+                        <h2>Create your account</h2>
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" id="signupName" placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-input" id="signupUsername" placeholder="Choose a username">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" id="signupEmail" placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" id="signupPassword" placeholder="Create a password">
+                        </div>
+                        <button class="btn btn-primary" id="signupBtn">Create Account</button>
+                        <div class="auth-toggle">
+                            Already have an account? <a class="auth-link" id="showLogin">Sign in</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App (hidden until authenticated) -->
     <div id="appContainer" class="hidden">
         <!-- Header -->
-        <div id="header-container"></div>
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-globe-americas logo-icon"></i>
+                <span>PrimeMar</span>
+            </div>
+            <div class="header-actions">
+                <span id="userName" style="margin-right: 15px;"></span>
+                <button id="themeToggle" class="action-btn">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="logoutBtn" class="action-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
 
         <!-- Main Content -->
         <main class="container">
-            <!-- Pages will be loaded here dynamically -->
-            <section id="homePage" class="page active"></section>
-            <section id="searchPage" class="page"></section>
-            <section id="notificationsPage" class="page"></section>
-            <section id="messagesPage" class="page"></section>
-            <section id="profilePage" class="page"></section>
-            <section id="settingsPage" class="page"></section>
-            <section id="groupsPage" class="page"></section>
-            <section id="pagesPage" class="page"></section>
+            <!-- Home Page -->
+            <section id="homePage" class="page active">
+                <!-- Post Composer -->
+                <div class="post-composer">
+                    <div class="composer-header">
+                        <img src="" alt="Profile" class="avatar" id="userAvatar">
+                        <textarea class="composer-textarea" placeholder="What's happening?" 
+                                 id="postTextarea" maxlength="280"></textarea>
+                    </div>
+                    <div class="composer-actions">
+                        <div class="action-buttons">
+                            <button class="action-btn" id="mediaBtn">
+                                <i class="fas fa-image"></i>
+                            </button>
+                            <button class="action-btn" id="gifBtn">
+                                <i class="fas fa-film"></i>
+                            </button>
+                            <button class="action-btn" id="emojiBtn">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <span class="char-count" id="charCount">280</span>
+                            <button class="post-btn" id="postBtn" disabled>Post</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stories -->
+                <div class="stories-container" id="storiesContainer">
+                    <!-- Stories will be loaded here -->
+                </div>
+
+                <!-- Feed -->
+                <div id="feedContainer">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading posts...
+                    </div>
+                </div>
+            </section>
+
+            <!-- Search Page -->
+            <section id="searchPage" class="page">
+                <div class="search-input-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search PrimeMar" id="searchInput">
+                </div>
+
+                <div class="p-3">
+                    <h3>Trending Now</h3>
+                    <div id="trendsContainer">
+                        <!-- Trends will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notifications Page -->
+            <section id="notificationsPage" class="page">
+                <div class="p-3">
+                    <h3>Notifications</h3>
+                    <div id="notificationsContainer">
+                        <!-- Notifications will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Messages Page -->
+            <section id="messagesPage" class="page">
+                <div class="p-3 text-center">
+                    <h3>Messages</h3>
+                    <p class="mt-2">Your messages will appear here</p>
+                </div>
+            </section>
+
+            <!-- Profile Page -->
+            <section id="profilePage" class="page">
+                <div class="profile-header">
+                    <img src="" alt="Profile" class="profile-avatar" id="profileAvatar">
+                </div>
+                <div class="profile-info">
+                    <h3 id="profileName">User Name</h3>
+                    <p class="user-handle" id="profileHandle">@username</p>
+                    <p class="profile-bio" id="profileBio">This is a sample bio. Update your profile to add your own bio!</p>
+                    
+                    <div class="profile-stats">
+                        <div>
+                            <strong id="postsCount">0</strong>
+                            <div>Posts</div>
+                        </div>
+                        <div>
+                            <strong id="followingCount">0</strong>
+                            <div>Following</div>
+                        </div>
+                        <div>
+                            <strong id="followersCount">0</strong>
+                            <div>Followers</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="profilePostsContainer">
+                    <!-- User's posts will be loaded here -->
+                </div>
+            </section>
         </main>
 
         <!-- Bottom Navigation -->
-        <div id="nav-container"></div>
+        <nav class="bottom-nav">
+            <a class="nav-item active" data-page="homePage">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <span>Home</span>
+            </a>
+            <a class="nav-item" data-page="searchPage">
+                <div class="nav-icon"><i class="fas fa-search"></i></div>
+                <span>Search</span>
+            </a>
+            <a class="nav-item" data-page="notificationsPage">
+                <div class="nav-icon"><i class="fas fa-bell"></i></div>
+                <span>Alerts</span>
+            </a>
+            <a class="nav-item" data-page="messagesPage">
+                <div class="nav-icon"><i class="fas fa-envelope"></i></div>
+                <span>Messages</span>
+            </a>
+            <a class="nav-item" data-page="profilePage">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <span>Profile</span>
+            </a>
+        </nav>
     </div>
 
-    <!-- All Modals -->
-    <div id="modals-container"></div>
+    <script>
+        // Your Supabase Configuration
+        const SUPABASE_URL = 'https://qsiwjjqxpegfmgkmtjje.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzaXdqanF4cGVnZm1na210amplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1NDU2MTYsImV4cCI6MjA3ODEyMTYxNn0.iZ5YLVdeZP0VOm_Qu8XBOfBa9hmyEqHl520q5hZd1z8';
 
-    <!-- JavaScript Files -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/home.js"></script>
-    <script src="js/messages.js"></script>
-    <script src="js/profile.js"></script>
-    <script src="js/calls.js"></script>
+        class PrimeMar {
+            constructor() {
+                this.posts = [];
+                this.users = [];
+                this.stories = [];
+                this.notifications = [];
+                this.currentUser = null;
+                this.maxChars = 280;
+                this.supabase = null;
+                
+                this.supabaseConfig = {
+                    url: SUPABASE_URL,
+                    key: SUPABASE_ANON_KEY
+                };
+                
+                this.init();
+            }
+
+            async init() {
+                try {
+                    console.log('🚀 Starting PrimeMar...');
+                    
+                    // Initialize Supabase
+                    this.supabase = supabase.createClient(this.supabaseConfig.url, this.supabaseConfig.key);
+                    
+                    // Check auth status
+                    const { data: { session } } = await this.supabase.auth.getSession();
+                    
+                    if (session) {
+                        this.currentUser = session.user;
+                        await this.loadUserProfile();
+                        this.showApp();
+                        await this.loadFeed();
+                        await this.loadStories();
+                    } else {
+                        this.showAuthModal();
+                    }
+                    
+                    this.setupEventListeners();
+                    this.updateUI();
+                    
+                } catch (error) {
+                    console.error('Initialization error:', error);
+                    this.showAuthModal();
+                }
+            }
+
+            async login(email, password) {
+                try {
+                    const { data, error } = await this.supabase.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+                    
+                    if (error) throw error;
+                    
+                    this.currentUser = data.user;
+                    this.showApp();
+                    await this.loadUserProfile();
+                    await this.loadFeed();
+                    this.showToast('Welcome back!');
+                    return true;
+                } catch (error) {
+                    this.showError('Login failed: ' + error.message);
+                    return false;
+                }
+            }
+
+            async signup(name, username, email, password) {
+                try {
+                    // Validate input
+                    if (!name || !username || !email || !password) {
+                        throw new Error('All fields are required');
+                    }
+
+                    if (username.length < 3) {
+                        throw new Error('Username must be at least 3 characters');
+                    }
+
+                    if (password.length < 6) {
+                        throw new Error('Password must be at least 6 characters');
+                    }
+
+                    console.log('Creating user account...');
+                    
+                    const { data, error } = await this.supabase.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: {
+                            data: {
+                                name: name,
+                                username: username.toLowerCase()
+                            }
+                        }
+                    });
+                    
+                    if (error) {
+                        console.error('Auth error:', error);
+                        throw error;
+                    }
+                    
+                    console.log('User created, waiting for profile...', data.user.id);
+                    
+                    // Wait a moment for the trigger to create the profile
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    // Check if profile was created
+                    const { data: profile, error: profileError } = await this.supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', data.user.id)
+                        .single();
+
+                    if (profileError || !profile) {
+                        console.warn('Profile not created automatically, creating manually...');
+                        // Create profile manually
+                        const { error: manualError } = await this.supabase
+                            .from('profiles')
+                            .insert({
+                                id: data.user.id,
+                                name: name,
+                                username: username.toLowerCase(),
+                                email: email,
+                                avatar: this.generateDefaultAvatar(name)
+                            });
+
+                        if (manualError) {
+                            console.error('Manual profile creation failed:', manualError);
+                            throw new Error('Failed to create user profile');
+                        }
+                    }
+
+                    this.currentUser = data.user;
+                    this.showApp();
+                    await this.loadUserProfile();
+                    this.showToast('Account created successfully! Welcome to PrimeMar!');
+                    return true;
+                    
+                } catch (error) {
+                    console.error('Signup error details:', error);
+                    this.showError('Signup failed: ' + error.message);
+                    return false;
+                }
+            }
+
+            async logout() {
+                await this.supabase.auth.signOut();
+                this.currentUser = null;
+                this.showAuthModal();
+                this.showToast('Signed out successfully');
+            }
+
+            async loadUserProfile() {
+                if (!this.currentUser) return;
+
+                const { data, error } = await this.supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', this.currentUser.id)
+                    .single();
+
+                if (!error && data) {
+                    this.userProfile = data;
+                    this.updateProfileUI();
+                }
+            }
+
+            async loadFeed() {
+                const feedContainer = document.getElementById('feedContainer');
+                feedContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading posts...</div>';
+
+                const { data, error } = await this.supabase
+                    .from('posts')
+                    .select(`
+                        *,
+                        profiles:author_id (name, username, avatar)
+                    `)
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (!error && data) {
+                    this.posts = data;
+                    this.renderPosts(this.posts);
+                } else {
+                    feedContainer.innerHTML = '<div class="p-3 text-center">No posts yet. Be the first to post!</div>';
+                }
+            }
+
+            async loadStories() {
+                const { data, error } = await this.supabase
+                    .from('profiles')
+                    .select('id, name, username, avatar')
+                    .limit(8);
+
+                if (!error && data) {
+                    this.stories = data;
+                    this.renderStories();
+                }
+            }
+
+            async post(content) {
+                if (!content.trim()) return;
+
+                const { data, error } = await this.supabase
+                    .from('posts')
+                    .insert({
+                        author_id: this.currentUser.id,
+                        content: content
+                    })
+                    .select(`
+                        *,
+                        profiles:author_id (name, username, avatar)
+                    `)
+                    .single();
+
+                if (!error && data) {
+                    this.posts.unshift(data);
+                    this.renderPosts([data], true);
+                    this.clearComposer();
+                    this.showToast('Post published!');
+                }
+            }
+
+            async likePost(postId) {
+                const { data: existingLike } = await this.supabase
+                    .from('likes')
+                    .select('id')
+                    .eq('user_id', this.currentUser.id)
+                    .eq('post_id', postId)
+                    .single();
+
+                if (existingLike) {
+                    await this.supabase.from('likes').delete().eq('id', existingLike.id);
+                } else {
+                    await this.supabase.from('likes').insert({
+                        user_id: this.currentUser.id,
+                        post_id: postId
+                    });
+                }
+                
+                await this.loadFeed();
+            }
+
+            setupEventListeners() {
+                // Auth events
+                document.getElementById('loginBtn').addEventListener('click', () => this.handleLogin());
+                document.getElementById('signupBtn').addEventListener('click', () => this.handleSignup());
+                document.getElementById('showSignup').addEventListener('click', () => this.showSignupForm());
+                document.getElementById('showLogin').addEventListener('click', () => this.showLoginForm());
+                document.getElementById('closeAuthModal').addEventListener('click', () => this.showAuthModal());
+                document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+
+                // Post composer
+                const postTextarea = document.getElementById('postTextarea');
+                const postBtn = document.getElementById('postBtn');
+
+                postTextarea.addEventListener('input', (e) => {
+                    this.updateCharCount(e.target.value.length);
+                });
+
+                postBtn.addEventListener('click', () => {
+                    this.post(postTextarea.value);
+                });
+
+                // Navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.showPage(item.dataset.page);
+                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                        item.classList.add('active');
+                    });
+                });
+
+                // Theme toggle
+                document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
+            }
+
+            async handleLogin() {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                if (email && password) await this.login(email, password);
+            }
+
+            async handleSignup() {
+                const name = document.getElementById('signupName').value;
+                const username = document.getElementById('signupUsername').value;
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                if (name && username && email && password) await this.signup(name, username, email, password);
+            }
+
+            showAuthModal() {
+                document.getElementById('authModal').classList.add('active');
+                document.getElementById('appContainer').classList.add('hidden');
+                this.showLoginForm();
+            }
+
+            showApp() {
+                document.getElementById('authModal').classList.remove('active');
+                document.getElementById('appContainer').classList.remove('hidden');
+            }
+
+            showLoginForm() {
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('signupForm').classList.add('hidden');
+            }
+
+            showSignupForm() {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('signupForm').classList.remove('hidden');
+            }
+
+            showPage(pageId) {
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+                document.getElementById(pageId).classList.add('active');
+                if (pageId === 'homePage') this.loadFeed();
+            }
+
+            updateCharCount(length) {
+                const charCount = document.getElementById('charCount');
+                const postBtn = document.getElementById('postBtn');
+                charCount.textContent = this.maxChars - length;
+                charCount.classList.toggle('error', length > this.maxChars);
+                postBtn.disabled = length === 0 || length > this.maxChars;
+            }
+
+            clearComposer() {
+                document.getElementById('postTextarea').value = '';
+                this.updateCharCount(0);
+            }
+
+            renderPosts(posts, prepend = false) {
+                const feedContainer = document.getElementById('feedContainer');
+                const postsHTML = posts.map(post => `
+                    <div class="post" data-post-id="${post.id}">
+                        <div style="display: flex; gap: 12px;">
+                            <img src="${post.profiles.avatar}" alt="${post.profiles.name}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(post.profiles.name)}&background=3b82f6&color=fff&size=128'">
+                            <div style="flex: 1;">
+                                <div class="post-header">
+                                    <span class="user-name">${post.profiles.name}</span>
+                                    <span class="user-handle">@${post.profiles.username}</span>
+                                    <span>·</span>
+                                    <span class="post-time">${this.formatTime(post.created_at)}</span>
+                                </div>
+                                <div class="post-content">${this.formatPostContent(post.content)}</div>
+                                <div class="post-actions">
+                                    <button class="post-action comment-action"><i class="far fa-comment"></i><span>${post.comments || 0}</span></button>
+                                    <button class="post-action retweet-action"><i class="fas fa-retweet"></i><span>${post.shares || 0}</span></button>
+                                    <button class="post-action like-action" data-action="like"><i class="far fa-heart"></i><span>${post.likes || 0}</span></button>
+                                    <button class="post-action"><i class="far fa-share-square"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                if (prepend) {
+                    feedContainer.innerHTML = postsHTML + feedContainer.innerHTML;
+                } else {
+                    feedContainer.innerHTML = postsHTML;
+                }
+
+                // Add like event listeners
+                document.querySelectorAll('.like-action').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const postId = btn.closest('.post').dataset.postId;
+                        this.likePost(postId);
+                    });
+                });
+            }
+
+            renderStories() {
+                const container = document.getElementById('storiesContainer');
+                if (!this.stories.length) return;
+
+                let storiesHTML = `
+                    <div class="story add-story">
+                        <div class="story-avatar">
+                            <img src="${this.userProfile?.avatar || 'https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff&size=128'}" class="avatar">
+                            <div class="add-story-icon"><i class="fas fa-plus"></i></div>
+                        </div>
+                        <div class="story-username">Your Story</div>
+                    </div>
+                `;
+
+                storiesHTML += this.stories.map(story => `
+                    <div class="story">
+                        <div class="story-avatar">
+                            <img src="${story.avatar}" alt="${story.name}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(story.name)}&background=3b82f6&color=fff&size=128'">
+                        </div>
+                        <div class="story-username">${story.username}</div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = storiesHTML;
+            }
+
+            generateDefaultAvatar(name) {
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+                const colors = ['#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#f59e0b'];
+                const color = colors[initials.charCodeAt(0) % colors.length];
+                return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=${color.replace('#', '')}&color=fff&size=128`;
+            }
+
+            updateProfileUI() {
+                if (!this.userProfile) return;
+                document.getElementById('userName').textContent = this.userProfile.name;
+                document.getElementById('userAvatar').src = this.userProfile.avatar;
+                document.getElementById('profileName').textContent = this.userProfile.name;
+                document.getElementById('profileHandle').textContent = '@' + this.userProfile.username;
+                document.getElementById('profileAvatar').src = this.userProfile.avatar;
+                document.getElementById('postsCount').textContent = this.userProfile.posts_count || 0;
+                document.getElementById('followingCount').textContent = this.userProfile.following_count || 0;
+                document.getElementById('followersCount').textContent = this.userProfile.followers_count || 0;
+            }
+
+            formatPostContent(content) {
+                return content
+                    .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" style="color: var(--primary-color);">$1</a>')
+                    .replace(/#(\w+)/g, '<span style="color: var(--primary-color);">#$1</span>')
+                    .replace(/@(\w+)/g, '<span style="color: var(--primary-color);">@$1</span>');
+            }
+
+            formatTime(timestamp) {
+                const now = new Date();
+                const postTime = new Date(timestamp);
+                const diffMs = now - postTime;
+                const diffMins = Math.floor(diffMs / (1000 * 60));
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                if (diffMins < 1) return 'now';
+                if (diffMins < 60) return `${diffMins}m`;
+                if (diffHours < 24) return `${diffHours}h`;
+                return postTime.toLocaleDateString();
+            }
+
+            toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                document.querySelector('#themeToggle i').className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+
+            showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+                    background: ${type === 'error' ? '#ef4444' : '#3b82f6'}; color: white;
+                    padding: 12px 24px; border-radius: 20px; z-index: 10000;
+                    animation: slideUp 0.3s ease; font-weight: 500;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+
+            showError(message) {
+                this.showToast(message, 'error');
+            }
+
+            updateUI() {
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                document.querySelector('#themeToggle i').className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideUp {
+                from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+                to { opacity: 1; transform: translateX(-50%) translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            window.primeMarApp = new PrimeMar();
+        });
+    </script>
 </body>
 </html>

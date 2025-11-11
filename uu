@@ -1,12 +1,45 @@
--- Just drop and recreate your profile table
-DROP TABLE IF EXISTS profile CASCADE;
-
-CREATE TABLE profile (
+-- Stories table
+CREATE TABLE stories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name TEXT NOT NULL,
-    username TEXT UNIQUE NOT NULL,
-    email TEXT NOT NULL,
-    author TEXT DEFAULT 'user',
-    bio TEXT DEFAULT 'Welcome to my profile',
+    profile_id UUID REFERENCES profile(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- Comments table
+CREATE TABLE comments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    story_id UUID REFERENCES stories(id) ON DELETE CASCADE,
+    profile_id UUID REFERENCES profile(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- Follows table
+CREATE TABLE follows (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    follower_id UUID REFERENCES profile(id) ON DELETE CASCADE,
+    following_id UUID REFERENCES profile(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+    UNIQUE(follower_id, following_id)
+);
+
+-- Messages table
+CREATE TABLE messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    sender_id UUID REFERENCES profile(id) ON DELETE CASCADE,
+    receiver_id UUID REFERENCES profile(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- Notifications table
+CREATE TABLE notifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    profile_id UUID REFERENCES profile(id) ON DELETE CASCADE,
+    type TEXT NOT NULL,
+    content TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );

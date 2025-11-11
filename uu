@@ -1,9 +1,7 @@
--- Insert sample profiles
-INSERT INTO profile (name, username, email, bio) VALUES
-('John Doe', 'johndoe', 'john@example.com', 'Hello world!'),
-('Jane Smith', 'janesmith', 'jane@example.com', 'Digital creator');
-
--- Insert sample stories
-INSERT INTO stories (profile_id, title, content) VALUES
-((SELECT id FROM profile WHERE username = 'johndoe'), 'My First Story', 'This is my first post!'),
-((SELECT id FROM profile WHERE username = 'janesmith'), 'Welcome All', 'Great to be here!');
+-- Add indexes for better performance
+CREATE INDEX idx_stories_profile_id ON stories(profile_id);
+CREATE INDEX idx_comments_story_id ON comments(story_id);
+CREATE INDEX idx_follows_follower_id ON follows(follower_id);
+CREATE INDEX idx_follows_following_id ON follows(following_id);
+CREATE INDEX idx_messages_sender_id ON messages(sender_id);
+CREATE INDEX idx_messages_receiver_id ON messages(receiver_id);

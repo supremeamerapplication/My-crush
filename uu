@@ -50,3 +50,22 @@ CREATE TABLE likes (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
     UNIQUE(user_id, post_id)
 );
+
+-- Drop the table if it exists
+DROP TABLE IF EXISTS profile;
+
+-- Drop the extension if you want to restart completely
+DROP EXTENSION IF EXISTS "uuid-ossp";
+
+-- Now recreate everything fresh
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE profile (
+    id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+    name TEXT NOT NULL,
+    username TEXT UNIQUE NOT NULL,
+    email TEXT NOT NULL,
+    author TEXT DEFAULT 'user',
+    bio TEXT DEFAULT 'Welcome to my profile!',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);

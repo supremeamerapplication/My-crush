@@ -402,6 +402,71 @@
             box-shadow: var(--shadow-md);
         }
 
+        /* Media Preview */
+        .media-preview {
+            display: flex;
+            gap: 8px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+
+        .media-preview-item {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            max-width: 200px;
+        }
+
+        .media-preview-item img, .media-preview-item video {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .remove-media {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Poll Styles */
+        .poll-container {
+            margin: 12px 0;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+        }
+
+        .poll-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0;
+            padding: 8px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .poll-option:hover {
+            background: var(--hover-color);
+        }
+
+        .poll-option.selected {
+            background: var(--primary-light);
+            border: 1px solid var(--primary-color);
+        }
+
         /* Stories */
         .stories-container {
             display: flex;
@@ -436,6 +501,22 @@
             object-fit: cover;
             padding: 2px;
             background: var(--story-ring);
+        }
+
+        .add-story-icon {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--primary-color);
+            color: white;
+            border-radius: var(--radius-full);
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            border: 2px solid var(--bg-color);
         }
 
         /* Posts */
@@ -622,6 +703,42 @@
             border-bottom: 1px solid var(--border-color);
         }
 
+        .profile-actions {
+            display: flex;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .follow-btn, .message-btn {
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .follow-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .follow-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .message-btn {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .message-btn:hover {
+            background: var(--hover-color);
+            transform: translateY(-2px);
+        }
+
         /* Messages */
         .messages-list {
             max-height: calc(100vh - 200px);
@@ -640,6 +757,36 @@
 
         .message-item:hover {
             background: var(--hover-color);
+        }
+
+        .message-item-info {
+            flex: 1;
+        }
+
+        .message-preview {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .message-time {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .unread-badge {
+            background: var(--primary-color);
+            color: white;
+            border-radius: var(--radius-full);
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
         }
 
         .chat-messages {
@@ -672,6 +819,12 @@
         .message.own .message-content {
             background: var(--primary-color);
             color: white;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            opacity: 0.7;
         }
 
         .chat-input-container {
@@ -814,6 +967,31 @@
             transform: scale(1.1);
         }
 
+        /* Share Options */
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+            border-radius: var(--radius-lg);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .share-option:hover {
+            background: var(--hover-color);
+            transform: scale(1.05);
+        }
+
         /* Utility Classes */
         .hidden {
             display: none !important;
@@ -826,6 +1004,33 @@
         .mt-2 { margin-top: 8px; }
         .mb-2 { margin-bottom: 8px; }
         .p-3 { padding: 12px; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: bold;
+            z-index: 10000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: var(--success-color);
+        }
+
+        .toast.error {
+            background: var(--error-color);
+        }
 
         /* Responsive */
         @media (min-width: 768px) {
@@ -947,12 +1152,21 @@
                         <textarea class="composer-textarea" placeholder="What's happening?" 
                                  id="postTextarea" maxlength="280"></textarea>
                     </div>
+                    
+                    <!-- Media Preview -->
+                    <div class="media-preview" id="mediaPreview"></div>
+                    
+                    <!-- Poll Preview -->
+                    <div class="poll-container hidden" id="pollPreview">
+                        <div id="pollOptionsPreview"></div>
+                    </div>
+                    
                     <div class="composer-actions">
                         <div class="action-buttons">
-                            <button class="action-btn" id="mediaBtn">
+                            <button class="action-btn" id="mediaBtn" data-tooltip="Add media">
                                 <i class="fas fa-image"></i>
                             </button>
-                            <button class="action-btn" id="pollBtn">
+                            <button class="action-btn" id="pollBtn" data-tooltip="Create poll">
                                 <i class="fas fa-chart-pie"></i>
                             </button>
                         </div>
@@ -973,6 +1187,18 @@
                     <div class="loading">
                         <i class="fas fa-spinner fa-spin"></i> Loading posts...
                     </div>
+                </div>
+            </section>
+
+            <!-- Search Page -->
+            <section id="searchPage" class="page">
+                <div class="search-input-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search PrimeMar" id="searchInput">
+                </div>
+                <div class="p-3">
+                    <h3>People</h3>
+                    <div id="peopleContainer"></div>
                 </div>
             </section>
 
@@ -1031,6 +1257,13 @@
                             <div>Followers</div>
                         </div>
                     </div>
+                    
+                    <div class="profile-actions">
+                        <button class="follow-btn" id="followBtn">Follow</button>
+                        <button class="message-btn" id="messageUserBtn">
+                            <i class="fas fa-envelope"></i> Message
+                        </button>
+                    </div>
                 </div>
                 
                 <div id="profilePostsContainer">
@@ -1045,6 +1278,10 @@
                 <div class="nav-icon"><i class="fas fa-home"></i></div>
                 <span>Home</span>
             </a>
+            <a class="nav-item" data-page="searchPage">
+                <div class="nav-icon"><i class="fas fa-search"></i></div>
+                <span>Search</span>
+            </a>
             <a class="nav-item" data-page="messagesPage">
                 <div class="nav-icon"><i class="fas fa-envelope"></i></div>
                 <span>Messages</span>
@@ -1057,6 +1294,46 @@
     </div>
 
     <!-- Modals -->
+    <!-- Media Upload Modal -->
+    <div class="modal" id="mediaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add Media</div>
+                <button class="modal-close" id="closeMediaModal">&times;</button>
+            </div>
+            <div class="p-3">
+                <input type="file" id="mediaInput" accept="image/*,video/*" multiple style="display: none;">
+                <button class="btn btn-primary" id="selectMediaBtn">Select Photos/Videos</button>
+                <div class="media-preview mt-2" id="mediaModalPreview"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Poll Creation Modal -->
+    <div class="modal" id="pollModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Create Poll</div>
+                <button class="modal-close" id="closePollModal">&times;</button>
+            </div>
+            <div class="p-3">
+                <div class="form-group">
+                    <label class="form-label">Poll Question</label>
+                    <input type="text" class="form-input" id="pollQuestion" placeholder="Ask a question...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Options</label>
+                    <div id="pollOptionsContainer">
+                        <input type="text" class="form-input mb-2" placeholder="Option 1">
+                        <input type="text" class="form-input mb-2" placeholder="Option 2">
+                    </div>
+                    <button class="btn" id="addPollOptionBtn">Add Option</button>
+                </div>
+                <button class="btn btn-primary" id="createPollBtn">Create Poll</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Profile Edit Modal -->
     <div class="modal" id="profileEditModal">
         <div class="modal-content">
@@ -1078,6 +1355,42 @@
         </div>
     </div>
 
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Share</div>
+                <button class="modal-close" id="closeShareModal">&times;</button>
+            </div>
+            <div class="share-options">
+                <div class="share-option" data-platform="copy">
+                    <i class="fas fa-link"></i>
+                    <span>Copy Link</span>
+                </div>
+                <div class="share-option" data-platform="twitter">
+                    <i class="fab fa-twitter"></i>
+                    <span>Twitter</span>
+                </div>
+                <div class="share-option" data-platform="facebook">
+                    <i class="fab fa-facebook"></i>
+                    <span>Facebook</span>
+                </div>
+                <div class="share-option" data-platform="whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </div>
+                <div class="share-option" data-platform="telegram">
+                    <i class="fab fa-telegram"></i>
+                    <span>Telegram</span>
+                </div>
+                <div class="share-option" data-platform="email">
+                    <i class="fas fa-envelope"></i>
+                    <span>Email</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Call Interface -->
     <div class="call-interface" id="callInterface">
         <div class="video-container">
@@ -1089,8 +1402,26 @@
         </div>
     </div>
 
+    <!-- Incoming Call Modal -->
+    <div class="modal" id="incomingCallModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Incoming Call</div>
+            </div>
+            <div class="p-3 text-center">
+                <img src="" alt="Profile" class="avatar" id="incomingCallAvatar">
+                <h3 id="incomingCallName">User Name</h3>
+                <p id="incomingCallType">Voice Call</p>
+                <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
+                    <button class="call-btn call-decline" id="declineCallBtn"><i class="fas fa-phone-slash"></i></button>
+                    <button class="call-btn call-accept" id="acceptCallBtn"><i class="fas fa-phone"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // PrimeMar Social Media Platform
+        // PrimeMar Social Media Platform - Complete Implementation
         class PrimeMar {
             constructor() {
                 this.supabase = null;
@@ -1102,6 +1433,10 @@
                 this.localStream = null;
                 this.peerConnection = null;
                 this.isInCall = false;
+                this.selectedMedia = [];
+                this.currentPoll = null;
+                this.following = new Set();
+                this.followers = new Set();
                 
                 this.supabaseConfig = {
                     url: 'https://qsiwjjqxpegfmgkmtjje.supabase.co',
@@ -1143,6 +1478,7 @@
                 await this.loadFeed();
                 await this.loadStories();
                 await this.loadConversations();
+                await this.loadFollowData();
             }
 
             // Authentication Methods
@@ -1242,24 +1578,27 @@
             }
 
             // Post Methods
-            async post(content) {
-                if (!content.trim()) return;
+            async post(content, media = [], poll = null) {
+                if (!content.trim() && media.length === 0 && !poll) return;
 
                 try {
+                    const postData = {
+                        content: content,
+                        author_id: this.currentUser.id,
+                        media: media,
+                        poll: poll
+                    };
+
                     const { data, error } = await this.supabase
                         .from('posts')
-                        .insert({
-                            content: content,
-                            author_id: this.currentUser.id
-                        })
+                        .insert(postData)
                         .select()
                         .single();
 
                     if (error) throw error;
 
                     // Clear composer and reload feed
-                    document.getElementById('postTextarea').value = '';
-                    document.getElementById('postBtn').disabled = true;
+                    this.clearComposer();
                     await this.loadFeed();
                     
                     this.showToast('Post published!');
@@ -1267,6 +1606,16 @@
                 } catch (error) {
                     this.showToast('Failed to publish post', 'error');
                 }
+            }
+
+            clearComposer() {
+                document.getElementById('postTextarea').value = '';
+                document.getElementById('postBtn').disabled = true;
+                document.getElementById('charCount').textContent = '280';
+                this.selectedMedia = [];
+                this.currentPoll = null;
+                this.updateMediaPreview();
+                this.hidePollPreview();
             }
 
             async loadFeed() {
@@ -1300,7 +1649,7 @@
                 }
 
                 container.innerHTML = this.posts.map(post => `
-                    <div class="post">
+                    <div class="post" data-post-id="${post.id}">
                         <div class="post-header">
                             <img src="${post.profiles.avatar}" alt="${post.profiles.name}" class="avatar">
                             <div>
@@ -1311,8 +1660,32 @@
                             <div class="post-time">${this.formatTime(post.created_at)}</div>
                         </div>
                         <div class="post-content">${post.content}</div>
+                        
+                        ${post.media && post.media.length > 0 ? `
+                            <div class="post-media">
+                                ${post.media.map(media => 
+                                    media.type === 'image' ? 
+                                        `<img src="${media.url}" alt="Post media">` :
+                                        `<video src="${media.url}" controls></video>`
+                                ).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        ${post.poll ? `
+                            <div class="poll-container">
+                                <h4>${post.poll.question}</h4>
+                                ${post.poll.options.map(option => `
+                                    <div class="poll-option">
+                                        <input type="radio" name="poll-${post.id}" value="${option}">
+                                        <span>${option}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        
                         <div class="post-actions">
-                            <button class="post-action like-action" onclick="primeMarApp.likePost('${post.id}')">
+                            <button class="post-action like-action ${this.isPostLiked(post.id) ? 'liked' : ''}" 
+                                    onclick="primeMarApp.likePost('${post.id}')">
                                 <i class="fas fa-heart"></i>
                                 <span>${post.likes?.length || 0}</span>
                             </button>
@@ -1324,22 +1697,118 @@
                 `).join('');
             }
 
+            isPostLiked(postId) {
+                // Check if current user liked this post
+                const post = this.posts.find(p => p.id === postId);
+                return post?.likes?.some(like => like.user_id === this.currentUser?.id) || false;
+            }
+
             async likePost(postId) {
                 try {
-                    const { error } = await this.supabase
-                        .from('likes')
-                        .insert({
-                            user_id: this.currentUser.id,
-                            post_id: postId
-                        });
-
-                    if (error) throw error;
+                    if (this.isPostLiked(postId)) {
+                        // Unlike
+                        const { error } = await this.supabase
+                            .from('likes')
+                            .delete()
+                            .eq('user_id', this.currentUser.id)
+                            .eq('post_id', postId);
+                    } else {
+                        // Like
+                        const { error } = await this.supabase
+                            .from('likes')
+                            .insert({
+                                user_id: this.currentUser.id,
+                                post_id: postId
+                            });
+                    }
                     
                     await this.loadFeed();
                     
                 } catch (error) {
                     console.error('Error liking post:', error);
                 }
+            }
+
+            // Media Methods
+            handleMediaSelect(event) {
+                const files = Array.from(event.target.files);
+                this.selectedMedia = [...this.selectedMedia, ...files];
+                this.updateMediaPreview();
+            }
+
+            updateMediaPreview() {
+                const container = document.getElementById('mediaPreview');
+                const modalContainer = document.getElementById('mediaModalPreview');
+                
+                const previewHTML = this.selectedMedia.map((file, index) => `
+                    <div class="media-preview-item">
+                        ${file.type.startsWith('image/') ? 
+                            `<img src="${URL.createObjectURL(file)}" alt="Preview">` :
+                            `<video src="${URL.createObjectURL(file)}" controls></video>`
+                        }
+                        <button class="remove-media" onclick="primeMarApp.removeMedia(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `).join('');
+                
+                container.innerHTML = previewHTML;
+                modalContainer.innerHTML = previewHTML;
+            }
+
+            removeMedia(index) {
+                this.selectedMedia.splice(index, 1);
+                this.updateMediaPreview();
+            }
+
+            // Poll Methods
+            createPoll() {
+                const question = document.getElementById('pollQuestion').value;
+                const options = Array.from(document.querySelectorAll('#pollOptionsContainer input'))
+                    .map(input => input.value)
+                    .filter(value => value.trim() !== '');
+                
+                if (!question || options.length < 2) {
+                    this.showToast('Please provide a question and at least 2 options', 'error');
+                    return;
+                }
+
+                this.currentPoll = {
+                    question: question,
+                    options: options,
+                    votes: {}
+                };
+
+                this.showPollPreview();
+                document.getElementById('pollModal').classList.remove('active');
+            }
+
+            showPollPreview() {
+                const container = document.getElementById('pollPreview');
+                const optionsContainer = document.getElementById('pollOptionsPreview');
+                
+                optionsContainer.innerHTML = this.currentPoll.options.map(option => `
+                    <div class="poll-option">
+                        <input type="radio" name="poll-preview" disabled>
+                        <span>${option}</span>
+                    </div>
+                `).join('');
+                
+                container.classList.remove('hidden');
+            }
+
+            hidePollPreview() {
+                document.getElementById('pollPreview').classList.add('hidden');
+            }
+
+            addPollOption() {
+                const container = document.getElementById('pollOptionsContainer');
+                const inputCount = container.querySelectorAll('input').length;
+                const newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.className = 'form-input mb-2';
+                newInput.placeholder = `Option ${inputCount + 1}`;
+                container.appendChild(newInput);
             }
 
             // Chat Methods
@@ -1428,6 +1897,8 @@
                         </div>
                     </div>
                 `).join('');
+                
+                container.scrollTop = container.scrollHeight;
             }
 
             async sendMessage(content) {
@@ -1507,6 +1978,89 @@
                 this.isInCall = false;
             }
 
+            // Follow System
+            async loadFollowData() {
+                // Mock follow data
+                this.following = new Set(['user2', 'user3']);
+                this.followers = new Set(['user2', 'user4', 'user5']);
+                
+                this.updateFollowUI();
+            }
+
+            async toggleFollow() {
+                // Simulate follow/unfollow
+                if (this.following.has(this.userProfile.username)) {
+                    this.following.delete(this.userProfile.username);
+                    this.showToast('Unfollowed user');
+                } else {
+                    this.following.add(this.userProfile.username);
+                    this.showToast('Followed user');
+                }
+                this.updateFollowUI();
+            }
+
+            updateFollowUI() {
+                const followBtn = document.getElementById('followBtn');
+                const followingCount = document.getElementById('followingCount');
+                const followersCount = document.getElementById('followersCount');
+                
+                if (followBtn) {
+                    followBtn.textContent = this.following.has(this.userProfile.username) ? 'Unfollow' : 'Follow';
+                }
+                
+                if (followingCount) {
+                    followingCount.textContent = this.following.size;
+                }
+                
+                if (followersCount) {
+                    followersCount.textContent = this.followers.size;
+                }
+            }
+
+            // Share System
+            sharePost(postId) {
+                this.activePostForShare = postId;
+                document.getElementById('shareModal').classList.add('active');
+            }
+
+            async shareToPlatform(platform) {
+                const post = this.posts.find(p => p.id === this.activePostForShare);
+                if (!post) return;
+
+                const shareUrl = `${window.location.origin}/post/${post.id}`;
+                const shareText = `Check out this post from ${post.profiles.name} on PrimeMar: ${post.content}`;
+
+                switch (platform) {
+                    case 'copy':
+                        await navigator.clipboard.writeText(shareUrl);
+                        this.showToast('Link copied to clipboard!');
+                        break;
+                    case 'twitter':
+                        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+                        break;
+                    case 'facebook':
+                        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+                        break;
+                    case 'whatsapp':
+                        window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`, '_blank');
+                        break;
+                    case 'telegram':
+                        window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
+                        break;
+                    case 'email':
+                        window.open(`mailto:?subject=Check out this post on PrimeMar&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`, '_blank');
+                        break;
+                }
+
+                document.getElementById('shareModal').classList.remove('active');
+            }
+
+            shareProfile() {
+                const profileUrl = `${window.location.origin}/profile/${this.userProfile.username}`;
+                navigator.clipboard.writeText(profileUrl);
+                this.showToast('Profile link copied to clipboard!');
+            }
+
             // Stories
             async loadStories() {
                 // Mock stories
@@ -1544,11 +2098,25 @@
             showLoginForm() {
                 document.getElementById('loginForm').classList.remove('hidden');
                 document.getElementById('signupForm').classList.add('hidden');
+                this.clearAuthForms();
             }
 
             showSignupForm() {
                 document.getElementById('loginForm').classList.add('hidden');
                 document.getElementById('signupForm').classList.remove('hidden');
+                this.clearAuthForms();
+            }
+
+            clearAuthForms() {
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('signupName').value = '';
+                document.getElementById('signupUsername').value = '';
+                document.getElementById('signupEmail').value = '';
+                document.getElementById('signupPassword').value = '';
+                
+                const errorDivs = document.querySelectorAll('.error-message');
+                errorDivs.forEach(div => div.textContent = '');
             }
 
             updateProfileUI() {
@@ -1603,16 +2171,49 @@
                 postTextarea.addEventListener('input', (e) => {
                     const length = e.target.value.length;
                     document.getElementById('charCount').textContent = 280 - length;
-                    postBtn.disabled = length === 0;
+                    postBtn.disabled = length === 0 && this.selectedMedia.length === 0 && !this.currentPoll;
                 });
 
                 postBtn.addEventListener('click', () => {
-                    this.post(postTextarea.value);
+                    const content = postTextarea.value;
+                    const media = this.selectedMedia.map(file => ({
+                        type: file.type.startsWith('image/') ? 'image' : 'video',
+                        url: URL.createObjectURL(file),
+                        file: file
+                    }));
+                    
+                    this.post(content, media, this.currentPoll);
                 });
 
                 // FAB
                 document.getElementById('fabBtn').addEventListener('click', () => {
                     postTextarea.focus();
+                });
+
+                // Media
+                document.getElementById('mediaBtn').addEventListener('click', () => {
+                    document.getElementById('mediaModal').classList.add('active');
+                });
+
+                document.getElementById('selectMediaBtn').addEventListener('click', () => {
+                    document.getElementById('mediaInput').click();
+                });
+
+                document.getElementById('mediaInput').addEventListener('change', (e) => {
+                    this.handleMediaSelect(e);
+                });
+
+                // Polls
+                document.getElementById('pollBtn').addEventListener('click', () => {
+                    document.getElementById('pollModal').classList.add('active');
+                });
+
+                document.getElementById('addPollOptionBtn').addEventListener('click', () => {
+                    this.addPollOption();
+                });
+
+                document.getElementById('createPollBtn').addEventListener('click', () => {
+                    this.createPoll();
                 });
 
                 // Chat
@@ -1673,6 +2274,23 @@
                     }
                 });
 
+                // Follow system
+                document.getElementById('followBtn').addEventListener('click', () => {
+                    this.toggleFollow();
+                });
+
+                // Share system
+                document.querySelectorAll('.share-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        const platform = e.currentTarget.dataset.platform;
+                        this.shareToPlatform(platform);
+                    });
+                });
+
+                document.getElementById('shareProfileBtn').addEventListener('click', () => {
+                    this.shareProfile();
+                });
+
                 // Theme toggle
                 document.getElementById('themeToggleNav').addEventListener('click', () => {
                     this.toggleTheme();
@@ -1689,6 +2307,13 @@
                         e.target.closest('.modal').classList.remove('active');
                     });
                 });
+
+                // Close modals on outside click
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal')) {
+                        e.target.classList.remove('active');
+                    }
+                });
             }
 
             toggleTheme() {
@@ -1696,6 +2321,7 @@
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
                 document.documentElement.setAttribute('data-theme', newTheme);
                 localStorage.setItem('primeMar-theme', newTheme);
+                this.showToast(`${newTheme === 'dark' ? 'Dark' : 'Light'} mode enabled`);
             }
 
             async logout() {
@@ -1754,10 +2380,6 @@
 
             showSuccess(message) {
                 this.showToast(message, 'success');
-            }
-
-            sharePost(postId) {
-                this.showToast('Share functionality coming soon!');
             }
         }
 

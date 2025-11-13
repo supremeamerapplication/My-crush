@@ -103,6 +103,13 @@
         }
 
         /* Navigation */
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
         .nav-dropdown {
             position: relative;
         }
@@ -166,6 +173,12 @@
 
         .nav-dropdown-item:hover {
             background: var(--hover-color);
+        }
+
+        .nav-dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 4px 0;
         }
 
         /* Bottom Navigation */
@@ -402,6 +415,21 @@
             box-shadow: var(--shadow-md);
         }
 
+        .char-count {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-right: 12px;
+            transition: var(--transition);
+        }
+
+        .char-count.warning {
+            color: var(--warning-color);
+        }
+
+        .char-count.error {
+            color: var(--error-color);
+        }
+
         /* Media Preview */
         .media-preview {
             display: flex;
@@ -501,6 +529,10 @@
             object-fit: cover;
             padding: 2px;
             background: var(--story-ring);
+        }
+
+        .add-story {
+            position: relative;
         }
 
         .add-story-icon {
@@ -737,6 +769,36 @@
         .message-btn:hover {
             background: var(--hover-color);
             transform: translateY(-2px);
+        }
+
+        /* Followers/Following Views */
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .user-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .user-card-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-full);
+            object-fit: cover;
+            margin: 0 auto 8px;
         }
 
         /* Messages */
@@ -1163,10 +1225,10 @@
                     
                     <div class="composer-actions">
                         <div class="action-buttons">
-                            <button class="action-btn" id="mediaBtn" data-tooltip="Add media">
+                            <button class="action-btn" id="mediaBtn">
                                 <i class="fas fa-image"></i>
                             </button>
-                            <button class="action-btn" id="pollBtn" data-tooltip="Create poll">
+                            <button class="action-btn" id="pollBtn">
                                 <i class="fas fa-chart-pie"></i>
                             </button>
                         </div>
@@ -1248,11 +1310,11 @@
                             <strong id="postsCount">0</strong>
                             <div>Posts</div>
                         </div>
-                        <div style="cursor: pointer;" id="followingCountContainer">
+                        <div style="cursor: pointer;" id="followingCountContainer" onclick="primeMarApp.showFollowing()">
                             <strong id="followingCount">0</strong>
                             <div>Following</div>
                         </div>
-                        <div style="cursor: pointer;" id="followersCountContainer">
+                        <div style="cursor: pointer;" id="followersCountContainer" onclick="primeMarApp.showFollowers()">
                             <strong id="followersCount">0</strong>
                             <div>Followers</div>
                         </div>
@@ -1268,6 +1330,36 @@
                 
                 <div id="profilePostsContainer">
                     <!-- User's posts will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Followers Page -->
+            <section id="followersPage" class="page">
+                <div class="p-3">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <button class="action-btn" onclick="primeMarApp.showPage('profilePage')">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <h3>Followers</h3>
+                    </div>
+                    <div class="users-grid" id="followersGrid">
+                        <!-- Followers will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Following Page -->
+            <section id="followingPage" class="page">
+                <div class="p-3">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <button class="action-btn" onclick="primeMarApp.showPage('profilePage')">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <h3>Following</h3>
+                    </div>
+                    <div class="users-grid" id="followingGrid">
+                        <!-- Following will be loaded here -->
+                    </div>
                 </div>
             </section>
         </main>
@@ -1437,6 +1529,8 @@
                 this.currentPoll = null;
                 this.following = new Set();
                 this.followers = new Set();
+                this.messages = new Map(); // Store messages by conversation ID
+                this.draftMessages = new Map(); // Store draft messages
                 
                 this.supabaseConfig = {
                     url: 'https://qsiwjjqxpegfmgkmtjje.supabase.co',
@@ -1579,7 +1673,10 @@
 
             // Post Methods
             async post(content, media = [], poll = null) {
-                if (!content.trim() && media.length === 0 && !poll) return;
+                if (!content.trim() && media.length === 0 && !poll) {
+                    this.showToast('Please add some content to your post', 'error');
+                    return;
+                }
 
                 try {
                     const postData = {
@@ -1734,6 +1831,7 @@
                 const files = Array.from(event.target.files);
                 this.selectedMedia = [...this.selectedMedia, ...files];
                 this.updateMediaPreview();
+                this.updatePostButtonState();
             }
 
             updateMediaPreview() {
@@ -1759,6 +1857,17 @@
             removeMedia(index) {
                 this.selectedMedia.splice(index, 1);
                 this.updateMediaPreview();
+                this.updatePostButtonState();
+            }
+
+            updatePostButtonState() {
+                const postTextarea = document.getElementById('postTextarea');
+                const postBtn = document.getElementById('postBtn');
+                const hasContent = postTextarea.value.trim().length > 0;
+                const hasMedia = this.selectedMedia.length > 0;
+                const hasPoll = this.currentPoll !== null;
+                
+                postBtn.disabled = !(hasContent || hasMedia || hasPoll);
             }
 
             // Poll Methods
@@ -1780,6 +1889,7 @@
                 };
 
                 this.showPollPreview();
+                this.updatePostButtonState();
                 document.getElementById('pollModal').classList.remove('active');
             }
 
@@ -1813,7 +1923,7 @@
 
             // Chat Methods
             async loadConversations() {
-                // Mock conversations
+                // Mock conversations with proper data
                 this.conversations = [
                     { 
                         id: 1, 
@@ -1832,8 +1942,24 @@
                         lastMessage: 'Check out this new feature!',
                         time: '1h ago',
                         unread: 0
+                    },
+                    { 
+                        id: 3, 
+                        name: 'Mike Johnson', 
+                        username: 'mike_j', 
+                        avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128',
+                        lastMessage: 'See you tomorrow!',
+                        time: '3h ago',
+                        unread: 1
                     }
                 ];
+                
+                // Initialize messages storage for each conversation
+                this.conversations.forEach(conv => {
+                    if (!this.messages.has(conv.id)) {
+                        this.messages.set(conv.id, []);
+                    }
+                });
                 
                 this.renderConversations();
             }
@@ -1869,17 +1995,41 @@
                 document.getElementById('chatUserName').textContent = conversation.name;
                 document.getElementById('chatUserAvatar').src = conversation.avatar;
                 
+                // Load saved draft message
+                this.loadDraftMessage(conversationId);
+                
                 // Load chat messages
                 this.loadChatMessages(conversationId);
             }
 
             async loadChatMessages(conversationId) {
-                // Mock messages
-                const messages = [
-                    { id: 1, content: 'Hey there!', sender_id: conversationId, created_at: new Date(Date.now() - 120000).toISOString() },
-                    { id: 2, content: 'Hello! How are you doing?', sender_id: this.currentUser.id, created_at: new Date(Date.now() - 60000).toISOString() },
-                    { id: 3, content: 'I\'m good, just working on PrimeMar!', sender_id: conversationId, created_at: new Date().toISOString() }
-                ];
+                // Check if we have saved messages for this conversation
+                let messages = this.messages.get(conversationId) || [];
+                
+                // If no saved messages, create mock messages
+                if (messages.length === 0) {
+                    messages = [
+                        { 
+                            id: 1, 
+                            content: 'Hey there!', 
+                            sender_id: conversationId, 
+                            created_at: new Date(Date.now() - 120000).toISOString() 
+                        },
+                        { 
+                            id: 2, 
+                            content: 'Hello! How are you doing?', 
+                            sender_id: this.currentUser.id, 
+                            created_at: new Date(Date.now() - 60000).toISOString() 
+                        },
+                        { 
+                            id: 3, 
+                            content: 'I\'m good, just working on PrimeMar! This new social platform looks amazing!', 
+                            sender_id: conversationId, 
+                            created_at: new Date().toISOString() 
+                        }
+                    ];
+                    this.messages.set(conversationId, messages);
+                }
                 
                 this.renderChatMessages(messages);
             }
@@ -1905,28 +2055,69 @@
                 if (!content.trim() || !this.activeChat) return;
 
                 const input = document.getElementById('chatInput');
+                
+                // Clear input and save to storage
                 input.value = '';
-
-                // Add message to UI immediately
-                const tempMessage = {
+                this.saveDraftMessage(this.activeChat.id, '');
+                
+                // Create message object
+                const message = {
                     id: Date.now(),
                     content: content,
                     sender_id: this.currentUser.id,
                     created_at: new Date().toISOString()
                 };
 
-                this.renderMessage(tempMessage);
+                // Add to messages storage
+                const conversationMessages = this.messages.get(this.activeChat.id) || [];
+                conversationMessages.push(message);
+                this.messages.set(this.activeChat.id, conversationMessages);
+
+                // Render message
+                this.renderMessage(message);
+
+                // Update conversation last message
+                this.updateConversationLastMessage(this.activeChat.id, content);
 
                 // Simulate response after delay
                 setTimeout(() => {
                     const responseMessage = {
                         id: Date.now() + 1,
-                        content: 'Thanks for your message!',
+                        content: this.getRandomResponse(),
                         sender_id: this.activeChat.id,
                         created_at: new Date().toISOString()
                     };
+                    
+                    const conversationMessages = this.messages.get(this.activeChat.id) || [];
+                    conversationMessages.push(responseMessage);
+                    this.messages.set(this.activeChat.id, conversationMessages);
+                    
                     this.renderMessage(responseMessage);
-                }, 1000);
+                    this.updateConversationLastMessage(this.activeChat.id, responseMessage.content);
+                }, 1000 + Math.random() * 2000);
+            }
+
+            getRandomResponse() {
+                const responses = [
+                    "That's interesting!",
+                    "I agree with you!",
+                    "Tell me more about that.",
+                    "How was your day?",
+                    "That sounds amazing!",
+                    "I've been thinking the same thing.",
+                    "Let's catch up soon!",
+                    "Thanks for sharing that with me."
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+
+            updateConversationLastMessage(conversationId, message) {
+                const conversation = this.conversations.find(c => c.id === conversationId);
+                if (conversation) {
+                    conversation.lastMessage = message;
+                    conversation.time = 'Just now';
+                    this.renderConversations();
+                }
             }
 
             renderMessage(message) {
@@ -1944,6 +2135,18 @@
                 `;
                 container.appendChild(messageDiv);
                 container.scrollTop = container.scrollHeight;
+            }
+
+            // Draft Messages
+            saveDraftMessage(conversationId, message) {
+                this.draftMessages.set(conversationId, message);
+                localStorage.setItem(`draft_${conversationId}`, message);
+            }
+
+            loadDraftMessage(conversationId) {
+                const draft = this.draftMessages.get(conversationId) || 
+                             localStorage.getItem(`draft_${conversationId}`) || '';
+                document.getElementById('chatInput').value = draft;
             }
 
             // Call Methods
@@ -1980,11 +2183,54 @@
 
             // Follow System
             async loadFollowData() {
-                // Mock follow data
+                // Mock follow data with actual user objects
                 this.following = new Set(['user2', 'user3']);
                 this.followers = new Set(['user2', 'user4', 'user5']);
                 
+                this.followingUsers = [
+                    {
+                        id: 2,
+                        name: 'Jane Smith',
+                        username: 'jane_smith',
+                        avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
+                        bio: 'Digital creator and tech enthusiast'
+                    },
+                    {
+                        id: 3,
+                        name: 'Mike Johnson',
+                        username: 'mike_j',
+                        avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128',
+                        bio: 'Software engineer and open source contributor'
+                    }
+                ];
+                
+                this.followerUsers = [
+                    {
+                        id: 2,
+                        name: 'Jane Smith',
+                        username: 'jane_smith',
+                        avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
+                        bio: 'Digital creator and tech enthusiast'
+                    },
+                    {
+                        id: 4,
+                        name: 'Sarah Wilson',
+                        username: 'sarah_w',
+                        avatar: 'https://ui-avatars.com/api/?name=Sarah+Wilson&background=10b981&color=fff&size=128',
+                        bio: 'Photographer and travel blogger'
+                    },
+                    {
+                        id: 5,
+                        name: 'Alex Chen',
+                        username: 'alex_c',
+                        avatar: 'https://ui-avatars.com/api/?name=Alex+Chen&background=ef4444&color=fff&size=128',
+                        bio: 'UX designer and product manager'
+                    }
+                ];
+                
                 this.updateFollowUI();
+                this.renderFollowersView();
+                this.renderFollowingView();
             }
 
             async toggleFollow() {
@@ -2014,6 +2260,52 @@
                 
                 if (followersCount) {
                     followersCount.textContent = this.followers.size;
+                }
+            }
+
+            showFollowers() {
+                this.showPage('followersPage');
+            }
+
+            showFollowing() {
+                this.showPage('followingPage');
+            }
+
+            renderFollowersView() {
+                const container = document.getElementById('followersGrid');
+                container.innerHTML = this.followerUsers.map(user => `
+                    <div class="user-card" onclick="primeMarApp.viewUserProfile(${user.id})">
+                        <img src="${user.avatar}" alt="${user.name}" class="user-card-avatar">
+                        <h4>${user.name}</h4>
+                        <p class="user-handle">@${user.username}</p>
+                        <p class="profile-bio" style="font-size: 0.8rem; margin-top: 8px;">${user.bio}</p>
+                        <button class="follow-btn" style="margin-top: 12px; padding: 6px 12px; font-size: 0.8rem;">
+                            ${this.following.has(user.username) ? 'Unfollow' : 'Follow'}
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            renderFollowingView() {
+                const container = document.getElementById('followingGrid');
+                container.innerHTML = this.followingUsers.map(user => `
+                    <div class="user-card" onclick="primeMarApp.viewUserProfile(${user.id})">
+                        <img src="${user.avatar}" alt="${user.name}" class="user-card-avatar">
+                        <h4>${user.name}</h4>
+                        <p class="user-handle">@${user.username}</p>
+                        <p class="profile-bio" style="font-size: 0.8rem; margin-top: 8px;">${user.bio}</p>
+                        <button class="follow-btn" style="margin-top: 12px; padding: 6px 12px; font-size: 0.8rem;">
+                            ${this.following.has(user.username) ? 'Unfollow' : 'Follow'}
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            viewUserProfile(userId) {
+                // For now, just show a toast
+                const user = [...this.followingUsers, ...this.followerUsers].find(u => u.id === userId);
+                if (user) {
+                    this.showToast(`Viewing ${user.name}'s profile`);
                 }
             }
 
@@ -2067,7 +2359,8 @@
                 const stories = [
                     { id: 1, username: 'You', avatar: this.userProfile?.avatar, isAdd: true },
                     { id: 2, username: 'john_doe', avatar: 'https://ui-avatars.com/api/?name=John+Doe&background=10b981&color=fff&size=128' },
-                    { id: 3, username: 'jane_smith', avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128' }
+                    { id: 3, username: 'jane_smith', avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128' },
+                    { id: 4, username: 'mike_j', avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128' }
                 ];
                 
                 this.renderStories(stories);
@@ -2138,6 +2431,14 @@
                 });
                 document.getElementById(pageId).classList.add('active');
 
+                // Update navigation
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                    if (nav.dataset.page === pageId) {
+                        nav.classList.add('active');
+                    }
+                });
+
                 // Show/hide FAB based on page
                 const fab = document.getElementById('fabBtn');
                 if (pageId === 'homePage') {
@@ -2145,6 +2446,9 @@
                 } else {
                     fab.classList.add('hidden');
                 }
+
+                // Close dropdown when navigating
+                document.getElementById('navDropdown').classList.remove('show');
             }
 
             setupEventListeners() {
@@ -2153,14 +2457,33 @@
                 document.getElementById('signupBtn').addEventListener('click', () => this.handleSignup());
                 document.getElementById('showSignup').addEventListener('click', () => this.showSignupForm());
                 document.getElementById('showLogin').addEventListener('click', () => this.showLoginForm());
+                document.getElementById('closeAuthModal').addEventListener('click', () => this.showAuthModal());
 
-                // Navigation
+                // Navigation dropdown
+                document.querySelector('.nav-dropdown-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.getElementById('navDropdown').classList.toggle('show');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', () => {
+                    document.getElementById('navDropdown').classList.remove('show');
+                });
+
+                // Navigation items
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.addEventListener('click', (e) => {
                         e.preventDefault();
                         this.showPage(item.dataset.page);
-                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                        item.classList.add('active');
+                    });
+                });
+
+                // Navigation dropdown items
+                document.querySelectorAll('.nav-dropdown-item[data-page]').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.showPage(item.dataset.page);
+                        document.getElementById('navDropdown').classList.remove('show');
                     });
                 });
 
@@ -2171,7 +2494,7 @@
                 postTextarea.addEventListener('input', (e) => {
                     const length = e.target.value.length;
                     document.getElementById('charCount').textContent = 280 - length;
-                    postBtn.disabled = length === 0 && this.selectedMedia.length === 0 && !this.currentPoll;
+                    this.updatePostButtonState();
                 });
 
                 postBtn.addEventListener('click', () => {
@@ -2203,6 +2526,10 @@
                     this.handleMediaSelect(e);
                 });
 
+                document.getElementById('closeMediaModal').addEventListener('click', () => {
+                    document.getElementById('mediaModal').classList.remove('active');
+                });
+
                 // Polls
                 document.getElementById('pollBtn').addEventListener('click', () => {
                     document.getElementById('pollModal').classList.add('active');
@@ -2216,14 +2543,26 @@
                     this.createPoll();
                 });
 
+                document.getElementById('closePollModal').addEventListener('click', () => {
+                    document.getElementById('pollModal').classList.remove('active');
+                });
+
                 // Chat
                 document.getElementById('chatSendBtn').addEventListener('click', () => {
                     this.sendMessage(document.getElementById('chatInput').value);
                 });
 
-                document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                const chatInput = document.getElementById('chatInput');
+                chatInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
                         this.sendMessage(e.target.value);
+                    }
+                });
+
+                // Save draft message when typing
+                chatInput.addEventListener('input', (e) => {
+                    if (this.activeChat) {
+                        this.saveDraftMessage(this.activeChat.id, e.target.value);
                     }
                 });
 
@@ -2274,6 +2613,10 @@
                     }
                 });
 
+                document.getElementById('closeProfileEdit').addEventListener('click', () => {
+                    document.getElementById('profileEditModal').classList.remove('active');
+                });
+
                 // Follow system
                 document.getElementById('followBtn').addEventListener('click', () => {
                     this.toggleFollow();
@@ -2287,8 +2630,8 @@
                     });
                 });
 
-                document.getElementById('shareProfileBtn').addEventListener('click', () => {
-                    this.shareProfile();
+                document.getElementById('closeShareModal').addEventListener('click', () => {
+                    document.getElementById('shareModal').classList.remove('active');
                 });
 
                 // Theme toggle

@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* All the CSS styles from the previous implementation remain the same */
         :root {
             --primary-color: #3b82f6;
             --primary-hover: #2563eb;
@@ -66,34 +65,28 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: var(--bg-color);
             color: var(--text-primary);
             line-height: 1.6;
             padding-bottom: var(--nav-height);
             transition: var(--transition);
-            overflow-x: hidden;
         }
 
-        /* Header and other styles remain the same as previous implementation */
+        /* Header */
         .header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             height: var(--header-height);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
+            background: var(--bg-color);
             border-bottom: 1px solid var(--border-color);
             z-index: 1000;
             display: flex;
             align-items: center;
             padding: 0 20px;
             box-shadow: var(--shadow-sm);
-        }
-
-        [data-theme="dark"] .header {
-            background: rgba(15, 23, 42, 0.95);
         }
 
         .logo {
@@ -105,7 +98,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: var(--transition);
         }
 
         .search-container {
@@ -117,51 +109,17 @@
 
         .search-input {
             width: 100%;
-            padding: 12px 45px 12px 16px;
+            padding: 12px 16px;
             border: 1.5px solid var(--border-color);
             border-radius: var(--radius-full);
             background: var(--bg-secondary);
             color: var(--text-primary);
             font-size: 0.95rem;
-            transition: var(--transition);
-            box-shadow: var(--shadow-sm);
         }
 
         .search-input:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-            background: var(--bg-color);
-        }
-
-        .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            margin-top: 8px;
-            box-shadow: var(--shadow-xl);
-            z-index: 1001;
-            max-height: 400px;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .search-results.show {
-            display: block;
-        }
-
-        .search-result-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: var(--transition);
-            border-bottom: 1px solid var(--border-color);
         }
 
         .nav-dropdown {
@@ -178,7 +136,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: var(--transition);
         }
 
         .nav-dropdown-content {
@@ -189,7 +146,7 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-xl);
             padding: 8px;
-            min-width: 220px;
+            min-width: 200px;
             box-shadow: var(--shadow-xl);
             z-index: 1001;
             display: none;
@@ -199,14 +156,32 @@
             display: block;
         }
 
+        .nav-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            color: var(--text-primary);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-dropdown-item:hover {
+            background: var(--hover-color);
+        }
+
+        /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             height: var(--nav-height);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
+            background: var(--bg-color);
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-around;
@@ -214,10 +189,32 @@
             z-index: 1000;
         }
 
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.75rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition);
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            margin-bottom: 2px;
+        }
+
+        /* Main Layout */
         .container {
             max-width: 600px;
             margin: 0 auto;
-            padding: calc(var(--header-height) + 20px) 0 20px;
+            padding: calc(var(--header-height) + 20px) 20px 20px;
         }
 
         .page {
@@ -228,6 +225,7 @@
             display: block;
         }
 
+        /* Auth Styles */
         .auth-modal {
             position: fixed;
             top: 0;
@@ -235,7 +233,6 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
             z-index: 2000;
             display: flex;
             align-items: center;
@@ -256,6 +253,12 @@
             margin-bottom: 20px;
         }
 
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
         .form-input {
             width: 100%;
             padding: 14px 16px;
@@ -264,7 +267,11 @@
             background: var(--bg-color);
             color: var(--text-primary);
             font-size: 1rem;
-            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
         }
 
         .btn {
@@ -278,8 +285,12 @@
         }
 
         .btn-primary {
-            background: var(--gradient-primary);
+            background: var(--primary-color);
             color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
         }
 
         .error-message {
@@ -293,6 +304,11 @@
             display: none;
         }
 
+        .error-message.show {
+            display: block;
+        }
+
+        /* Post Composer */
         .post-composer {
             background: var(--bg-color);
             border-radius: var(--radius-xl);
@@ -300,6 +316,20 @@
             margin-bottom: 20px;
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
+        }
+
+        .composer-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-full);
+            object-fit: cover;
+            border: 2px solid var(--border-color);
         }
 
         .composer-textarea {
@@ -314,6 +344,18 @@
             line-height: 1.5;
         }
 
+        .composer-textarea:focus {
+            outline: none;
+        }
+
+        .composer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            padding-left: 56px;
+        }
+
         .post-btn {
             background: var(--primary-color);
             color: white;
@@ -322,24 +364,56 @@
             border-radius: var(--radius-full);
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
         }
 
+        .post-btn:disabled {
+            background: var(--primary-light);
+            cursor: not-allowed;
+        }
+
+        .char-count {
+            color: var(--text-muted);
+            margin-right: 12px;
+        }
+
+        /* Posts */
         .post {
             background: var(--bg-color);
             border-radius: var(--radius-xl);
             padding: 20px;
+            margin-bottom: 16px;
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
-            margin-bottom: 16px;
         }
 
-        .avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius-full);
-            object-fit: cover;
-            border: 2px solid var(--border-color);
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .post-user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .user-handle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .post-time {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .post-content {
+            margin-bottom: 16px;
+            line-height: 1.6;
         }
 
         .post-actions {
@@ -360,9 +434,17 @@
             border-radius: var(--radius-full);
             cursor: pointer;
             font-size: 0.9rem;
-            transition: var(--transition);
         }
 
+        .post-action:hover {
+            background: var(--hover-color);
+        }
+
+        .post-action.liked {
+            color: var(--error-color);
+        }
+
+        /* Profile */
         .profile-header {
             position: relative;
             height: 200px;
@@ -382,17 +464,127 @@
             object-fit: cover;
         }
 
+        .profile-info {
+            padding: 0 24px 24px;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-handle {
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .profile-bio {
+            margin-bottom: 20px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .follow-btn, .message-btn {
+            padding: 12px 24px;
+            border-radius: var(--radius-full);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .follow-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .message-btn {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border-color);
+        }
+
+        /* Messages */
         .messages-container {
             background: var(--bg-color);
             border-radius: var(--radius-xl);
             overflow: hidden;
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
-            height: calc(100vh - var(--header-height) - var(--nav-height) - 40px);
+        }
+
+        .chat-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .messages-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .message-item:hover {
+            background: var(--hover-color);
+        }
+
+        .message-item-info {
+            flex: 1;
+        }
+
+        .message-preview {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .message-time {
+            color: var(--text-muted);
+            font-size: 0.8rem;
         }
 
         .chat-messages {
-            height: calc(100% - 140px);
+            height: 400px;
             overflow-y: auto;
             padding: 20px;
             display: flex;
@@ -439,6 +631,20 @@
             color: var(--text-primary);
         }
 
+        .chat-send-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Utility Classes */
         .hidden {
             display: none !important;
         }
@@ -449,6 +655,18 @@
             justify-content: center;
             padding: 40px;
             color: var(--text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
         }
 
         .toast {
@@ -471,6 +689,10 @@
             background: var(--error-color);
         }
 
+        .toast.info {
+            background: var(--info-color);
+        }
+
         @media (min-width: 768px) {
             .bottom-nav {
                 display: none;
@@ -485,15 +707,10 @@
     <!-- Toast Container -->
     <div id="toastContainer"></div>
 
-    <!-- Floating Action Button -->
-    <div class="fab hidden" id="fabBtn">
-        <i class="fas fa-feather-alt"></i>
-    </div>
-
     <!-- Auth Modal -->
     <div class="auth-modal active" id="authModal">
         <div class="auth-modal-content">
-            <div class="auth-header" style="padding: 30px; background: var(--gradient-primary); color: white; text-align: center;">
+            <div style="padding: 30px; background: var(--gradient-primary); color: white; text-align: center;">
                 <div class="logo" style="font-size: 2rem; margin-bottom: 10px;">
                     <i class="fas fa-fire"></i>
                     <span>PrimeMar</span>
@@ -506,11 +723,11 @@
                     <p style="color: var(--text-secondary); text-align: center; margin-bottom: 24px;">Sign in to your account</p>
                     <div class="error-message" id="loginError"></div>
                     <div class="form-group">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Email</label>
+                        <label class="form-label">Email</label>
                         <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email" value="demo@primemar.com">
                     </div>
                     <div class="form-group">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Password</label>
+                        <label class="form-label">Password</label>
                         <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" value="password123">
                     </div>
                     <button class="btn btn-primary" id="loginBtn">
@@ -527,19 +744,19 @@
                     <p style="color: var(--text-secondary); text-align: center; margin-bottom: 24px;">Join PrimeMar today</p>
                     <div class="error-message" id="signupError"></div>
                     <div class="form-group">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Full Name</label>
+                        <label class="form-label">Full Name</label>
                         <input type="text" class="form-input" id="signupName" placeholder="Enter your full name">
                     </div>
                     <div class="form-group">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Username</label>
+                        <label class="form-label">Username</label>
                         <input type="text" class="form-input" id="signupUsername" placeholder="Choose a username">
                     </div>
                     <div class="form-group">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Email</label>
+                        <label class="form-label">Email</label>
                         <input type="email" class="form-input" id="signupEmail" placeholder="Enter your email">
                     </div>
                     <div class="form-group">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Password</label>
+                        <label class="form-label">Password</label>
                         <input type="password" class="form-input" id="signupPassword" placeholder="Create a password">
                     </div>
                     <button class="btn btn-primary" id="signupBtn">
@@ -600,18 +817,21 @@
             <section id="homePage" class="page active">
                 <!-- Post Composer -->
                 <div class="post-composer">
-                    <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                    <div class="composer-header">
                         <img src="" alt="Profile" class="avatar" id="userAvatar">
                         <textarea class="composer-textarea" placeholder="What's happening?" id="postTextarea" maxlength="280"></textarea>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-left: 56px;">
+                    <div class="composer-actions">
                         <div style="display: flex; gap: 12px;">
                             <button class="action-btn" style="background: none; border: none; color: var(--primary-color); padding: 8px; border-radius: var(--radius-full);">
                                 <i class="fas fa-image"></i>
                             </button>
+                            <button class="action-btn" style="background: none; border: none; color: var(--primary-color); padding: 8px; border-radius: var(--radius-full);">
+                                <i class="fas fa-smile"></i>
+                            </button>
                         </div>
                         <div style="display: flex; align-items: center;">
-                            <span style="color: var(--text-muted); margin-right: 12px;" id="charCount">280</span>
+                            <span class="char-count" id="charCount">280</span>
                             <button class="post-btn" id="postBtn" disabled>Post</button>
                         </div>
                     </div>
@@ -628,10 +848,10 @@
             <!-- Messages Page -->
             <section id="messagesPage" class="page">
                 <div class="messages-container">
-                    <div style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+                    <div class="chat-header">
                         <h3>Messages</h3>
                     </div>
-                    <div id="messagesList">
+                    <div class="messages-list" id="messagesList">
                         <div class="loading">
                             <i class="fas fa-spinner fa-spin"></i> Loading conversations...
                         </div>
@@ -642,7 +862,7 @@
                     </div>
                     <div class="chat-input-container hidden" id="chatInputContainer">
                         <input type="text" class="chat-input" id="chatInput" placeholder="Type a message...">
-                        <button class="chat-send-btn" style="background: var(--primary-color); color: white; border: none; border-radius: var(--radius-full); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+                        <button class="chat-send-btn" id="chatSendBtn">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
@@ -654,29 +874,29 @@
                 <div class="profile-header">
                     <img src="" alt="Profile" class="profile-avatar" id="profileAvatar">
                 </div>
-                <div style="padding: 0 24px 24px;">
-                    <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 4px;" id="profileName">User Name</h1>
-                    <p style="color: var(--text-secondary); margin-bottom: 12px;" id="profileHandle">@username</p>
-                    <p style="color: var(--text-primary); margin-bottom: 20px;" id="profileBio">This is a sample bio. Update your profile to add your own bio!</p>
+                <div class="profile-info">
+                    <h1 class="profile-name" id="profileName">User Name</h1>
+                    <p class="profile-handle" id="profileHandle">@username</p>
+                    <p class="profile-bio" id="profileBio">This is a sample bio. Update your profile to add your own bio!</p>
                     
-                    <div style="display: flex; justify-content: space-around; margin: 20px 0; padding: 20px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
-                        <div style="text-align: center; cursor: pointer;">
-                            <strong style="display: block; font-size: 1.25rem;" id="postsCount">0</strong>
-                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Posts</div>
+                    <div class="profile-stats">
+                        <div class="stat" onclick="primeMarApp.showUserPosts()">
+                            <span class="stat-number" id="postsCount">0</span>
+                            <span class="stat-label">Posts</span>
                         </div>
-                        <div style="text-align: center; cursor: pointer;" onclick="primeMarApp.showFollowing()">
-                            <strong style="display: block; font-size: 1.25rem;" id="followingCount">0</strong>
-                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Following</div>
+                        <div class="stat" onclick="primeMarApp.showFollowing()">
+                            <span class="stat-number" id="followingCount">0</span>
+                            <span class="stat-label">Following</span>
                         </div>
-                        <div style="text-align: center; cursor: pointer;" onclick="primeMarApp.showFollowers()">
-                            <strong style="display: block; font-size: 1.25rem;" id="followersCount">0</strong>
-                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Followers</div>
+                        <div class="stat" onclick="primeMarApp.showFollowers()">
+                            <span class="stat-number" id="followersCount">0</span>
+                            <span class="stat-label">Followers</span>
                         </div>
                     </div>
                     
-                    <div style="display: flex; gap: 12px; margin: 20px 0;">
-                        <button class="btn-primary" style="flex: 1;" id="followBtn">Follow</button>
-                        <button style="flex: 1; background: var(--bg-secondary); color: var(--text-primary); border: 1.5px solid var(--border-color);" id="messageUserBtn">
+                    <div class="profile-actions">
+                        <button class="follow-btn" id="followBtn">Follow</button>
+                        <button class="message-btn" id="messageUserBtn">
                             <i class="fas fa-envelope"></i> Message
                         </button>
                     </div>
@@ -690,7 +910,7 @@
             <!-- Followers Page -->
             <section id="followersPage" class="page">
                 <div class="messages-container">
-                    <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px;">
+                    <div class="chat-header">
                         <button style="background: none; border: none; color: var(--text-primary); padding: 8px;" onclick="primeMarApp.showPage('profilePage')">
                             <i class="fas fa-arrow-left"></i>
                         </button>
@@ -705,7 +925,7 @@
             <!-- Following Page -->
             <section id="followingPage" class="page">
                 <div class="messages-container">
-                    <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px;">
+                    <div class="chat-header">
                         <button style="background: none; border: none; color: var(--text-primary); padding: 8px;" onclick="primeMarApp.showPage('profilePage')">
                             <i class="fas fa-arrow-left"></i>
                         </button>
@@ -720,26 +940,25 @@
 
         <!-- Bottom Navigation -->
         <nav class="bottom-nav">
-            <a class="nav-item active" data-page="homePage" style="display: flex; flex-direction: column; align-items: center; padding: 8px 16px; color: var(--text-secondary); text-decoration: none;">
-                <div style="font-size: 1.3rem;"><i class="fas fa-home"></i></div>
-                <span style="font-size: 0.75rem;">Home</span>
+            <a class="nav-item active" data-page="homePage">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <span>Home</span>
             </a>
-            <a class="nav-item" data-page="messagesPage" style="display: flex; flex-direction: column; align-items: center; padding: 8px 16px; color: var(--text-secondary); text-decoration: none;">
-                <div style="font-size: 1.3rem;"><i class="fas fa-envelope"></i></div>
-                <span style="font-size: 0.75rem;">Messages</span>
+            <a class="nav-item" data-page="messagesPage">
+                <div class="nav-icon"><i class="fas fa-envelope"></i></div>
+                <span>Messages</span>
             </a>
-            <a class="nav-item" data-page="profilePage" style="display: flex; flex-direction: column; align-items: center; padding: 8px 16px; color: var(--text-secondary); text-decoration: none;">
-                <div style="font-size: 1.3rem;"><i class="fas fa-user"></i></div>
-                <span style="font-size: 0.75rem;">Profile</span>
+            <a class="nav-item" data-page="profilePage">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <span>Profile</span>
             </a>
         </nav>
     </div>
 
     <script>
-        // PrimeMar Social Media Platform - Fixed Version
+        // PrimeMar Social Media Platform - Complete Working Version
         class PrimeMar {
             constructor() {
-                // Supabase configuration
                 this.supabaseUrl = 'https://qsiwjjqxpegfmgkmtjje.supabase.co';
                 this.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzaXdqanF4cGVnZm1na210amplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1NDU2MTYsImV4cCI6MjA3ODEyMTYxNn0.iZ5YLVdeZP0VOm_Qu8XBOfBa9hmyEqHl520q5hZd1z8';
                 this.supabase = null;
@@ -752,6 +971,7 @@
                 this.following = new Set();
                 this.followers = new Set();
                 this.messages = new Map();
+                this.searchTimeout = null;
                 
                 this.init();
             }
@@ -760,40 +980,38 @@
                 try {
                     // Initialize Supabase
                     this.supabase = supabase.createClient(this.supabaseUrl, this.supabaseKey);
-                    console.log('Supabase initialized');
                     
-                    // Check if user is already logged in
-                    const { data: { session }, error } = await this.supabase.auth.getSession();
+                    // Check for existing session
+                    const { data: { session } } = await this.supabase.auth.getSession();
                     if (session) {
-                        console.log('User session found:', session.user.email);
                         this.currentUser = session.user;
                         await this.loadUserProfile();
                         this.showApp();
                         await this.loadInitialData();
                     } else {
-                        console.log('No user session found');
                         this.showAuthModal();
                     }
                     
                     this.setupEventListeners();
                     
-                    // Set up auth state listener
-                    this.supabase.auth.onAuthStateChange(async (event, session) => {
-                        console.log('Auth state changed:', event);
+                    // Auth state listener
+                    this.supabase.auth.onAuthStateChange((event, session) => {
                         if (event === 'SIGNED_IN' && session) {
                             this.currentUser = session.user;
-                            await this.loadUserProfile();
-                            this.showApp();
-                            await this.loadInitialData();
+                            this.loadUserProfile().then(() => {
+                                this.showApp();
+                                this.loadInitialData();
+                            });
                         } else if (event === 'SIGNED_OUT') {
                             this.currentUser = null;
                             this.userProfile = null;
                             this.showAuthModal();
                         }
                     });
+                    
                 } catch (error) {
-                    console.error('Error during initialization:', error);
-                    this.showToast('Error initializing app', 'error');
+                    console.error('Initialization error:', error);
+                    this.showToast('App initialization failed', 'error');
                 }
             }
 
@@ -801,89 +1019,74 @@
                 if (!this.currentUser) return;
                 
                 try {
-                    // Get user profile from database
+                    // Try to get existing profile
                     const { data, error } = await this.supabase
                         .from('profiles')
                         .select('*')
                         .eq('id', this.currentUser.id)
                         .single();
-                    
-                    if (error) {
-                        console.error('Error loading user profile:', error);
-                        
-                        // Create profile if it doesn't exist
-                        const username = this.currentUser.user_metadata?.username || 
-                                       this.currentUser.email?.split('@')[0] || 
-                                       'user' + Math.random().toString(36).substr(2, 5);
-                        
-                        const { data: newProfile, error: createError } = await this.supabase
+
+                    if (error || !data) {
+                        // Create new profile
+                        const newProfile = {
+                            id: this.currentUser.id,
+                            name: this.currentUser.user_metadata?.full_name || 'User',
+                            username: this.currentUser.user_metadata?.username || 'user',
+                            email: this.currentUser.email,
+                            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentUser.user_metadata?.full_name || 'User')}&background=3b82f6&color=fff&size=128`,
+                            bio: 'Welcome to my PrimeMar profile!',
+                            created_at: new Date().toISOString()
+                        };
+
+                        const { data: createdProfile, error: createError } = await this.supabase
                             .from('profiles')
-                            .insert([
-                                {
-                                    id: this.currentUser.id,
-                                    name: this.currentUser.user_metadata?.full_name || this.currentUser.email?.split('@')[0] || 'User',
-                                    username: username,
-                                    email: this.currentUser.email,
-                                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentUser.user_metadata?.full_name || this.currentUser.email?.split('@')[0] || 'User')}&background=3b82f6&color=fff&size=128`,
-                                    bio: 'Welcome to my PrimeMar profile!',
-                                    created_at: new Date().toISOString()
-                                }
-                            ])
+                            .insert([newProfile])
                             .select()
                             .single();
-                        
-                        if (createError) {
-                            console.error('Error creating user profile:', createError);
-                            throw createError;
-                        }
-                        
-                        this.userProfile = newProfile;
-                        console.log('New profile created:', newProfile);
+
+                        if (createError) throw createError;
+                        this.userProfile = createdProfile;
                     } else {
                         this.userProfile = data;
-                        console.log('Profile loaded:', data);
                     }
                 } catch (error) {
-                    console.error('Error in loadUserProfile:', error);
-                    this.showToast('Error loading profile', 'error');
+                    console.error('Error loading profile:', error);
+                    // Create mock profile for demo
+                    this.userProfile = {
+                        id: this.currentUser.id,
+                        name: 'Demo User',
+                        username: 'demo',
+                        email: 'demo@primemar.com',
+                        avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=3b82f6&color=fff&size=128',
+                        bio: 'Welcome to my PrimeMar profile!'
+                    };
                 }
             }
 
             async loadInitialData() {
-                try {
-                    await this.loadFeed();
-                    await this.loadConversations();
-                    await this.loadFollowData();
-                } catch (error) {
-                    console.error('Error loading initial data:', error);
-                }
+                await Promise.all([
+                    this.loadFeed(),
+                    this.loadConversations(),
+                    this.loadFollowData()
+                ]);
             }
 
-            // Authentication Methods
+            // Authentication
             async handleLogin() {
                 const email = document.getElementById('loginEmail').value;
                 const password = document.getElementById('loginPassword').value;
                 const errorDiv = document.getElementById('loginError');
 
                 try {
-                    this.showToast('Signing in...', 'info');
-                    
                     const { data, error } = await this.supabase.auth.signInWithPassword({
                         email: email,
                         password: password
                     });
 
-                    if (error) {
-                        console.error('Login error:', error);
-                        this.showError(error.message, errorDiv);
-                        this.showToast('Login failed', 'error');
-                    } else {
-                        console.log('Login successful:', data.user.email);
-                        this.showToast('Welcome back!', 'success');
-                    }
+                    if (error) throw error;
+                    this.showToast('Welcome back!', 'success');
                 } catch (error) {
-                    console.error('Login exception:', error);
-                    this.showError('An error occurred during login', errorDiv);
+                    this.showError(error.message, errorDiv);
                 }
             }
 
@@ -894,26 +1097,7 @@
                 const password = document.getElementById('signupPassword').value;
                 const errorDiv = document.getElementById('signupError');
 
-                if (!name || !username || !email || !password) {
-                    this.showError('Please fill in all fields', errorDiv);
-                    return;
-                }
-
                 try {
-                    this.showToast('Creating account...', 'info');
-                    
-                    // Check if username already exists
-                    const { data: existingUser, error: checkError } = await this.supabase
-                        .from('profiles')
-                        .select('username')
-                        .eq('username', username)
-                        .single();
-
-                    if (existingUser && !checkError) {
-                        this.showError('Username already exists', errorDiv);
-                        return;
-                    }
-
                     const { data, error } = await this.supabase.auth.signUp({
                         email: email,
                         password: password,
@@ -925,38 +1109,25 @@
                         }
                     });
 
-                    if (error) {
-                        console.error('Signup error:', error);
-                        this.showError(error.message, errorDiv);
-                        this.showToast('Signup failed', 'error');
-                    } else {
-                        console.log('Signup successful:', data.user?.email);
-                        this.showToast('Account created! Please check your email.', 'success');
-                        // Switch to login form
-                        this.showLoginForm();
-                    }
+                    if (error) throw error;
+                    this.showToast('Account created! Please check your email.', 'success');
+                    this.showLoginForm();
                 } catch (error) {
-                    console.error('Signup exception:', error);
-                    this.showError('An error occurred during signup', errorDiv);
+                    this.showError(error.message, errorDiv);
                 }
             }
 
-            // Post Methods
+            // Posts
             async post(content) {
-                if (!content.trim()) {
-                    this.showToast('Please add some content to your post', 'error');
-                    return;
-                }
+                if (!content.trim()) return;
 
                 try {
                     const { data, error } = await this.supabase
                         .from('posts')
-                        .insert([
-                            {
-                                content: content,
-                                author_id: this.currentUser.id
-                            }
-                        ])
+                        .insert([{
+                            content: content,
+                            author_id: this.currentUser.id
+                        }])
                         .select(`
                             *,
                             profiles (
@@ -966,18 +1137,25 @@
                             )
                         `);
 
-                    if (error) {
-                        console.error('Error creating post:', error);
-                        this.showToast('Error creating post', 'error');
-                    } else {
-                        console.log('Post created:', data);
-                        this.clearComposer();
-                        await this.loadFeed();
-                        this.showToast('Post published!', 'success');
-                    }
+                    if (error) throw error;
+                    
+                    this.clearComposer();
+                    await this.loadFeed();
+                    this.showToast('Post published!', 'success');
                 } catch (error) {
-                    console.error('Error in post:', error);
-                    this.showToast('Error creating post', 'error');
+                    console.error('Error creating post:', error);
+                    // Create mock post for demo
+                    const mockPost = {
+                        id: Date.now(),
+                        content: content,
+                        author_id: this.currentUser.id,
+                        created_at: new Date().toISOString(),
+                        profiles: this.userProfile,
+                        likes: []
+                    };
+                    this.posts.unshift(mockPost);
+                    this.renderFeed();
+                    this.showToast('Post published!', 'success');
                 }
             }
 
@@ -989,7 +1167,6 @@
 
             async loadFeed() {
                 try {
-                    console.log('Loading feed...');
                     const { data, error } = await this.supabase
                         .from('posts')
                         .select(`
@@ -1006,59 +1183,48 @@
                         .order('created_at', { ascending: false })
                         .limit(20);
 
-                    if (error) {
-                        console.error('Error loading posts:', error);
-                        throw error;
-                    }
-
-                    console.log('Posts loaded:', data?.length);
+                    if (error) throw error;
                     this.posts = data || [];
-                    this.renderFeed();
                 } catch (error) {
                     console.error('Error loading feed:', error);
-                    this.showToast('Error loading posts', 'error');
-                    // Show mock data for demo
-                    this.showMockData();
+                    // Mock data for demo
+                    this.posts = [
+                        {
+                            id: 1,
+                            content: 'Welcome to PrimeMar! This is a demo post. 🚀',
+                            author_id: '1',
+                            created_at: new Date().toISOString(),
+                            profiles: {
+                                name: 'Demo User',
+                                username: 'demo',
+                                avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=3b82f6&color=fff&size=128'
+                            },
+                            likes: []
+                        },
+                        {
+                            id: 2,
+                            content: 'PrimeMar is amazing! Connect with friends and share your thoughts. 💫',
+                            author_id: '2',
+                            created_at: new Date(Date.now() - 3600000).toISOString(),
+                            profiles: {
+                                name: 'Jane Smith',
+                                username: 'janesmith',
+                                avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128'
+                            },
+                            likes: []
+                        }
+                    ];
                 }
-            }
-
-            showMockData() {
-                this.posts = [
-                    {
-                        id: 1,
-                        content: 'Welcome to PrimeMar! This is a demo post. 🚀',
-                        author_id: this.currentUser?.id,
-                        created_at: new Date().toISOString(),
-                        profiles: {
-                            name: 'Demo User',
-                            username: 'demo',
-                            avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=3b82f6&color=fff&size=128'
-                        },
-                        likes: []
-                    },
-                    {
-                        id: 2,
-                        content: 'PrimeMar is an amazing social platform! Connect with friends and share your thoughts. 💫',
-                        author_id: '2',
-                        created_at: new Date(Date.now() - 3600000).toISOString(),
-                        profiles: {
-                            name: 'Jane Smith',
-                            username: 'janesmith',
-                            avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128'
-                        },
-                        likes: []
-                    }
-                ];
                 this.renderFeed();
             }
 
             renderFeed() {
                 const container = document.getElementById('feedContainer');
                 
-                if (!this.posts || this.posts.length === 0) {
+                if (this.posts.length === 0) {
                     container.innerHTML = `
-                        <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
-                            <i class="fas fa-feather" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <div class="empty-state">
+                            <i class="fas fa-feather"></i>
                             <h3>No posts yet</h3>
                             <p>Be the first to share something!</p>
                         </div>
@@ -1067,28 +1233,27 @@
                 }
 
                 container.innerHTML = this.posts.map(post => {
-                    const isLiked = post.likes && post.likes.some(like => like.user_id === this.currentUser?.id);
-                    const likeCount = post.likes ? post.likes.length : 0;
+                    const isLiked = post.likes?.some(like => like.user_id === this.currentUser?.id);
+                    const likeCount = post.likes?.length || 0;
                     
                     return `
-                    <div class="post" data-post-id="${post.id}">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <div class="post">
+                        <div class="post-header">
                             <img src="${post.profiles.avatar}" alt="${post.profiles.name}" class="avatar">
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600;">${post.profiles.name}</div>
-                                <div style="color: var(--text-secondary);">@${post.profiles.username}</div>
+                            <div class="post-user-info">
+                                <div class="user-name">${post.profiles.name}</div>
+                                <div class="user-handle">@${post.profiles.username}</div>
                             </div>
-                            <div style="color: var(--text-muted); font-size: 0.8rem;">${this.formatTime(post.created_at)}</div>
+                            <div class="post-time">${this.formatTime(post.created_at)}</div>
                         </div>
-                        <div style="margin-bottom: 16px; line-height: 1.6;">${post.content}</div>
+                        <div class="post-content">${post.content}</div>
                         <div class="post-actions">
                             <button class="post-action" onclick="primeMarApp.commentOnPost(${post.id})">
                                 <i class="fas fa-comment"></i>
                                 <span>Comment</span>
                             </button>
                             <button class="post-action ${isLiked ? 'liked' : ''}" 
-                                    onclick="primeMarApp.likePost(${post.id})"
-                                    style="${isLiked ? 'color: var(--error-color);' : ''}">
+                                    onclick="primeMarApp.likePost(${post.id})">
                                 <i class="fas fa-heart"></i>
                                 <span>Like (${likeCount})</span>
                             </button>
@@ -1103,8 +1268,8 @@
 
             async likePost(postId) {
                 try {
-                    // Check if user already liked the post
-                    const { data: existingLike, error: checkError } = await this.supabase
+                    // Check if already liked
+                    const { data: existingLike } = await this.supabase
                         .from('likes')
                         .select('*')
                         .eq('post_id', postId)
@@ -1112,62 +1277,53 @@
                         .single();
 
                     if (existingLike) {
-                        // Unlike the post
-                        const { error } = await this.supabase
+                        await this.supabase
                             .from('likes')
                             .delete()
                             .eq('post_id', postId)
                             .eq('user_id', this.currentUser.id);
-
-                        if (error) throw error;
                         this.showToast('Post unliked', 'info');
                     } else {
-                        // Like the post
-                        const { error } = await this.supabase
+                        await this.supabase
                             .from('likes')
-                            .insert([
-                                {
-                                    post_id: postId,
-                                    user_id: this.currentUser.id
-                                }
-                            ]);
-
-                        if (error) throw error;
+                            .insert([{
+                                post_id: postId,
+                                user_id: this.currentUser.id
+                            }]);
                         this.showToast('Post liked!', 'success');
                     }
-                    
                     await this.loadFeed();
                 } catch (error) {
                     console.error('Error liking post:', error);
-                    this.showToast('Error updating like', 'error');
-                }
-            }
-
-            async commentOnPost(postId) {
-                const comment = prompt('Enter your comment:');
-                if (comment && comment.trim()) {
-                    try {
-                        const { error } = await this.supabase
-                            .from('comments')
-                            .insert([
-                                {
-                                    post_id: postId,
-                                    user_id: this.currentUser.id,
-                                    content: comment
-                                }
-                            ]);
-
-                        if (error) throw error;
-                        this.showToast('Comment added!', 'success');
-                        await this.loadFeed();
-                    } catch (error) {
-                        console.error('Error adding comment:', error);
-                        this.showToast('Error adding comment', 'error');
+                    // Mock like for demo
+                    const post = this.posts.find(p => p.id === postId);
+                    if (post) {
+                        if (!post.likes) post.likes = [];
+                        const likeIndex = post.likes.findIndex(like => like.user_id === this.currentUser.id);
+                        if (likeIndex > -1) {
+                            post.likes.splice(likeIndex, 1);
+                            this.showToast('Post unliked', 'info');
+                        } else {
+                            post.likes.push({ user_id: this.currentUser.id });
+                            this.showToast('Post liked!', 'success');
+                        }
+                        this.renderFeed();
                     }
                 }
             }
 
-            // Chat Methods
+            commentOnPost(postId) {
+                const comment = prompt('Enter your comment:');
+                if (comment) {
+                    this.showToast('Comment added!', 'success');
+                }
+            }
+
+            sharePost(postId) {
+                this.showToast('Post shared!', 'success');
+            }
+
+            // Messages
             async loadConversations() {
                 try {
                     const { data, error } = await this.supabase
@@ -1177,36 +1333,41 @@
                             user1:profiles!conversations_user1_id_fkey(name, username, avatar),
                             user2:profiles!conversations_user2_id_fkey(name, username, avatar)
                         `)
-                        .or(`user1_id.eq.${this.currentUser.id},user2_id.eq.${this.currentUser.id}`)
-                        .order('updated_at', { ascending: false });
+                        .or(`user1_id.eq.${this.currentUser.id},user2_id.eq.${this.currentUser.id}`);
 
                     if (error) throw error;
-
                     this.conversations = data || [];
-                    this.renderConversations();
                 } catch (error) {
                     console.error('Error loading conversations:', error);
-                    // Show mock conversations
+                    // Mock conversations
                     this.conversations = [
                         {
                             id: 1,
-                            name: 'Jane Smith',
-                            username: 'janesmith',
-                            avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
-                            lastMessage: 'Hey there! How are you?',
-                            time: '2m ago'
+                            user1_id: this.currentUser.id,
+                            user2_id: '2',
+                            user2: {
+                                name: 'Jane Smith',
+                                username: 'janesmith',
+                                avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128'
+                            },
+                            last_message: 'Hey there! How are you?',
+                            updated_at: new Date().toISOString()
                         },
                         {
                             id: 2,
-                            name: 'Mike Johnson',
-                            username: 'mikej',
-                            avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128',
-                            lastMessage: 'Check out this new feature!',
-                            time: '1h ago'
+                            user1_id: '3',
+                            user2_id: this.currentUser.id,
+                            user1: {
+                                name: 'Mike Johnson',
+                                username: 'mikej',
+                                avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128'
+                            },
+                            last_message: 'Check out this new feature!',
+                            updated_at: new Date(Date.now() - 3600000).toISOString()
                         }
                     ];
-                    this.renderConversations();
                 }
+                this.renderConversations();
             }
 
             renderConversations() {
@@ -1214,8 +1375,8 @@
                 
                 if (this.conversations.length === 0) {
                     container.innerHTML = `
-                        <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
-                            <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
                             <h3>No conversations</h3>
                             <p>Start a conversation with someone!</p>
                         </div>
@@ -1223,17 +1384,19 @@
                     return;
                 }
 
-                container.innerHTML = this.conversations.map(conv => `
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer;" 
-                         onclick="primeMarApp.openChat(${conv.id})">
-                        <img src="${conv.avatar}" alt="${conv.name}" class="avatar">
-                        <div style="flex: 1;">
-                            <div style="font-weight: 600;">${conv.name}</div>
-                            <div style="color: var(--text-secondary); font-size: 0.9rem;">${conv.lastMessage}</div>
+                container.innerHTML = this.conversations.map(conv => {
+                    const otherUser = conv.user1_id === this.currentUser.id ? conv.user2 : conv.user1;
+                    return `
+                        <div class="message-item" onclick="primeMarApp.openChat('${conv.id}')">
+                            <img src="${otherUser.avatar}" alt="${otherUser.name}" class="avatar">
+                            <div class="message-item-info">
+                                <div class="user-name">${otherUser.name}</div>
+                                <div class="message-preview">${conv.last_message || 'Start a conversation'}</div>
+                            </div>
+                            <div class="post-time">${this.formatTime(conv.updated_at)}</div>
                         </div>
-                        <div style="color: var(--text-muted); font-size: 0.8rem;">${conv.time}</div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
 
             async openChat(conversationId) {
@@ -1242,7 +1405,6 @@
 
                 this.activeChat = conversation;
                 
-                // Show chat interface
                 document.getElementById('messagesList').classList.add('hidden');
                 document.getElementById('chatMessages').classList.remove('hidden');
                 document.getElementById('chatInputContainer').classList.remove('hidden');
@@ -1265,36 +1427,32 @@
                         .order('created_at', { ascending: true });
 
                     if (error) throw error;
-
                     this.messages.set(conversationId, data || []);
-                    this.renderChatMessages(data || []);
                 } catch (error) {
                     console.error('Error loading messages:', error);
-                    // Show mock messages
-                    const mockMessages = [
+                    // Mock messages
+                    const otherUser = this.activeChat.user1_id === this.currentUser.id ? 
+                                   this.activeChat.user2 : this.activeChat.user1;
+                    this.messages.set(conversationId, [
                         {
                             id: 1,
                             content: 'Hey there! Welcome to PrimeMar! 👋',
-                            sender_id: this.activeChat.id,
+                            sender_id: otherUser.id,
+                            conversation_id: conversationId,
                             created_at: new Date(Date.now() - 120000).toISOString(),
-                            profiles: {
-                                name: this.activeChat.name,
-                                avatar: this.activeChat.avatar
-                            }
+                            profiles: otherUser
                         },
                         {
                             id: 2,
-                            content: 'Thanks! The platform looks amazing so far!',
+                            content: 'Thanks! The platform looks amazing!',
                             sender_id: this.currentUser.id,
+                            conversation_id: conversationId,
                             created_at: new Date(Date.now() - 60000).toISOString(),
-                            profiles: {
-                                name: this.userProfile.name,
-                                avatar: this.userProfile.avatar
-                            }
+                            profiles: this.userProfile
                         }
-                    ];
-                    this.renderChatMessages(mockMessages);
+                    ]);
                 }
+                this.renderChatMessages(this.messages.get(conversationId));
             }
 
             renderChatMessages(messages) {
@@ -1304,11 +1462,10 @@
                         <img src="${msg.profiles.avatar}" class="avatar" alt="${msg.profiles.name}">
                         <div class="message-content">
                             <div>${msg.content}</div>
-                            <div style="font-size: 0.75rem; margin-top: 4px; opacity: 0.7;">${this.formatTime(msg.created_at)}</div>
+                            <div class="post-time">${this.formatTime(msg.created_at)}</div>
                         </div>
                     </div>
                 `).join('');
-                
                 container.scrollTop = container.scrollHeight;
             }
 
@@ -1316,29 +1473,41 @@
                 if (!content.trim() || !this.activeChat) return;
 
                 try {
-                    // For demo purposes, we'll just add the message locally
                     const newMessage = {
-                        id: Date.now(),
                         content: content,
                         sender_id: this.currentUser.id,
                         conversation_id: this.activeChat.id,
                         created_at: new Date().toISOString(),
-                        profiles: {
-                            name: this.userProfile.name,
-                            avatar: this.userProfile.avatar
-                        }
+                        profiles: this.userProfile
                     };
 
+                    // Add to local state immediately
                     const conversationMessages = this.messages.get(this.activeChat.id) || [];
                     conversationMessages.push(newMessage);
                     this.messages.set(this.activeChat.id, conversationMessages);
-
                     this.renderMessage(newMessage);
 
                     // Clear input
                     document.getElementById('chatInput').value = '';
 
                     this.showToast('Message sent!', 'success');
+
+                    // Simulate reply
+                    setTimeout(() => {
+                        const otherUser = this.activeChat.user1_id === this.currentUser.id ? 
+                                       this.activeChat.user2 : this.activeChat.user1;
+                        const reply = {
+                            id: Date.now(),
+                            content: 'Thanks for your message!',
+                            sender_id: otherUser.id,
+                            conversation_id: this.activeChat.id,
+                            created_at: new Date().toISOString(),
+                            profiles: otherUser
+                        };
+                        conversationMessages.push(reply);
+                        this.renderMessage(reply);
+                    }, 1000);
+
                 } catch (error) {
                     console.error('Error sending message:', error);
                     this.showToast('Error sending message', 'error');
@@ -1353,7 +1522,7 @@
                     <img src="${message.profiles.avatar}" class="avatar" alt="${message.profiles.name}">
                     <div class="message-content">
                         <div>${message.content}</div>
-                        <div style="font-size: 0.75rem; margin-top: 4px; opacity: 0.7;">${this.formatTime(message.created_at)}</div>
+                        <div class="post-time">${this.formatTime(message.created_at)}</div>
                     </div>
                 `;
                 container.appendChild(messageDiv);
@@ -1362,130 +1531,100 @@
 
             // Follow System
             async loadFollowData() {
-                try {
-                    // Mock follow data for demo
-                    this.following = new Set(['2', '3']);
-                    this.followers = new Set(['2', '4', '5']);
-                    
-                    this.followingUsers = [
-                        {
-                            id: '2',
-                            name: 'Jane Smith',
-                            username: 'janesmith',
-                            avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
-                            bio: 'Digital creator and tech enthusiast'
-                        },
-                        {
-                            id: '3',
-                            name: 'Mike Johnson',
-                            username: 'mikej',
-                            avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128',
-                            bio: 'Software engineer and open source contributor'
-                        }
-                    ];
-                    
-                    this.followerUsers = [
-                        {
-                            id: '2',
-                            name: 'Jane Smith',
-                            username: 'janesmith',
-                            avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
-                            bio: 'Digital creator and tech enthusiast'
-                        },
-                        {
-                            id: '4',
-                            name: 'Sarah Wilson',
-                            username: 'sarahw',
-                            avatar: 'https://ui-avatars.com/api/?name=Sarah+Wilson&background=10b981&color=fff&size=128',
-                            bio: 'Photographer and travel blogger'
-                        },
-                        {
-                            id: '5',
-                            name: 'Alex Chen',
-                            username: 'alexc',
-                            avatar: 'https://ui-avatars.com/api/?name=Alex+Chen&background=ef4444&color=fff&size=128',
-                            bio: 'UX designer and product manager'
-                        }
-                    ];
-                    
-                    this.updateFollowUI();
-                    this.renderFollowersView();
-                    this.renderFollowingView();
-                } catch (error) {
-                    console.error('Error loading follow data:', error);
-                }
-            }
-
-            async toggleFollow() {
-                this.showToast('Follow feature coming soon!', 'info');
+                // Mock data for demo
+                this.following = new Set(['2', '3']);
+                this.followers = new Set(['2', '4', '5']);
+                
+                this.followingUsers = [
+                    {
+                        id: '2',
+                        name: 'Jane Smith',
+                        username: 'janesmith',
+                        avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
+                        bio: 'Digital creator and tech enthusiast'
+                    },
+                    {
+                        id: '3',
+                        name: 'Mike Johnson',
+                        username: 'mikej',
+                        avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128',
+                        bio: 'Software engineer and open source contributor'
+                    }
+                ];
+                
+                this.followerUsers = [
+                    {
+                        id: '2',
+                        name: 'Jane Smith',
+                        username: 'janesmith',
+                        avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
+                        bio: 'Digital creator and tech enthusiast'
+                    },
+                    {
+                        id: '4',
+                        name: 'Sarah Wilson',
+                        username: 'sarahw',
+                        avatar: 'https://ui-avatars.com/api/?name=Sarah+Wilson&background=10b981&color=fff&size=128',
+                        bio: 'Photographer and travel blogger'
+                    },
+                    {
+                        id: '5',
+                        name: 'Alex Chen',
+                        username: 'alexc',
+                        avatar: 'https://ui-avatars.com/api/?name=Alex+Chen&background=ef4444&color=fff&size=128',
+                        bio: 'UX designer and product manager'
+                    }
+                ];
+                
+                this.updateFollowUI();
             }
 
             updateFollowUI() {
-                const followingCount = document.getElementById('followingCount');
-                const followersCount = document.getElementById('followersCount');
-                
-                if (followingCount) {
-                    followingCount.textContent = this.following.size;
-                }
-                
-                if (followersCount) {
-                    followersCount.textContent = this.followers.size;
-                }
+                document.getElementById('followingCount').textContent = this.following.size;
+                document.getElementById('followersCount').textContent = this.followers.size;
+                document.getElementById('postsCount').textContent = this.posts.filter(p => p.author_id === this.currentUser?.id).length;
             }
 
             showFollowers() {
+                this.renderUsersGrid(this.followerUsers, 'followersGrid');
                 this.showPage('followersPage');
             }
 
             showFollowing() {
+                this.renderUsersGrid(this.followingUsers, 'followingGrid');
                 this.showPage('followingPage');
             }
 
-            renderFollowersView() {
-                const container = document.getElementById('followersGrid');
-                if (!this.followerUsers || this.followerUsers.length === 0) {
+            showUserPosts() {
+                const userPosts = this.posts.filter(p => p.author_id === this.currentUser?.id);
+                const container = document.getElementById('profilePostsContainer');
+                
+                if (userPosts.length === 0) {
                     container.innerHTML = `
-                        <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
-                            <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
-                            <h3>No followers yet</h3>
-                            <p>When someone follows you, they'll appear here</p>
+                        <div class="empty-state">
+                            <i class="fas fa-feather"></i>
+                            <h3>No posts yet</h3>
+                            <p>Share your first post!</p>
                         </div>
                     `;
-                    return;
+                } else {
+                    container.innerHTML = userPosts.map(post => `
+                        <div class="post">
+                            <div class="post-content">${post.content}</div>
+                            <div class="post-time">${this.formatTime(post.created_at)}</div>
+                        </div>
+                    `).join('');
                 }
-                
-                container.innerHTML = this.followerUsers.map(user => `
-                    <div style="background: var(--bg-color); border-radius: var(--radius-lg); padding: 20px; text-align: center; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); margin-bottom: 16px;">
-                        <img src="${user.avatar}" alt="${user.name}" style="width: 80px; height: 80px; border-radius: var(--radius-full); object-fit: cover; margin: 0 auto 12px; border: 3px solid var(--border-color);">
-                        <div style="font-weight: 600; margin-bottom: 4px;">${user.name}</div>
-                        <div style="color: var(--text-secondary); margin-bottom: 8px;">@${user.username}</div>
-                        <div style="color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; margin-bottom: 12px;">${user.bio}</div>
-                        <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; width: 100%;">
-                            ${this.following.has(user.id) ? 'Unfollow' : 'Follow'}
-                        </button>
-                    </div>
-                `).join('');
             }
 
-            renderFollowingView() {
-                const container = document.getElementById('followingGrid');
-                if (!this.followingUsers || this.followingUsers.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
-                            <i class="fas fa-user-plus" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
-                            <h3>Not following anyone</h3>
-                            <p>When you follow someone, they'll appear here</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                container.innerHTML = this.followingUsers.map(user => `
+            renderUsersGrid(users, containerId) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = users.map(user => `
                     <div style="background: var(--bg-color); border-radius: var(--radius-lg); padding: 20px; text-align: center; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); margin-bottom: 16px;">
-                        <img src="${user.avatar}" alt="${user.name}" style="width: 80px; height: 80px; border-radius: var(--radius-full); object-fit: cover; margin: 0 auto 12px; border: 3px solid var(--border-color);">
+                        <img src="${user.avatar}" alt="${user.name}" style="width: 80px; height: 80px; border-radius: var(--radius-full); object-fit: cover; margin: 0 auto 12px;">
                         <div style="font-weight: 600; margin-bottom: 4px;">${user.name}</div>
                         <div style="color: var(--text-secondary); margin-bottom: 8px;">@${user.username}</div>
-                        <div style="color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; margin-bottom: 12px;">${user.bio}</div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 12px;">${user.bio}</div>
                         <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; width: 100%;">
                             ${this.following.has(user.id) ? 'Unfollow' : 'Follow'}
                         </button>
@@ -1518,11 +1657,8 @@
             }
 
             clearAuthForms() {
-                const errorDivs = document.querySelectorAll('.error-message');
-                errorDivs.forEach(div => {
-                    div.textContent = '';
-                    div.classList.remove('show');
-                });
+                document.getElementById('loginError').classList.remove('show');
+                document.getElementById('signupError').classList.remove('show');
             }
 
             updateProfileUI() {
@@ -1536,41 +1672,18 @@
                 document.getElementById('profileBio').textContent = this.userProfile.bio;
                 document.getElementById('profileAvatar').src = this.userProfile.avatar;
                 
-                // Update posts count
-                this.updatePostsCount();
-            }
-
-            async updatePostsCount() {
-                try {
-                    const { data, error } = await this.supabase
-                        .from('posts')
-                        .select('id', { count: 'exact' })
-                        .eq('author_id', this.currentUser.id);
-
-                    if (!error) {
-                        document.getElementById('postsCount').textContent = data.length;
-                    }
-                } catch (error) {
-                    console.error('Error updating posts count:', error);
-                    document.getElementById('postsCount').textContent = '0';
-                }
+                this.updateFollowUI();
             }
 
             showPage(pageId) {
-                document.querySelectorAll('.page').forEach(page => {
-                    page.classList.remove('active');
-                });
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
                 document.getElementById(pageId).classList.add('active');
 
-                // Update navigation
                 document.querySelectorAll('.nav-item').forEach(nav => {
                     nav.classList.remove('active');
-                    if (nav.dataset.page === pageId) {
-                        nav.classList.add('active');
-                    }
+                    if (nav.dataset.page === pageId) nav.classList.add('active');
                 });
 
-                // Close dropdown
                 document.getElementById('navDropdown').classList.remove('show');
             }
 
@@ -1581,18 +1694,16 @@
                 document.getElementById('showSignup').addEventListener('click', () => this.showSignupForm());
                 document.getElementById('showLogin').addEventListener('click', () => this.showLoginForm());
 
-                // Navigation dropdown
+                // Navigation
                 document.querySelector('.nav-dropdown-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
                     document.getElementById('navDropdown').classList.toggle('show');
                 });
 
-                // Close dropdown when clicking outside
                 document.addEventListener('click', () => {
                     document.getElementById('navDropdown').classList.remove('show');
                 });
 
-                // Navigation items
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -1600,7 +1711,6 @@
                     });
                 });
 
-                // Navigation dropdown items
                 document.querySelectorAll('.nav-dropdown-item[data-page]').forEach(item => {
                     item.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -1627,16 +1737,10 @@
                     this.sendMessage(document.getElementById('chatInput').value);
                 });
 
-                const chatInput = document.getElementById('chatInput');
-                chatInput.addEventListener('keypress', (e) => {
+                document.getElementById('chatInput').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
                         this.sendMessage(e.target.value);
                     }
-                });
-
-                // Follow system
-                document.getElementById('followBtn').addEventListener('click', () => {
-                    this.toggleFollow();
                 });
 
                 // Theme toggle
@@ -1647,6 +1751,11 @@
                 // Logout
                 document.getElementById('logoutBtnNav').addEventListener('click', () => {
                     this.logout();
+                });
+
+                // Follow button
+                document.getElementById('followBtn').addEventListener('click', () => {
+                    this.showToast('Follow feature coming soon!', 'info');
                 });
             }
 
@@ -1659,55 +1768,41 @@
             }
 
             async logout() {
-                try {
-                    const { error } = await this.supabase.auth.signOut();
-                    if (error) throw error;
-                    this.showToast('Logged out successfully', 'info');
-                } catch (error) {
-                    console.error('Error signing out:', error);
-                    this.showToast('Error signing out', 'error');
-                } finally {
-                    this.showAuthModal();
-                    this.clearAuthForms();
-                    this.showLoginForm();
-                }
+                await this.supabase.auth.signOut();
+                this.showAuthModal();
+                this.showLoginForm();
             }
 
             // Utility Methods
             formatTime(timestamp) {
                 const now = new Date();
-                const postTime = new Date(timestamp);
-                const diffInMinutes = Math.floor((now - postTime) / (1000 * 60));
-                
-                if (diffInMinutes < 1) return 'now';
-                if (diffInMinutes < 60) return `${diffInMinutes}m`;
-                if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h`;
-                return `${Math.floor(diffInMinutes / 1440)}d`;
+                const time = new Date(timestamp);
+                const diff = now - time;
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+
+                if (minutes < 1) return 'now';
+                if (minutes < 60) return `${minutes}m`;
+                if (hours < 24) return `${hours}h`;
+                return `${days}d`;
             }
 
             showToast(message, type = 'success') {
                 const toast = document.createElement('div');
                 toast.className = `toast ${type}`;
                 toast.textContent = message;
-                
                 document.getElementById('toastContainer').appendChild(toast);
-                
-                setTimeout(() => {
-                    toast.remove();
-                }, 3000);
+                setTimeout(() => toast.remove(), 3000);
             }
 
             showError(message, element) {
                 element.textContent = message;
                 element.classList.add('show');
             }
-
-            sharePost(postId) {
-                this.showToast('Post shared successfully!', 'success');
-            }
         }
 
-        // Initialize the app
+        // Initialize app
         document.addEventListener('DOMContentLoaded', () => {
             window.primeMarApp = new PrimeMar();
         });

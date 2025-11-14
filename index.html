@@ -854,11 +854,11 @@
                         <div class="error-message" id="loginError"></div>
                         <div class="form-group">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email" value="demo@primemar.com">
+                            <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Password</label>
-                            <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" value="password123">
+                            <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password">
                         </div>
                         <button class="btn btn-primary" id="loginBtn">Sign In</button>
                         <div class="auth-toggle">
@@ -1104,9 +1104,14 @@
     </div>
 
     <script>
-        // PrimeMar Social Media Platform - Working Implementation
+        // PrimeMar Social Media Platform with Supabase Integration
         class PrimeMar {
             constructor() {
+                // Supabase configuration - Replace with your actual Supabase URL and Key
+                this.supabaseUrl = 'https://your-project.supabase.co';
+                this.supabaseKey = 'your-supabase-anon-key';
+                this.supabase = null;
+                
                 this.currentUser = null;
                 this.userProfile = null;
                 this.posts = [];
@@ -1117,70 +1122,18 @@
                 this.messages = new Map();
                 this.draftMessages = new Map();
                 
-                // Mock data for demo
-                this.mockUsers = [
-                    {
-                        id: 1,
-                        name: 'Demo User',
-                        username: 'demouser',
-                        email: 'demo@primemar.com',
-                        avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=3b82f6&color=fff&size=128',
-                        bio: 'Welcome to my PrimeMar profile!'
-                    },
-                    {
-                        id: 2,
-                        name: 'Jane Smith',
-                        username: 'janesmith',
-                        email: 'jane@example.com',
-                        avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
-                        bio: 'Digital creator and tech enthusiast'
-                    },
-                    {
-                        id: 3,
-                        name: 'Mike Johnson',
-                        username: 'mikej',
-                        email: 'mike@example.com',
-                        avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128',
-                        bio: 'Software engineer and open source contributor'
-                    }
-                ];
-
-                this.mockPosts = [
-                    {
-                        id: 1,
-                        content: 'Just joined PrimeMar! This platform looks amazing! 🚀',
-                        author_id: 1,
-                        created_at: new Date(Date.now() - 3600000).toISOString(),
-                        likes: [2, 3],
-                        profiles: this.mockUsers[0]
-                    },
-                    {
-                        id: 2,
-                        content: 'Working on some exciting new features for the platform. Stay tuned! 💫',
-                        author_id: 2,
-                        created_at: new Date(Date.now() - 7200000).toISOString(),
-                        likes: [1],
-                        profiles: this.mockUsers[1]
-                    },
-                    {
-                        id: 3,
-                        content: 'Beautiful day for coding! ☀️ What are you working on today?',
-                        author_id: 3,
-                        created_at: new Date(Date.now() - 10800000).toISOString(),
-                        likes: [1, 2],
-                        profiles: this.mockUsers[2]
-                    }
-                ];
-
                 this.init();
             }
 
             async init() {
-                // Check if user is already logged in (from localStorage)
-                const savedUser = localStorage.getItem('primemar_user');
-                if (savedUser) {
-                    this.currentUser = JSON.parse(savedUser);
-                    this.userProfile = this.mockUsers.find(u => u.id === this.currentUser.id);
+                // Initialize Supabase
+                this.supabase = supabase.createClient(this.supabaseUrl, this.supabaseKey);
+                
+                // Check if user is already logged in
+                const { data: { session }, error } = await this.supabase.auth.getSession();
+                if (session) {
+                    this.currentUser = session.user;
+                    await this.loadUserProfile();
                     this.showApp();
                     await this.loadInitialData();
                 } else {
@@ -1188,6 +1141,60 @@
                 }
                 
                 this.setupEventListeners();
+                
+                // Set up auth state listener
+                this.supabase.auth.onAuthStateChange(async (event, session) => {
+                    if (event === 'SIGNED_IN' && session) {
+                        this.currentUser = session.user;
+                        await this.loadUserProfile();
+                        this.showApp();
+                        await this.loadInitialData();
+                    } else if (event === 'SIGNED_OUT') {
+                        this.currentUser = null;
+                        this.userProfile = null;
+                        this.showAuthModal();
+                    }
+                });
+            }
+
+            async loadUserProfile() {
+                if (!this.currentUser) return;
+                
+                // Get user profile from database
+                const { data, error } = await this.supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', this.currentUser.id)
+                    .single();
+                
+                if (error) {
+                    console.error('Error loading user profile:', error);
+                    
+                    // Create profile if it doesn't exist
+                    const { data: newProfile, error: createError } = await this.supabase
+                        .from('profiles')
+                        .insert([
+                            {
+                                id: this.currentUser.id,
+                                name: this.currentUser.user_metadata?.full_name || this.currentUser.email?.split('@')[0] || 'User',
+                                username: this.currentUser.user_metadata?.username || this.currentUser.email?.split('@')[0] || 'user',
+                                email: this.currentUser.email,
+                                avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentUser.user_metadata?.full_name || this.currentUser.email?.split('@')[0] || 'User')}&background=3b82f6&color=fff&size=128`,
+                                bio: 'Welcome to my PrimeMar profile!'
+                            }
+                        ])
+                        .select()
+                        .single();
+                    
+                    if (createError) {
+                        console.error('Error creating user profile:', createError);
+                        return;
+                    }
+                    
+                    this.userProfile = newProfile;
+                } else {
+                    this.userProfile = data;
+                }
             }
 
             async loadInitialData() {
@@ -1203,19 +1210,15 @@
                 const password = document.getElementById('loginPassword').value;
                 const errorDiv = document.getElementById('loginError');
 
-                // Simple demo authentication
-                if (email === 'demo@primemar.com' && password === 'password123') {
-                    this.currentUser = this.mockUsers[0];
-                    this.userProfile = this.mockUsers[0];
-                    
-                    // Save to localStorage
-                    localStorage.setItem('primemar_user', JSON.stringify(this.currentUser));
-                    
-                    this.showApp();
-                    await this.loadInitialData();
-                    this.showToast('Welcome back to PrimeMar!');
+                const { data, error } = await this.supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    this.showError(error.message, errorDiv);
                 } else {
-                    this.showError('Invalid email or password', errorDiv);
+                    this.showToast('Welcome back to PrimeMar!');
                 }
             }
 
@@ -1231,25 +1234,22 @@
                     return;
                 }
 
-                // Create new user
-                const newUser = {
-                    id: Date.now(),
-                    name: name,
-                    username: username,
+                const { data, error } = await this.supabase.auth.signUp({
                     email: email,
-                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=128`,
-                    bio: 'New PrimeMar user'
-                };
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: name,
+                            username: username
+                        }
+                    }
+                });
 
-                this.mockUsers.push(newUser);
-                this.currentUser = newUser;
-                this.userProfile = newUser;
-                
-                localStorage.setItem('primemar_user', JSON.stringify(this.currentUser));
-                
-                this.showApp();
-                await this.loadInitialData();
-                this.showToast('Welcome to PrimeMar!');
+                if (error) {
+                    this.showError(error.message, errorDiv);
+                } else {
+                    this.showToast('Account created! Please check your email for verification.');
+                }
             }
 
             // Post Methods
@@ -1259,20 +1259,32 @@
                     return;
                 }
 
-                // Create new post
-                const newPost = {
-                    id: Date.now(),
-                    content: content,
-                    author_id: this.currentUser.id,
-                    created_at: new Date().toISOString(),
-                    likes: [],
-                    profiles: this.userProfile
-                };
+                // Create new post in database
+                const { data, error } = await this.supabase
+                    .from('posts')
+                    .insert([
+                        {
+                            content: content,
+                            author_id: this.currentUser.id
+                        }
+                    ])
+                    .select(`
+                        *,
+                        profiles (
+                            name,
+                            username,
+                            avatar
+                        )
+                    `);
 
-                this.mockPosts.unshift(newPost);
-                this.clearComposer();
-                await this.loadFeed();
-                this.showToast('Post published!');
+                if (error) {
+                    console.error('Error creating post:', error);
+                    this.showToast('Error creating post', 'error');
+                } else {
+                    this.clearComposer();
+                    await this.loadFeed();
+                    this.showToast('Post published!');
+                }
             }
 
             clearComposer() {
@@ -1282,8 +1294,29 @@
             }
 
             async loadFeed() {
-                this.posts = this.mockPosts;
-                this.renderFeed();
+                // Get posts from database with user profiles
+                const { data, error } = await this.supabase
+                    .from('posts')
+                    .select(`
+                        *,
+                        profiles (
+                            name,
+                            username,
+                            avatar
+                        ),
+                        likes (
+                            user_id
+                        )
+                    `)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error loading posts:', error);
+                    this.showToast('Error loading posts', 'error');
+                } else {
+                    this.posts = data;
+                    this.renderFeed();
+                }
             }
 
             renderFeed() {
@@ -1295,7 +1328,9 @@
                 }
 
                 container.innerHTML = this.posts.map(post => {
-                    const isLiked = post.likes.includes(this.currentUser.id);
+                    const isLiked = post.likes && post.likes.some(like => like.user_id === this.currentUser.id);
+                    const likeCount = post.likes ? post.likes.length : 0;
+                    
                     return `
                     <div class="post" data-post-id="${post.id}">
                         <div class="post-header">
@@ -1312,7 +1347,7 @@
                             <button class="post-action like-action ${isLiked ? 'liked' : ''}" 
                                     onclick="primeMarApp.likePost(${post.id})">
                                 <i class="fas fa-heart"></i>
-                                <span>${post.likes.length}</span>
+                                <span>${likeCount}</span>
                             </button>
                             <button class="post-action" onclick="primeMarApp.sharePost(${post.id})">
                                 <i class="fas fa-share"></i>
@@ -1322,44 +1357,79 @@
                 `}).join('');
             }
 
-            likePost(postId) {
-                const post = this.mockPosts.find(p => p.id === postId);
-                if (!post) return;
+            async likePost(postId) {
+                // Check if user already liked the post
+                const { data: existingLike, error: checkError } = await this.supabase
+                    .from('likes')
+                    .select('*')
+                    .eq('post_id', postId)
+                    .eq('user_id', this.currentUser.id)
+                    .single();
 
-                const userIndex = post.likes.indexOf(this.currentUser.id);
-                if (userIndex > -1) {
-                    // Unlike
-                    post.likes.splice(userIndex, 1);
+                if (checkError && checkError.code !== 'PGRST116') {
+                    console.error('Error checking like:', checkError);
+                    return;
+                }
+
+                if (existingLike) {
+                    // Unlike the post
+                    const { error } = await this.supabase
+                        .from('likes')
+                        .delete()
+                        .eq('post_id', postId)
+                        .eq('user_id', this.currentUser.id);
+
+                    if (error) {
+                        console.error('Error unliking post:', error);
+                    }
                 } else {
-                    // Like
-                    post.likes.push(this.currentUser.id);
+                    // Like the post
+                    const { error } = await this.supabase
+                        .from('likes')
+                        .insert([
+                            {
+                                post_id: postId,
+                                user_id: this.currentUser.id
+                            }
+                        ]);
+
+                    if (error) {
+                        console.error('Error liking post:', error);
+                    }
                 }
                 
-                this.renderFeed();
+                await this.loadFeed();
             }
 
             // Chat Methods
             async loadConversations() {
-                this.conversations = [
-                    { 
-                        id: 1, 
-                        name: 'Jane Smith', 
-                        username: 'janesmith', 
-                        avatar: this.mockUsers[1].avatar,
-                        lastMessage: 'Hey there! How are you?',
-                        time: '2m ago',
-                        unread: 2
-                    },
-                    { 
-                        id: 2, 
-                        name: 'Mike Johnson', 
-                        username: 'mikej', 
-                        avatar: this.mockUsers[2].avatar,
-                        lastMessage: 'Check out this new feature!',
-                        time: '1h ago',
-                        unread: 0
-                    }
-                ];
+                // Get conversations from database
+                const { data, error } = await this.supabase
+                    .from('conversations')
+                    .select(`
+                        *,
+                        user1:profiles!conversations_user1_id_fkey(name, username, avatar),
+                        user2:profiles!conversations_user2_id_fkey(name, username, avatar)
+                    `)
+                    .or(`user1_id.eq.${this.currentUser.id},user2_id.eq.${this.currentUser.id}`);
+
+                if (error) {
+                    console.error('Error loading conversations:', error);
+                    return;
+                }
+
+                this.conversations = data.map(conv => {
+                    const otherUser = conv.user1_id === this.currentUser.id ? conv.user2 : conv.user1;
+                    return {
+                        id: conv.id,
+                        name: otherUser.name,
+                        username: otherUser.username,
+                        avatar: otherUser.avatar,
+                        lastMessage: conv.last_message || 'Start a conversation',
+                        time: this.formatTime(conv.updated_at),
+                        unread: 0 // You can implement unread count logic
+                    };
+                });
                 
                 // Initialize messages storage
                 this.conversations.forEach(conv => {
@@ -1386,7 +1456,7 @@
                 `).join('');
             }
 
-            openChat(conversationId) {
+            async openChat(conversationId) {
                 const conversation = this.conversations.find(c => c.id === conversationId);
                 if (!conversation) return;
 
@@ -1406,47 +1476,39 @@
                 this.loadDraftMessage(conversationId);
                 
                 // Load chat messages
-                this.loadChatMessages(conversationId);
+                await this.loadChatMessages(conversationId);
             }
 
             async loadChatMessages(conversationId) {
-                let messages = this.messages.get(conversationId) || [];
-                
-                // Create initial messages if none exist
-                if (messages.length === 0) {
-                    messages = [
-                        { 
-                            id: 1, 
-                            content: 'Hey there! Welcome to PrimeMar! 👋', 
-                            sender_id: conversationId, 
-                            created_at: new Date(Date.now() - 120000).toISOString() 
-                        },
-                        { 
-                            id: 2, 
-                            content: 'Thanks! The platform looks amazing so far!', 
-                            sender_id: this.currentUser.id, 
-                            created_at: new Date(Date.now() - 60000).toISOString() 
-                        },
-                        { 
-                            id: 3, 
-                            content: 'Glad you like it! We have many exciting features coming soon!', 
-                            sender_id: conversationId, 
-                            created_at: new Date().toISOString() 
-                        }
-                    ];
-                    this.messages.set(conversationId, messages);
+                // Get messages from database
+                const { data, error } = await this.supabase
+                    .from('messages')
+                    .select(`
+                        *,
+                        profiles (
+                            name,
+                            avatar
+                        )
+                    `)
+                    .eq('conversation_id', conversationId)
+                    .order('created_at', { ascending: true });
+
+                if (error) {
+                    console.error('Error loading messages:', error);
+                    return;
                 }
-                
-                this.renderChatMessages(messages);
+
+                this.messages.set(conversationId, data || []);
+                this.renderChatMessages(data || []);
             }
 
             renderChatMessages(messages) {
                 const container = document.getElementById('chatMessages');
                 container.innerHTML = messages.map(msg => `
                     <div class="message ${msg.sender_id === this.currentUser.id ? 'own' : ''}">
-                        <img src="${msg.sender_id === this.currentUser.id ? this.userProfile.avatar : this.activeChat.avatar}" 
+                        <img src="${msg.profiles.avatar}" 
                              class="avatar" 
-                             alt="${msg.sender_id === this.currentUser.id ? this.userProfile.name : this.activeChat.name}">
+                             alt="${msg.profiles.name}">
                         <div class="message-content">
                             <div>${msg.content}</div>
                             <div class="message-time">${this.formatTime(msg.created_at)}</div>
@@ -1464,50 +1526,49 @@
                 input.value = '';
                 this.saveDraftMessage(this.activeChat.id, '');
                 
-                // Create message
-                const message = {
-                    id: Date.now(),
-                    content: content,
-                    sender_id: this.currentUser.id,
-                    created_at: new Date().toISOString()
-                };
+                // Create message in database
+                const { data, error } = await this.supabase
+                    .from('messages')
+                    .insert([
+                        {
+                            content: content,
+                            sender_id: this.currentUser.id,
+                            conversation_id: this.activeChat.id
+                        }
+                    ])
+                    .select(`
+                        *,
+                        profiles (
+                            name,
+                            avatar
+                        )
+                    `);
 
-                // Add to storage
+                if (error) {
+                    console.error('Error sending message:', error);
+                    this.showToast('Error sending message', 'error');
+                    return;
+                }
+
+                // Update conversation last message
+                await this.supabase
+                    .from('conversations')
+                    .update({ 
+                        last_message: content,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', this.activeChat.id);
+
+                // Add to local storage
                 const conversationMessages = this.messages.get(this.activeChat.id) || [];
-                conversationMessages.push(message);
+                conversationMessages.push(data[0]);
                 this.messages.set(this.activeChat.id, conversationMessages);
 
                 // Render message
-                this.renderMessage(message);
+                this.renderMessage(data[0]);
 
                 // Update conversation
                 this.updateConversationLastMessage(this.activeChat.id, content);
-
-                // Simulate response
-                setTimeout(() => {
-                    const responses = [
-                        "That's interesting!",
-                        "I agree with you!",
-                        "Tell me more about that.",
-                        "How was your day?",
-                        "That sounds amazing!"
-                    ];
-                    const response = responses[Math.floor(Math.random() * responses.length)];
-                    
-                    const responseMessage = {
-                        id: Date.now() + 1,
-                        content: response,
-                        sender_id: this.activeChat.id,
-                        created_at: new Date().toISOString()
-                    };
-                    
-                    const conversationMessages = this.messages.get(this.activeChat.id) || [];
-                    conversationMessages.push(responseMessage);
-                    this.messages.set(this.activeChat.id, conversationMessages);
-                    
-                    this.renderMessage(responseMessage);
-                    this.updateConversationLastMessage(this.activeChat.id, response);
-                }, 1000 + Math.random() * 2000);
             }
 
             updateConversationLastMessage(conversationId, message) {
@@ -1524,9 +1585,9 @@
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${message.sender_id === this.currentUser.id ? 'own' : ''}`;
                 messageDiv.innerHTML = `
-                    <img src="${message.sender_id === this.currentUser.id ? this.userProfile.avatar : this.activeChat.avatar}" 
+                    <img src="${message.profiles.avatar}" 
                          class="avatar" 
-                         alt="${message.sender_id === this.currentUser.id ? this.userProfile.name : this.activeChat.name}">
+                         alt="${message.profiles.name}">
                     <div class="message-content">
                         <div>${message.content}</div>
                         <div class="message-time">${this.formatTime(message.created_at)}</div>
@@ -1550,31 +1611,37 @@
 
             // Follow System
             async loadFollowData() {
-                this.following = new Set(['janesmith', 'mikej']);
-                this.followers = new Set(['janesmith', 'sarahw', 'alexc']);
-                
-                this.followingUsers = [
-                    this.mockUsers[1],
-                    this.mockUsers[2]
-                ];
-                
-                this.followerUsers = [
-                    this.mockUsers[1],
-                    {
-                        id: 4,
-                        name: 'Sarah Wilson',
-                        username: 'sarahw',
-                        avatar: 'https://ui-avatars.com/api/?name=Sarah+Wilson&background=10b981&color=fff&size=128',
-                        bio: 'Photographer and travel blogger'
-                    },
-                    {
-                        id: 5,
-                        name: 'Alex Chen',
-                        username: 'alexc',
-                        avatar: 'https://ui-avatars.com/api/?name=Alex+Chen&background=ef4444&color=fff&size=128',
-                        bio: 'UX designer and product manager'
-                    }
-                ];
+                // Get following list from database
+                const { data: followingData, error: followingError } = await this.supabase
+                    .from('follows')
+                    .select(`
+                        following_id,
+                        profiles!follows_following_id_fkey(*)
+                    `)
+                    .eq('follower_id', this.currentUser.id);
+
+                if (followingError) {
+                    console.error('Error loading following:', followingError);
+                } else {
+                    this.following = new Set(followingData.map(f => f.following_id));
+                    this.followingUsers = followingData.map(f => f.profiles);
+                }
+
+                // Get followers list from database
+                const { data: followersData, error: followersError } = await this.supabase
+                    .from('follows')
+                    .select(`
+                        follower_id,
+                        profiles!follows_follower_id_fkey(*)
+                    `)
+                    .eq('following_id', this.currentUser.id);
+
+                if (followersError) {
+                    console.error('Error loading followers:', followersError);
+                } else {
+                    this.followers = new Set(followersData.map(f => f.follower_id));
+                    this.followerUsers = followersData.map(f => f.profiles);
+                }
                 
                 this.updateFollowUI();
                 this.renderFollowersView();
@@ -1582,12 +1649,39 @@
             }
 
             async toggleFollow() {
-                if (this.following.has(this.userProfile.username)) {
-                    this.following.delete(this.userProfile.username);
-                    this.showToast('Unfollowed user');
+                if (this.following.has(this.userProfile.id)) {
+                    // Unfollow
+                    const { error } = await this.supabase
+                        .from('follows')
+                        .delete()
+                        .eq('follower_id', this.currentUser.id)
+                        .eq('following_id', this.userProfile.id);
+
+                    if (error) {
+                        console.error('Error unfollowing user:', error);
+                        this.showToast('Error unfollowing user', 'error');
+                    } else {
+                        this.following.delete(this.userProfile.id);
+                        this.showToast('Unfollowed user');
+                    }
                 } else {
-                    this.following.add(this.userProfile.username);
-                    this.showToast('Followed user');
+                    // Follow
+                    const { error } = await this.supabase
+                        .from('follows')
+                        .insert([
+                            {
+                                follower_id: this.currentUser.id,
+                                following_id: this.userProfile.id
+                            }
+                        ]);
+
+                    if (error) {
+                        console.error('Error following user:', error);
+                        this.showToast('Error following user', 'error');
+                    } else {
+                        this.following.add(this.userProfile.id);
+                        this.showToast('Followed user');
+                    }
                 }
                 this.updateFollowUI();
             }
@@ -1598,7 +1692,7 @@
                 const followersCount = document.getElementById('followersCount');
                 
                 if (followBtn) {
-                    followBtn.textContent = this.following.has(this.userProfile.username) ? 'Unfollow' : 'Follow';
+                    followBtn.textContent = this.following.has(this.userProfile.id) ? 'Unfollow' : 'Follow';
                 }
                 
                 if (followingCount) {
@@ -1620,6 +1714,11 @@
 
             renderFollowersView() {
                 const container = document.getElementById('followersGrid');
+                if (!this.followerUsers || this.followerUsers.length === 0) {
+                    container.innerHTML = '<div class="text-center p-3">No followers yet</div>';
+                    return;
+                }
+                
                 container.innerHTML = this.followerUsers.map(user => `
                     <div class="user-card">
                         <img src="${user.avatar}" alt="${user.name}" class="user-card-avatar">
@@ -1627,8 +1726,8 @@
                         <p class="user-handle">@${user.username}</p>
                         <p class="profile-bio" style="font-size: 0.8rem; margin-top: 8px;">${user.bio}</p>
                         <button class="follow-btn" style="margin-top: 12px; padding: 6px 12px; font-size: 0.8rem;" 
-                                onclick="primeMarApp.toggleFollowUser('${user.username}')">
-                            ${this.following.has(user.username) ? 'Unfollow' : 'Follow'}
+                                onclick="primeMarApp.toggleFollowUser('${user.id}')">
+                            ${this.following.has(user.id) ? 'Unfollow' : 'Follow'}
                         </button>
                     </div>
                 `).join('');
@@ -1636,6 +1735,11 @@
 
             renderFollowingView() {
                 const container = document.getElementById('followingGrid');
+                if (!this.followingUsers || this.followingUsers.length === 0) {
+                    container.innerHTML = '<div class="text-center p-3">Not following anyone yet</div>';
+                    return;
+                }
+                
                 container.innerHTML = this.followingUsers.map(user => `
                     <div class="user-card">
                         <img src="${user.avatar}" alt="${user.name}" class="user-card-avatar">
@@ -1643,20 +1747,47 @@
                         <p class="user-handle">@${user.username}</p>
                         <p class="profile-bio" style="font-size: 0.8rem; margin-top: 8px;">${user.bio}</p>
                         <button class="follow-btn" style="margin-top: 12px; padding: 6px 12px; font-size: 0.8rem;"
-                                onclick="primeMarApp.toggleFollowUser('${user.username}')">
-                            ${this.following.has(user.username) ? 'Unfollow' : 'Follow'}
+                                onclick="primeMarApp.toggleFollowUser('${user.id}')">
+                            ${this.following.has(user.id) ? 'Unfollow' : 'Follow'}
                         </button>
                     </div>
                 `).join('');
             }
 
-            toggleFollowUser(username) {
-                if (this.following.has(username)) {
-                    this.following.delete(username);
-                    this.showToast(`Unfollowed @${username}`);
+            async toggleFollowUser(userId) {
+                if (this.following.has(userId)) {
+                    // Unfollow
+                    const { error } = await this.supabase
+                        .from('follows')
+                        .delete()
+                        .eq('follower_id', this.currentUser.id)
+                        .eq('following_id', userId);
+
+                    if (error) {
+                        console.error('Error unfollowing user:', error);
+                        this.showToast('Error unfollowing user', 'error');
+                    } else {
+                        this.following.delete(userId);
+                        this.showToast(`Unfollowed user`);
+                    }
                 } else {
-                    this.following.add(username);
-                    this.showToast(`Followed @${username}`);
+                    // Follow
+                    const { error } = await this.supabase
+                        .from('follows')
+                        .insert([
+                            {
+                                follower_id: this.currentUser.id,
+                                following_id: userId
+                            }
+                        ]);
+
+                    if (error) {
+                        console.error('Error following user:', error);
+                        this.showToast('Error following user', 'error');
+                    } else {
+                        this.following.add(userId);
+                        this.showToast(`Followed user`);
+                    }
                 }
                 this.updateFollowUI();
                 this.renderFollowersView();
@@ -1665,11 +1796,37 @@
 
             // Stories
             async loadStories() {
+                // Get stories from database
+                const { data, error } = await this.supabase
+                    .from('stories')
+                    .select(`
+                        *,
+                        profiles (
+                            username,
+                            avatar
+                        )
+                    `)
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) {
+                    console.error('Error loading stories:', error);
+                    return;
+                }
+
                 const stories = [
-                    { id: 1, username: 'You', avatar: this.userProfile?.avatar, isAdd: true },
-                    { id: 2, username: 'janesmith', avatar: this.mockUsers[1].avatar },
-                    { id: 3, username: 'mikej', avatar: this.mockUsers[2].avatar }
+                    { id: 0, username: 'You', avatar: this.userProfile?.avatar, isAdd: true }
                 ];
+
+                if (data) {
+                    data.forEach(story => {
+                        stories.push({
+                            id: story.id,
+                            username: story.profiles.username,
+                            avatar: story.profiles.avatar
+                        });
+                    });
+                }
                 
                 this.renderStories(stories);
             }
@@ -1734,8 +1891,18 @@
                 document.getElementById('editProfileBio').value = this.userProfile.bio;
                 
                 // Update posts count
-                const userPosts = this.mockPosts.filter(p => p.author_id === this.currentUser.id);
-                document.getElementById('postsCount').textContent = userPosts.length;
+                this.updatePostsCount();
+            }
+
+            async updatePostsCount() {
+                const { data, error } = await this.supabase
+                    .from('posts')
+                    .select('id', { count: 'exact' })
+                    .eq('author_id', this.currentUser.id);
+
+                if (!error) {
+                    document.getElementById('postsCount').textContent = data.length;
+                }
             }
 
             showPage(pageId) {
@@ -1850,16 +2017,29 @@
                     document.getElementById('profileEditModal').classList.add('active');
                 });
 
-                document.getElementById('saveProfileBtn').addEventListener('click', () => {
+                document.getElementById('saveProfileBtn').addEventListener('click', async () => {
                     const name = document.getElementById('editProfileName').value;
                     const bio = document.getElementById('editProfileBio').value;
 
-                    this.userProfile.name = name;
-                    this.userProfile.bio = bio;
-                    
-                    this.updateProfileUI();
-                    document.getElementById('profileEditModal').classList.remove('active');
-                    this.showToast('Profile updated!');
+                    const { data, error } = await this.supabase
+                        .from('profiles')
+                        .update({
+                            name: name,
+                            bio: bio
+                        })
+                        .eq('id', this.currentUser.id);
+
+                    if (error) {
+                        console.error('Error updating profile:', error);
+                        this.showToast('Error updating profile', 'error');
+                    } else {
+                        this.userProfile.name = name;
+                        this.userProfile.bio = bio;
+                        
+                        this.updateProfileUI();
+                        document.getElementById('profileEditModal').classList.remove('active');
+                        this.showToast('Profile updated!');
+                    }
                 });
 
                 document.getElementById('closeProfileEdit').addEventListener('click', () => {
@@ -1904,12 +2084,13 @@
                 this.showToast(`${newTheme === 'dark' ? 'Dark' : 'Light'} mode enabled`);
             }
 
-            logout() {
-                this.currentUser = null;
-                this.userProfile = null;
-                localStorage.removeItem('primemar_user');
-                this.showAuthModal();
-                this.showToast('Logged out successfully');
+            async logout() {
+                const { error } = await this.supabase.auth.signOut();
+                if (error) {
+                    console.error('Error signing out:', error);
+                } else {
+                    this.showToast('Logged out successfully');
+                }
             }
 
             // Utility Methods

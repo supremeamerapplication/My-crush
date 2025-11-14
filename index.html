@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* All the CSS styles from previous implementation */
+        /* Complete CSS styles from previous implementation */
         :root {
             --primary-color: #3b82f6;
             --primary-hover: #2563eb;
@@ -101,6 +101,69 @@
             height: 32px;
             border-radius: var(--radius-md);
             object-fit: cover;
+        }
+
+        /* Search Bar */
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 20px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-full);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            margin-top: 8px;
+            box-shadow: var(--shadow-xl);
+            z-index: 1001;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .search-results.show {
+            display: block;
+        }
+
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-result-item:hover {
+            background: var(--hover-color);
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
         }
 
         /* Navigation */
@@ -821,6 +884,24 @@
             background: var(--error-color);
         }
 
+        /* Loading Spinner */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         @media (min-width: 768px) {
             .bottom-nav {
                 display: none;
@@ -903,6 +984,13 @@
                 <img src="https://raw.githubusercontent.com/creativetimofficial/public-assets/master/logos/logo-prime.jpg" alt="PrimeMar" class="logo-img">
                 <span>PrimeMar</span>
             </div>
+            
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search users, posts...">
+                <div class="search-results" id="searchResults"></div>
+            </div>
+
             <div class="header-nav">
                 <div class="nav-dropdown">
                     <button class="nav-dropdown-btn">
@@ -944,6 +1032,9 @@
                             <button class="action-btn" id="mediaBtn">
                                 <i class="fas fa-image"></i>
                             </button>
+                            <button class="action-btn" id="emojiBtn">
+                                <i class="fas fa-smile"></i>
+                            </button>
                         </div>
                         <div style="display: flex; align-items: center;">
                             <span class="char-count" id="charCount">280</span>
@@ -973,6 +1064,7 @@
                         <img src="" alt="Profile" class="avatar" id="chatUserAvatar">
                         <div>
                             <div id="chatUserName">User Name</div>
+                            <div class="user-handle" id="chatUserStatus">Online</div>
                         </div>
                         <div style="flex: 1;"></div>
                         <button class="action-btn" id="voiceCallBtn"><i class="fas fa-phone"></i></button>
@@ -1095,6 +1187,10 @@
                     <input type="text" class="form-input" id="editProfileName" placeholder="Enter your name">
                 </div>
                 <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" id="editProfileUsername" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
                     <label class="form-label">Bio</label>
                     <textarea class="form-input" id="editProfileBio" placeholder="Tell others about yourself" rows="3"></textarea>
                 </div>
@@ -1104,12 +1200,12 @@
     </div>
 
     <script>
-        // PrimeMar Social Media Platform with Supabase Integration
+        // PrimeMar Social Media Platform with Complete Supabase Integration
         class PrimeMar {
             constructor() {
                 // Supabase configuration - Replace with your actual Supabase URL and Key
-                this.supabaseUrl = 'https://qsiwjjqxpegfmgkmtjje.supabase.co';
-                this.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzaXdqanF4cGVnZm1na210amplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1NDU2MTYsImV4cCI6MjA3ODEyMTYxNn0.iZ5YLVdeZP0VOm_Qu8XBOfBa9hmyEqHl520q5hZd1z8';
+                this.supabaseUrl = 'https://your-project.supabase.co';
+                this.supabaseKey = 'your-supabase-anon-key';
                 this.supabase = null;
                 
                 this.currentUser = null;
@@ -1121,6 +1217,7 @@
                 this.followers = new Set();
                 this.messages = new Map();
                 this.draftMessages = new Map();
+                this.searchTimeout = null;
                 
                 this.init();
             }
@@ -1180,7 +1277,8 @@
                                 username: this.currentUser.user_metadata?.username || this.currentUser.email?.split('@')[0] || 'user',
                                 email: this.currentUser.email,
                                 avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentUser.user_metadata?.full_name || this.currentUser.email?.split('@')[0] || 'User')}&background=3b82f6&color=fff&size=128`,
-                                bio: 'Welcome to my PrimeMar profile!'
+                                bio: 'Welcome to my PrimeMar profile!',
+                                created_at: new Date().toISOString()
                             }
                         ])
                         .select()
@@ -1234,6 +1332,18 @@
                     return;
                 }
 
+                // Check if username already exists
+                const { data: existingUser, error: checkError } = await this.supabase
+                    .from('profiles')
+                    .select('username')
+                    .eq('username', username)
+                    .single();
+
+                if (existingUser) {
+                    this.showError('Username already exists', errorDiv);
+                    return;
+                }
+
                 const { data, error } = await this.supabase.auth.signUp({
                     email: email,
                     password: password,
@@ -1252,7 +1362,7 @@
                 }
             }
 
-            // Post Methods
+            // Post Methods (Twitter-like features)
             async post(content) {
                 if (!content.trim()) {
                     this.showToast('Please add some content to your post', 'error');
@@ -1294,7 +1404,7 @@
             }
 
             async loadFeed() {
-                // Get posts from database with user profiles
+                // Get posts from database with user profiles and likes
                 const { data, error } = await this.supabase
                     .from('posts')
                     .select(`
@@ -1306,9 +1416,13 @@
                         ),
                         likes (
                             user_id
+                        ),
+                        comments (
+                            id
                         )
                     `)
-                    .order('created_at', { ascending: false });
+                    .order('created_at', { ascending: false })
+                    .limit(50);
 
                 if (error) {
                     console.error('Error loading posts:', error);
@@ -1330,6 +1444,7 @@
                 container.innerHTML = this.posts.map(post => {
                     const isLiked = post.likes && post.likes.some(like => like.user_id === this.currentUser.id);
                     const likeCount = post.likes ? post.likes.length : 0;
+                    const commentCount = post.comments ? post.comments.length : 0;
                     
                     return `
                     <div class="post" data-post-id="${post.id}">
@@ -1342,8 +1457,12 @@
                             <div style="flex: 1;"></div>
                             <div class="post-time">${this.formatTime(post.created_at)}</div>
                         </div>
-                        <div class="post-content">${post.content}</div>
+                        <div class="post-content">${this.formatPostContent(post.content)}</div>
                         <div class="post-actions">
+                            <button class="post-action" onclick="primeMarApp.commentOnPost(${post.id})">
+                                <i class="fas fa-comment"></i>
+                                <span>${commentCount}</span>
+                            </button>
                             <button class="post-action like-action ${isLiked ? 'liked' : ''}" 
                                     onclick="primeMarApp.likePost(${post.id})">
                                 <i class="fas fa-heart"></i>
@@ -1355,6 +1474,13 @@
                         </div>
                     </div>
                 `}).join('');
+            }
+
+            formatPostContent(content) {
+                // Simple formatting for hashtags and mentions
+                return content
+                    .replace(/#(\w+)/g, '<span class="hashtag" style="color: var(--primary-color);">#$1</span>')
+                    .replace(/@(\w+)/g, '<span class="mention" style="color: var(--primary-color);">@$1</span>');
             }
 
             async likePost(postId) {
@@ -1401,7 +1527,78 @@
                 await this.loadFeed();
             }
 
-            // Chat Methods
+            async commentOnPost(postId) {
+                const comment = prompt('Enter your comment:');
+                if (comment && comment.trim()) {
+                    const { error } = await this.supabase
+                        .from('comments')
+                        .insert([
+                            {
+                                post_id: postId,
+                                user_id: this.currentUser.id,
+                                content: comment
+                            }
+                        ]);
+
+                    if (error) {
+                        console.error('Error adding comment:', error);
+                        this.showToast('Error adding comment', 'error');
+                    } else {
+                        this.showToast('Comment added!');
+                        await this.loadFeed();
+                    }
+                }
+            }
+
+            // Search Functionality (Facebook-like search)
+            async searchUsers(query) {
+                if (!query.trim()) {
+                    document.getElementById('searchResults').classList.remove('show');
+                    return;
+                }
+
+                const { data, error } = await this.supabase
+                    .from('profiles')
+                    .select('*')
+                    .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
+                    .limit(10);
+
+                if (error) {
+                    console.error('Error searching users:', error);
+                    return;
+                }
+
+                this.renderSearchResults(data);
+            }
+
+            renderSearchResults(users) {
+                const container = document.getElementById('searchResults');
+                
+                if (users.length === 0) {
+                    container.innerHTML = '<div class="search-result-item">No users found</div>';
+                } else {
+                    container.innerHTML = users.map(user => `
+                        <div class="search-result-item" onclick="primeMarApp.viewUserProfile('${user.id}')">
+                            <img src="${user.avatar}" alt="${user.name}" class="avatar">
+                            <div>
+                                <div class="user-name">${user.name}</div>
+                                <div class="user-handle">@${user.username}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                container.classList.add('show');
+            }
+
+            viewUserProfile(userId) {
+                // Navigate to user profile
+                this.showPage('profilePage');
+                // Load the specific user's profile
+                this.loadUserProfileById(userId);
+            }
+
+            // Chat Methods (WhatsApp-like messaging)
             async loadConversations() {
                 // Get conversations from database
                 const { data, error } = await this.supabase
@@ -1411,7 +1608,8 @@
                         user1:profiles!conversations_user1_id_fkey(name, username, avatar),
                         user2:profiles!conversations_user2_id_fkey(name, username, avatar)
                     `)
-                    .or(`user1_id.eq.${this.currentUser.id},user2_id.eq.${this.currentUser.id}`);
+                    .or(`user1_id.eq.${this.currentUser.id},user2_id.eq.${this.currentUser.id}`)
+                    .order('updated_at', { ascending: false });
 
                 if (error) {
                     console.error('Error loading conversations:', error);
@@ -1431,18 +1629,17 @@
                     };
                 });
                 
-                // Initialize messages storage
-                this.conversations.forEach(conv => {
-                    if (!this.messages.has(conv.id)) {
-                        this.messages.set(conv.id, []);
-                    }
-                });
-                
                 this.renderConversations();
             }
 
             renderConversations() {
                 const container = document.getElementById('messagesList');
+                
+                if (this.conversations.length === 0) {
+                    container.innerHTML = '<div class="text-center p-3">No conversations yet. Start a chat!</div>';
+                    return;
+                }
+
                 container.innerHTML = this.conversations.map(conv => `
                     <div class="message-item" onclick="primeMarApp.openChat(${conv.id})">
                         <img src="${conv.avatar}" alt="${conv.name}" class="avatar">
@@ -1609,7 +1806,7 @@
                 document.getElementById('chatInput').value = draft;
             }
 
-            // Follow System
+            // Follow System (Facebook-like friends)
             async loadFollowData() {
                 // Get following list from database
                 const { data: followingData, error: followingError } = await this.supabase
@@ -1888,6 +2085,7 @@
                 document.getElementById('profileBio').textContent = this.userProfile.bio;
                 document.getElementById('profileAvatar').src = this.userProfile.avatar;
                 document.getElementById('editProfileName').value = this.userProfile.name;
+                document.getElementById('editProfileUsername').value = this.userProfile.username;
                 document.getElementById('editProfileBio').value = this.userProfile.bio;
                 
                 // Update posts count
@@ -1938,6 +2136,21 @@
                 document.getElementById('showSignup').addEventListener('click', () => this.showSignupForm());
                 document.getElementById('showLogin').addEventListener('click', () => this.showLoginForm());
                 document.getElementById('closeAuthModal').addEventListener('click', () => this.showAuthModal());
+
+                // Search functionality
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    clearTimeout(this.searchTimeout);
+                    this.searchTimeout = setTimeout(() => {
+                        this.searchUsers(e.target.value);
+                    }, 300);
+                });
+
+                // Close search results when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.search-container')) {
+                        document.getElementById('searchResults').classList.remove('show');
+                    }
+                });
 
                 // Navigation dropdown
                 document.querySelector('.nav-dropdown-btn').addEventListener('click', (e) => {
@@ -2019,12 +2232,14 @@
 
                 document.getElementById('saveProfileBtn').addEventListener('click', async () => {
                     const name = document.getElementById('editProfileName').value;
+                    const username = document.getElementById('editProfileUsername').value;
                     const bio = document.getElementById('editProfileBio').value;
 
                     const { data, error } = await this.supabase
                         .from('profiles')
                         .update({
                             name: name,
+                            username: username,
                             bio: bio
                         })
                         .eq('id', this.currentUser.id);
@@ -2034,6 +2249,7 @@
                         this.showToast('Error updating profile', 'error');
                     } else {
                         this.userProfile.name = name;
+                        this.userProfile.username = username;
                         this.userProfile.bio = bio;
                         
                         this.updateProfileUI();
@@ -2090,7 +2306,14 @@
                     console.error('Error signing out:', error);
                 } else {
                     this.showToast('Logged out successfully');
-                }
+                this.showAuthModal();
+                this.clearAuthForms();
+                this.showLoginForm();
+                document.getElementById('searchInput').value = '';
+                document.getElementById('searchResults').classList.remove('show');
+                document.getElementById('postTextarea').value = '';
+                document.getElementById('charCount').textContent = '280';
+                document.getElementById('postBtn').disabled = true;
             }
 
             // Utility Methods

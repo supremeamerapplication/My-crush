@@ -9,42 +9,48 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Complete CSS styles from previous implementation */
         :root {
             --primary-color: #3b82f6;
             --primary-hover: #2563eb;
             --primary-light: rgba(59, 130, 246, 0.1);
+            --secondary-color: #8b5cf6;
+            --accent-color: #f59e0b;
             --text-primary: #0f1419;
             --text-secondary: #64748b;
+            --text-muted: #94a3b8;
             --border-color: #e2e8f0;
             --bg-color: #ffffff;
             --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
             --hover-color: #f1f5f9;
             --success-color: #10b981;
             --error-color: #ef4444;
             --warning-color: #f59e0b;
-            --instagram-color: #e1306c;
-            --facebook-color: #1877f2;
-            --twitter-color: #1da1f2;
+            --info-color: #3b82f6;
             --story-ring: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --radius-sm: 4px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --radius-xl: 16px;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
             --radius-full: 9999px;
-            --transition: all 0.2s ease;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --header-height: 64px;
+            --nav-height: 60px;
         }
 
         [data-theme="dark"] {
             --text-primary: #f1f5f9;
             --text-secondary: #94a3b8;
+            --text-muted: #64748b;
             --border-color: #334155;
             --bg-color: #0f172a;
             --bg-secondary: #1e293b;
+            --bg-tertiary: #1e293b;
             --hover-color: #1e293b;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
@@ -59,33 +65,42 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
             background: var(--bg-color);
             color: var(--text-primary);
-            line-height: 1.5;
-            padding-bottom: 60px;
+            line-height: 1.6;
+            padding-bottom: var(--nav-height);
             transition: var(--transition);
+            overflow-x: hidden;
         }
 
-        /* Header */
+        /* Enhanced Header */
         .header {
-            position: sticky;
+            position: fixed;
             top: 0;
-            background: var(--bg-color);
-            padding: 12px 16px;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
             z-index: 1000;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            backdrop-filter: blur(10px);
+            padding: 0 20px;
             box-shadow: var(--shadow-sm);
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(15, 23, 42, 0.95);
         }
 
         .logo {
             font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -103,29 +118,44 @@
             object-fit: cover;
         }
 
-        /* Search Bar */
+        /* Enhanced Search */
         .search-container {
             flex: 1;
-            max-width: 400px;
-            margin: 0 20px;
+            max-width: 500px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-wrapper {
             position: relative;
         }
 
         .search-input {
             width: 100%;
-            padding: 10px 16px;
-            border: 1px solid var(--border-color);
+            padding: 12px 45px 12px 16px;
+            border: 1.5px solid var(--border-color);
             border-radius: var(--radius-full);
             background: var(--bg-secondary);
             color: var(--text-primary);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             transition: var(--transition);
+            box-shadow: var(--shadow-sm);
         }
 
         .search-input:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: var(--bg-color);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            cursor: pointer;
         }
 
         .search-results {
@@ -139,9 +169,15 @@
             margin-top: 8px;
             box-shadow: var(--shadow-xl);
             z-index: 1001;
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
             display: none;
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .search-results.show {
@@ -166,12 +202,48 @@
             border-bottom: none;
         }
 
-        /* Navigation */
+        /* Enhanced Navigation */
         .header-nav {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            transition: var(--transition);
             position: relative;
+        }
+
+        .nav-btn:hover {
+            background: var(--hover-color);
+            color: var(--text-primary);
+        }
+
+        .nav-btn.active {
+            color: var(--primary-color);
+            background: var(--primary-light);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: var(--error-color);
+            color: white;
+            border-radius: var(--radius-full);
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
         }
 
         .nav-dropdown {
@@ -187,7 +259,7 @@
             border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             transition: var(--transition);
         }
 
@@ -203,10 +275,11 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-xl);
             padding: 8px;
-            min-width: 200px;
+            min-width: 220px;
             box-shadow: var(--shadow-xl);
             z-index: 1001;
             display: none;
+            animation: slideDown 0.2s ease;
         }
 
         .nav-dropdown-content.show {
@@ -227,6 +300,7 @@
             background: none;
             width: 100%;
             text-align: left;
+            font-size: 0.9rem;
         }
 
         .nav-dropdown-item:hover {
@@ -236,22 +310,27 @@
         .nav-dropdown-divider {
             height: 1px;
             background: var(--border-color);
-            margin: 4px 0;
+            margin: 6px 0;
         }
 
-        /* Bottom Navigation */
+        /* Enhanced Bottom Navigation */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--bg-color);
+            height: var(--nav-height);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-around;
-            padding: 8px 0;
+            align-items: center;
             z-index: 1000;
-            backdrop-filter: blur(10px);
+        }
+
+        [data-theme="dark"] .bottom-nav {
+            background: rgba(15, 23, 42, 0.95);
         }
 
         .nav-item {
@@ -261,10 +340,12 @@
             padding: 8px 16px;
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             border-radius: var(--radius-full);
             transition: var(--transition);
             position: relative;
+            flex: 1;
+            max-width: 80px;
         }
 
         .nav-item.active {
@@ -282,7 +363,7 @@
         }
 
         .nav-icon {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             margin-bottom: 2px;
             transition: var(--transition);
         }
@@ -295,26 +376,71 @@
         .container {
             max-width: 600px;
             margin: 0 auto;
+            padding: calc(var(--header-height) + 20px) 0 20px;
         }
 
         .page {
             display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .page.active {
             display: block;
         }
 
-        /* Auth Styles */
-        .auth-page {
-            padding: 40px 20px;
-            text-align: center;
+        /* Enhanced Auth Styles */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
         }
 
-        .auth-form {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
+        .auth-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .auth-modal-content {
+            background: var(--bg-color);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 440px;
+            box-shadow: var(--shadow-xl);
+            transform: scale(0.9);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .auth-modal.active .auth-modal-content {
+            transform: scale(1);
+        }
+
+        .auth-header {
+            padding: 30px 30px 20px;
+            text-align: center;
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .auth-body {
+            padding: 30px;
         }
 
         .form-group {
@@ -324,15 +450,16 @@
 
         .form-label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 600;
             color: var(--text-primary);
+            font-size: 0.9rem;
         }
 
         .form-input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
+            padding: 14px 16px;
+            border: 1.5px solid var(--border-color);
             border-radius: var(--radius-md);
             background: var(--bg-color);
             color: var(--text-primary);
@@ -348,30 +475,46 @@
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 14px 24px;
             border-radius: var(--radius-full);
             border: none;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             width: 100%;
             box-shadow: var(--shadow-sm);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-primary {
-            background: var(--primary-color);
+            background: var(--gradient-primary);
             color: white;
         }
 
         .btn-primary:hover {
-            background: var(--primary-hover);
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-color);
         }
 
         .auth-toggle {
             margin-top: 20px;
             color: var(--text-secondary);
+            text-align: center;
+            font-size: 0.9rem;
         }
 
         .auth-link {
@@ -383,38 +526,43 @@
 
         .error-message {
             color: var(--error-color);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-top: 8px;
             text-align: center;
-            padding: 8px;
+            padding: 10px;
             background: rgba(239, 68, 68, 0.1);
             border-radius: var(--radius-md);
             display: none;
+            border-left: 4px solid var(--error-color);
         }
 
         .error-message.show {
             display: block;
         }
 
-        /* Post Composer */
+        /* Enhanced Post Composer */
         .post-composer {
-            border-bottom: 1px solid var(--border-color);
-            padding: 16px;
             background: var(--bg-color);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
         }
 
         .composer-header {
             display: flex;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .avatar {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: var(--radius-full);
             object-fit: cover;
             border: 2px solid var(--border-color);
+            flex-shrink: 0;
         }
 
         .composer-textarea {
@@ -424,13 +572,14 @@
             font-size: 1.2rem;
             background: transparent;
             color: var(--text-primary);
-            min-height: 60px;
+            min-height: 80px;
             font-family: inherit;
-            line-height: 1.4;
+            line-height: 1.5;
+            padding: 0;
         }
 
         .composer-textarea::placeholder {
-            color: var(--text-secondary);
+            color: var(--text-muted);
         }
 
         .composer-textarea:focus {
@@ -441,24 +590,29 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 12px;
-            padding-left: 52px;
+            margin-top: 16px;
+            padding-left: 56px;
         }
 
         .action-buttons {
             display: flex;
-            gap: 12px;
+            gap: 8px;
         }
 
         .action-btn {
             background: none;
             border: none;
             color: var(--primary-color);
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             cursor: pointer;
             padding: 8px;
             border-radius: var(--radius-full);
             transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .action-btn:hover {
@@ -469,11 +623,12 @@
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 8px 20px;
+            padding: 10px 24px;
             border-radius: var(--radius-full);
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
+            box-shadow: var(--shadow-sm);
         }
 
         .post-btn:disabled {
@@ -484,38 +639,87 @@
 
         .post-btn:not(:disabled):hover {
             background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
         .char-count {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
             margin-right: 12px;
         }
 
-        /* Stories */
+        .char-count.warning {
+            color: var(--warning-color);
+        }
+
+        .char-count.error {
+            color: var(--error-color);
+        }
+
+        /* Enhanced Stories */
+        .stories-section {
+            background: var(--bg-color);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .stories-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .stories-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
         .stories-container {
             display: flex;
-            gap: 12px;
-            padding: 16px;
+            gap: 16px;
             overflow-x: auto;
-            border-bottom: 1px solid var(--border-color);
+            padding: 4px 0;
+        }
+
+        .stories-container::-webkit-scrollbar {
+            display: none;
         }
 
         .story {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             cursor: pointer;
+            transition: var(--transition);
+            min-width: 70px;
+        }
+
+        .story:hover {
+            transform: scale(1.05);
         }
 
         .story-avatar {
-            width: 60px;
-            height: 60px;
+            width: 68px;
+            height: 68px;
             border-radius: var(--radius-full);
             object-fit: cover;
-            padding: 2px;
+            padding: 3px;
             background: var(--story-ring);
+            transition: var(--transition);
+        }
+
+        .story.unseen .story-avatar {
+            background: var(--story-ring);
+        }
+
+        .story.seen .story-avatar {
+            background: var(--border-color);
         }
 
         .add-story {
@@ -529,113 +733,273 @@
             background: var(--primary-color);
             color: white;
             border-radius: var(--radius-full);
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.8rem;
+            border: 2px solid var(--bg-color);
         }
 
-        /* Posts */
+        .story-username {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Enhanced Posts */
+        .feed {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
         .post {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-color);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .post:hover {
+            box-shadow: var(--shadow-lg);
         }
 
         .post-header {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .post-user-info {
+            flex: 1;
         }
 
         .user-name {
-            font-weight: bold;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .user-handle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .post-time {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .post-options {
+            position: relative;
+        }
+
+        .post-options-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: var(--radius-full);
+            transition: var(--transition);
+        }
+
+        .post-options-btn:hover {
+            background: var(--hover-color);
             color: var(--text-primary);
         }
 
-        .user-handle, .post-time {
-            color: var(--text-secondary);
+        .post-content {
+            margin-bottom: 16px;
+            line-height: 1.6;
+            font-size: 1.05rem;
         }
 
-        .post-content {
+        .post-image {
+            width: 100%;
+            border-radius: var(--radius-lg);
+            margin-bottom: 16px;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        .post-stats {
+            display: flex;
+            gap: 16px;
             margin-bottom: 12px;
-            line-height: 1.4;
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
         .post-actions {
             display: flex;
-            justify-content: space-between;
-            max-width: 425px;
+            justify-content: space-around;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
         }
 
         .post-action {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             background: none;
             border: none;
             color: var(--text-secondary);
-            padding: 8px;
+            padding: 8px 16px;
             border-radius: var(--radius-full);
             cursor: pointer;
             font-size: 0.9rem;
+            transition: var(--transition);
+            flex: 1;
+            justify-content: center;
+            max-width: 120px;
         }
 
         .post-action:hover {
-            background: var(--primary-light);
+            background: var(--hover-color);
             color: var(--primary-color);
         }
 
-        .like-action.liked {
+        .post-action.liked {
             color: var(--error-color);
         }
 
-        /* Profile */
-        .profile-header {
-            position: relative;
-            height: 200px;
-            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+        .post-action i {
+            font-size: 1.1rem;
         }
 
-        .profile-avatar {
-            position: absolute;
-            bottom: -50px;
-            left: 20px;
-            width: 100px;
-            height: 100px;
-            border-radius: var(--radius-full);
-            border: 4px solid var(--bg-color);
+        /* Enhanced Profile */
+        .profile-header {
+            position: relative;
+            height: 240px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-xl);
+            margin-bottom: 80px;
+            overflow: hidden;
+        }
+
+        .profile-cover {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
         }
 
+        .profile-avatar-container {
+            position: absolute;
+            bottom: -60px;
+            left: 24px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: var(--radius-full);
+            border: 4px solid var(--bg-color);
+            object-fit: cover;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .profile-edit-cover {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .profile-edit-cover:hover {
+            background: white;
+        }
+
         .profile-info {
-            padding: 60px 20px 20px;
+            padding: 0 24px 24px;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-handle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        .profile-bio {
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin-bottom: 20px;
         }
 
         .profile-stats {
             display: flex;
             justify-content: space-around;
-            margin: 16px 0;
-            padding: 16px 0;
+            margin: 20px 0;
+            padding: 20px 0;
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
         }
 
+        .stat {
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 8px;
+            border-radius: var(--radius-md);
+        }
+
+        .stat:hover {
+            background: var(--hover-color);
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
         .profile-actions {
             display: flex;
-            gap: 8px;
-            margin: 16px 0;
+            gap: 12px;
+            margin: 20px 0;
         }
 
         .follow-btn, .message-btn {
-            padding: 8px 16px;
+            padding: 12px 24px;
             border-radius: var(--radius-full);
             border: none;
             font-weight: 600;
             cursor: pointer;
+            transition: var(--transition);
             flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .follow-btn {
@@ -643,37 +1007,61 @@
             color: white;
         }
 
+        .follow-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
         .message-btn {
             background: var(--bg-secondary);
             color: var(--text-primary);
+            border: 1.5px solid var(--border-color);
         }
 
-        /* Followers/Following Views */
-        .users-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 16px;
-            padding: 16px;
+        .message-btn:hover {
+            background: var(--hover-color);
         }
 
-        .user-card {
+        /* Enhanced Messages */
+        .messages-container {
+            background: var(--bg-color);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            height: calc(100vh - var(--header-height) - var(--nav-height) - 40px);
+        }
+
+        .chat-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
             background: var(--bg-secondary);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .user-card-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: var(--radius-full);
-            object-fit: cover;
-            margin: 0 auto 8px;
+        .chat-user-info {
+            flex: 1;
         }
 
-        /* Messages */
+        .chat-user-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .chat-user-status {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 8px;
+        }
+
         .messages-list {
-            max-height: calc(100vh - 200px);
+            height: 100%;
             overflow-y: auto;
         }
 
@@ -684,10 +1072,15 @@
             padding: 12px 16px;
             border-bottom: 1px solid var(--border-color);
             cursor: pointer;
+            transition: var(--transition);
         }
 
         .message-item:hover {
             background: var(--hover-color);
+        }
+
+        .message-item.unread {
+            background: var(--primary-light);
         }
 
         .message-item-info {
@@ -697,10 +1090,14 @@
         .message-preview {
             color: var(--text-secondary);
             font-size: 0.9rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .message-time {
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-size: 0.8rem;
         }
 
@@ -714,21 +1111,28 @@
             align-items: center;
             justify-content: center;
             font-size: 0.7rem;
+            font-weight: 600;
         }
 
         .chat-messages {
-            height: calc(100vh - 280px);
+            height: calc(100% - 140px);
             overflow-y: auto;
-            padding: 16px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
         }
 
         .message {
             display: flex;
             gap: 8px;
             max-width: 80%;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message.own {
@@ -740,6 +1144,8 @@
             background: var(--bg-secondary);
             padding: 12px 16px;
             border-radius: var(--radius-lg);
+            position: relative;
+            box-shadow: var(--shadow-sm);
         }
 
         .message.own .message-content {
@@ -747,21 +1153,44 @@
             color: white;
         }
 
+        .message-time {
+            font-size: 0.75rem;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
         .chat-input-container {
-            display: flex;
-            gap: 8px;
-            padding: 16px;
+            padding: 16px 20px;
             border-top: 1px solid var(--border-color);
             background: var(--bg-color);
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .chat-input-wrapper {
+            flex: 1;
+            position: relative;
         }
 
         .chat-input {
-            flex: 1;
+            width: 100%;
             padding: 12px 16px;
-            border: 1px solid var(--border-color);
+            border: 1.5px solid var(--border-color);
             border-radius: var(--radius-full);
             background: var(--bg-secondary);
             color: var(--text-primary);
+            font-size: 0.95rem;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            transition: var(--transition);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: var(--bg-color);
         }
 
         .chat-send-btn {
@@ -769,22 +1198,90 @@
             color: white;
             border: none;
             border-radius: var(--radius-full);
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
         }
 
-        /* Floating Action Button */
+        .chat-send-btn:hover {
+            background: var(--primary-hover);
+            transform: scale(1.05);
+        }
+
+        .chat-send-btn:disabled {
+            background: var(--primary-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Enhanced Users Grid */
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .user-card {
+            background: var(--bg-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .user-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .user-card-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-full);
+            object-fit: cover;
+            margin: 0 auto 12px;
+            border: 3px solid var(--border-color);
+        }
+
+        .user-card-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .user-card-handle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .user-card-bio {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Enhanced Floating Action Button */
         .fab {
             position: fixed;
             bottom: 80px;
             right: 20px;
-            width: 56px;
-            height: 56px;
-            background: var(--primary-color);
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
             color: white;
             border-radius: var(--radius-full);
             display: flex;
@@ -793,56 +1290,84 @@
             font-size: 1.5rem;
             cursor: pointer;
             z-index: 999;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
         }
 
-        /* Modals */
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* Enhanced Modals */
         .modal {
-            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
             z-index: 2000;
+            display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
         }
 
         .modal.active {
-            display: flex;
+            opacity: 1;
+            visibility: visible;
         }
 
         .modal-content {
             background: var(--bg-color);
             border-radius: var(--radius-xl);
-            width: 90%;
-            max-width: 600px;
+            width: 100%;
+            max-width: 500px;
             max-height: 90vh;
             overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            transform: scale(0.9);
+            transition: var(--transition);
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
         }
 
         .modal-header {
-            padding: 16px;
+            padding: 20px 24px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            background: var(--bg-secondary);
         }
 
         .modal-title {
-            font-weight: bold;
+            font-weight: 600;
             font-size: 1.2rem;
+            color: var(--text-primary);
         }
 
         .modal-close {
             background: none;
             border: none;
             font-size: 1.2rem;
-            color: var(--text-primary);
+            color: var(--text-secondary);
             cursor: pointer;
             padding: 8px;
             border-radius: var(--radius-full);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--hover-color);
+            color: var(--text-primary);
         }
 
         /* Utility Classes */
@@ -854,22 +1379,57 @@
             text-align: center;
         }
 
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            gap: 12px;
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
         .mt-2 { margin-top: 8px; }
         .mb-2 { margin-bottom: 8px; }
         .p-3 { padding: 12px; }
 
-        /* Toast */
+        /* Enhanced Toast */
         .toast {
             position: fixed;
-            top: 20px;
+            top: 90px;
             right: 20px;
-            padding: 12px 20px;
-            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            border-radius: var(--radius-lg);
             color: white;
-            font-weight: bold;
+            font-weight: 600;
             z-index: 10000;
             transform: translateX(400px);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+            max-width: 320px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .toast.show {
@@ -884,28 +1444,58 @@
             background: var(--error-color);
         }
 
-        /* Loading Spinner */
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            color: var(--text-secondary);
+        .toast.warning {
+            background: var(--warning-color);
         }
 
-        .spinner {
-            animation: spin 1s linear infinite;
+        .toast.info {
+            background: var(--info-color);
         }
 
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: calc(var(--header-height) + 10px) 16px 16px;
+            }
+
+            .header {
+                padding: 0 16px;
+            }
+
+            .search-container {
+                margin: 0 16px;
+            }
+
+            .nav-btn span {
+                display: none;
+            }
+
+            .post-composer {
+                padding: 16px;
+            }
+
+            .profile-header {
+                height: 200px;
+                margin-bottom: 70px;
+            }
+
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+            }
+
+            .users-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+                padding: 16px;
+            }
         }
 
         @media (min-width: 768px) {
             .bottom-nav {
                 display: none;
             }
+
             body {
                 padding-bottom: 0;
             }
@@ -922,54 +1512,63 @@
     </div>
 
     <!-- Auth Modal -->
-    <div class="modal active" id="authModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Join PrimeMar</div>
-                <button class="modal-close" id="closeAuthModal">&times;</button>
+    <div class="auth-modal active" id="authModal">
+        <div class="auth-modal-content">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fas fa-fire"></i>
+                    <span>PrimeMar</span>
+                </div>
+                <p style="margin-top: 8px; opacity: 0.9;">Join the conversation</p>
             </div>
-            <div class="auth-page">
-                <div class="auth-form">
-                    <div id="loginForm">
-                        <h2>Sign in to PrimeMar</h2>
-                        <div class="error-message" id="loginError"></div>
-                        <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password">
-                        </div>
-                        <button class="btn btn-primary" id="loginBtn">Sign In</button>
-                        <div class="auth-toggle">
-                            Don't have an account? <a class="auth-link" id="showSignup">Sign up</a>
-                        </div>
+            <div class="auth-body">
+                <div id="loginForm">
+                    <h2 style="margin-bottom: 8px; text-align: center;">Welcome back</h2>
+                    <p style="color: var(--text-secondary); text-align: center; margin-bottom: 24px;">Sign in to your account</p>
+                    <div class="error-message" id="loginError"></div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email">
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password">
+                    </div>
+                    <button class="btn btn-primary" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </button>
+                    <div class="auth-toggle">
+                        Don't have an account? <a class="auth-link" id="showSignup">Sign up</a>
+                    </div>
+                </div>
 
-                    <div id="signupForm" class="hidden">
-                        <h2>Create your account</h2>
-                        <div class="error-message" id="signupError"></div>
-                        <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" class="form-input" id="signupName" placeholder="Enter your full name">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Username</label>
-                            <input type="text" class="form-input" id="signupUsername" placeholder="Choose a username">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-input" id="signupEmail" placeholder="Enter your email">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-input" id="signupPassword" placeholder="Create a password">
-                        </div>
-                        <button class="btn btn-primary" id="signupBtn">Create Account</button>
-                        <div class="auth-toggle">
-                            Already have an account? <a class="auth-link" id="showLogin">Sign in</a>
-                        </div>
+                <div id="signupForm" class="hidden">
+                    <h2 style="margin-bottom: 8px; text-align: center;">Create account</h2>
+                    <p style="color: var(--text-secondary); text-align: center; margin-bottom: 24px;">Join PrimeMar today</p>
+                    <div class="error-message" id="signupError"></div>
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-input" id="signupName" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-input" id="signupUsername" placeholder="Choose a username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="signupEmail" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="signupPassword" placeholder="Create a password">
+                    </div>
+                    <button class="btn btn-primary" id="signupBtn">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                    </button>
+                    <div class="auth-toggle">
+                        Already have an account? <a class="auth-link" id="showLogin">Sign in</a>
                     </div>
                 </div>
             </div>
@@ -981,26 +1580,45 @@
         <!-- Header -->
         <header class="header">
             <div class="logo">
-                <img src="https://raw.githubusercontent.com/creativetimofficial/public-assets/master/logos/logo-prime.jpg" alt="PrimeMar" class="logo-img">
+                <i class="fas fa-fire"></i>
                 <span>PrimeMar</span>
             </div>
             
             <!-- Search Bar -->
             <div class="search-container">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search users, posts...">
-                <div class="search-results" id="searchResults"></div>
+                <div class="search-wrapper">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search users, posts...">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="search-results" id="searchResults"></div>
+                </div>
             </div>
 
             <div class="header-nav">
+                <button class="nav-btn active" data-page="homePage">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </button>
+                <button class="nav-btn" data-page="messagesPage">
+                    <i class="fas fa-envelope"></i>
+                    <span>Messages</span>
+                    <div class="notification-badge">3</div>
+                </button>
+                <button class="nav-btn" data-page="notificationsPage">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <div class="notification-badge">5</div>
+                </button>
+                
                 <div class="nav-dropdown">
                     <button class="nav-dropdown-btn">
-                        <i class="fas fa-user"></i>
-                        <span id="userNameNav">User</span>
+                        <img src="" alt="Profile" class="avatar" id="headerAvatar">
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="nav-dropdown-content" id="navDropdown">
                         <button class="nav-dropdown-item" data-page="profilePage">
-                            <i class="fas fa-user-edit"></i>
+                            <i class="fas fa-user"></i>
                             <span>Profile</span>
                         </button>
                         <button class="nav-dropdown-item" id="themeToggleNav">
@@ -1029,11 +1647,17 @@
                     </div>
                     <div class="composer-actions">
                         <div class="action-buttons">
-                            <button class="action-btn" id="mediaBtn">
+                            <button class="action-btn" id="mediaBtn" title="Add media">
                                 <i class="fas fa-image"></i>
                             </button>
-                            <button class="action-btn" id="emojiBtn">
+                            <button class="action-btn" id="gifBtn" title="Add GIF">
+                                <i class="fas fa-film"></i>
+                            </button>
+                            <button class="action-btn" id="emojiBtn" title="Add emoji">
                                 <i class="fas fa-smile"></i>
+                            </button>
+                            <button class="action-btn" id="pollBtn" title="Create poll">
+                                <i class="fas fa-chart-pie"></i>
                             </button>
                         </div>
                         <div style="display: flex; align-items: center;">
@@ -1043,13 +1667,21 @@
                     </div>
                 </div>
 
-                <!-- Stories -->
-                <div class="stories-container" id="storiesContainer">
-                    <!-- Stories will be loaded here -->
+                <!-- Stories Section -->
+                <div class="stories-section">
+                    <div class="stories-header">
+                        <div class="stories-title">Stories</div>
+                        <button class="action-btn" style="font-size: 0.9rem;">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="stories-container" id="storiesContainer">
+                        <!-- Stories will be loaded here -->
+                    </div>
                 </div>
 
                 <!-- Feed -->
-                <div id="feedContainer">
+                <div class="feed" id="feedContainer">
                     <div class="loading">
                         <i class="fas fa-spinner fa-spin"></i> Loading posts...
                     </div>
@@ -1058,19 +1690,7 @@
 
             <!-- Messages Page -->
             <section id="messagesPage" class="page">
-                <div class="chat-container">
-                    <div class="chat-header hidden" id="activeChatHeader">
-                        <button class="action-btn" id="backToMessages"><i class="fas fa-arrow-left"></i></button>
-                        <img src="" alt="Profile" class="avatar" id="chatUserAvatar">
-                        <div>
-                            <div id="chatUserName">User Name</div>
-                            <div class="user-handle" id="chatUserStatus">Online</div>
-                        </div>
-                        <div style="flex: 1;"></div>
-                        <button class="action-btn" id="voiceCallBtn"><i class="fas fa-phone"></i></button>
-                        <button class="action-btn" id="videoCallBtn"><i class="fas fa-video"></i></button>
-                    </div>
-                    
+                <div class="messages-container">
                     <div class="messages-list" id="messagesList">
                         <!-- Messages list will be loaded here -->
                     </div>
@@ -1079,61 +1699,81 @@
                         <!-- Messages will be loaded here -->
                     </div>
                     <div class="chat-input-container hidden" id="chatInputContainer">
-                        <input type="text" class="chat-input" id="chatInput" placeholder="Type a message...">
-                        <button class="chat-send-btn" id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
+                        <div class="chat-input-wrapper">
+                            <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1"></textarea>
+                        </div>
+                        <button class="chat-send-btn" id="chatSendBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </div>
+                </div>
+            </section>
+
+            <!-- Notifications Page -->
+            <section id="notificationsPage" class="page">
+                <div class="empty-state">
+                    <i class="fas fa-bell-slash"></i>
+                    <h3>No notifications yet</h3>
+                    <p>When you get notifications, they'll show up here</p>
                 </div>
             </section>
 
             <!-- Profile Page -->
             <section id="profilePage" class="page">
                 <div class="profile-header">
-                    <img src="" alt="Profile" class="profile-avatar" id="profileAvatar">
-                    <button class="action-btn" id="editProfileBtn" style="position: absolute; bottom: 10px; right: 20px; background: rgba(255,255,255,0.8);">
-                        <i class="fas fa-edit"></i>
+                    <div class="profile-cover"></div>
+                    <div class="profile-avatar-container">
+                        <img src="" alt="Profile" class="profile-avatar" id="profileAvatar">
+                    </div>
+                    <button class="profile-edit-cover" id="editProfileBtn">
+                        <i class="fas fa-camera"></i> Edit Profile
                     </button>
                 </div>
                 <div class="profile-info">
-                    <h3 id="profileName">User Name</h3>
-                    <p class="user-handle" id="profileHandle">@username</p>
+                    <h1 class="profile-name" id="profileName">User Name</h1>
+                    <p class="profile-handle" id="profileHandle">@username</p>
                     <p class="profile-bio" id="profileBio">This is a sample bio. Update your profile to add your own bio!</p>
                     
                     <div class="profile-stats">
-                        <div style="cursor: pointer;" id="postsCountContainer">
-                            <strong id="postsCount">0</strong>
-                            <div>Posts</div>
+                        <div class="stat" onclick="primeMarApp.showPage('postsPage')">
+                            <span class="stat-number" id="postsCount">0</span>
+                            <span class="stat-label">Posts</span>
                         </div>
-                        <div style="cursor: pointer;" id="followingCountContainer" onclick="primeMarApp.showFollowing()">
-                            <strong id="followingCount">0</strong>
-                            <div>Following</div>
+                        <div class="stat" onclick="primeMarApp.showFollowing()">
+                            <span class="stat-number" id="followingCount">0</span>
+                            <span class="stat-label">Following</span>
                         </div>
-                        <div style="cursor: pointer;" id="followersCountContainer" onclick="primeMarApp.showFollowers()">
-                            <strong id="followersCount">0</strong>
-                            <div>Followers</div>
+                        <div class="stat" onclick="primeMarApp.showFollowers()">
+                            <span class="stat-number" id="followersCount">0</span>
+                            <span class="stat-label">Followers</span>
                         </div>
                     </div>
                     
                     <div class="profile-actions">
-                        <button class="follow-btn" id="followBtn">Follow</button>
+                        <button class="follow-btn" id="followBtn">
+                            <i class="fas fa-user-plus"></i> Follow
+                        </button>
                         <button class="message-btn" id="messageUserBtn">
                             <i class="fas fa-envelope"></i> Message
                         </button>
                     </div>
                 </div>
                 
-                <div id="profilePostsContainer">
+                <div class="feed" id="profilePostsContainer">
                     <!-- User's posts will be loaded here -->
                 </div>
             </section>
 
             <!-- Followers Page -->
             <section id="followersPage" class="page">
-                <div class="p-3">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <div class="messages-container">
+                    <div class="chat-header">
                         <button class="action-btn" onclick="primeMarApp.showPage('profilePage')">
                             <i class="fas fa-arrow-left"></i>
                         </button>
-                        <h3>Followers</h3>
+                        <div class="chat-user-info">
+                            <div class="chat-user-name">Followers</div>
+                        </div>
                     </div>
                     <div class="users-grid" id="followersGrid">
                         <!-- Followers will be loaded here -->
@@ -1143,12 +1783,14 @@
 
             <!-- Following Page -->
             <section id="followingPage" class="page">
-                <div class="p-3">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <div class="messages-container">
+                    <div class="chat-header">
                         <button class="action-btn" onclick="primeMarApp.showPage('profilePage')">
                             <i class="fas fa-arrow-left"></i>
                         </button>
-                        <h3>Following</h3>
+                        <div class="chat-user-info">
+                            <div class="chat-user-name">Following</div>
+                        </div>
                     </div>
                     <div class="users-grid" id="followingGrid">
                         <!-- Following will be loaded here -->
@@ -1166,6 +1808,10 @@
             <a class="nav-item" data-page="messagesPage">
                 <div class="nav-icon"><i class="fas fa-envelope"></i></div>
                 <span>Messages</span>
+            </a>
+            <a class="nav-item" data-page="notificationsPage">
+                <div class="nav-icon"><i class="fas fa-bell"></i></div>
+                <span>Alerts</span>
             </a>
             <a class="nav-item" data-page="profilePage">
                 <div class="nav-icon"><i class="fas fa-user"></i></div>
@@ -1194,16 +1840,20 @@
                     <label class="form-label">Bio</label>
                     <textarea class="form-input" id="editProfileBio" placeholder="Tell others about yourself" rows="3"></textarea>
                 </div>
+                <div class="form-group">
+                    <label class="form-label">Profile Picture</label>
+                    <input type="file" class="form-input" id="editProfileAvatar" accept="image/*">
+                </div>
                 <button class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
             </div>
         </div>
     </div>
 
     <script>
-        // PrimeMar Social Media Platform with Complete Supabase Integration
+        // PrimeMar Social Media Platform - Enhanced Version
         class PrimeMar {
             constructor() {
-                // Supabase configuration - Replace with your actual Supabase URL and Key
+                // Supabase configuration
                 this.supabaseUrl = 'https://qsiwjjqxpegfmgkmtjje.supabase.co';
                 this.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzaXdqanF4cGVnZm1na210amplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1NDU2MTYsImV4cCI6MjA3ODEyMTYxNn0.iZ5YLVdeZP0VOm_Qu8XBOfBa9hmyEqHl520q5hZd1z8';
                 this.supabase = null;
@@ -1218,6 +1868,7 @@
                 this.messages = new Map();
                 this.draftMessages = new Map();
                 this.searchTimeout = null;
+                this.isDarkMode = localStorage.getItem('primemar-theme') === 'dark';
                 
                 this.init();
             }
@@ -1225,6 +1876,9 @@
             async init() {
                 // Initialize Supabase
                 this.supabase = supabase.createClient(this.supabaseUrl, this.supabaseKey);
+                
+                // Set initial theme
+                this.applyTheme();
                 
                 // Check if user is already logged in
                 const { data: { session }, error } = await this.supabase.auth.getSession();
@@ -1252,6 +1906,14 @@
                         this.showAuthModal();
                     }
                 });
+            }
+
+            applyTheme() {
+                if (this.isDarkMode) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                }
             }
 
             async loadUserProfile() {
@@ -1316,7 +1978,7 @@
                 if (error) {
                     this.showError(error.message, errorDiv);
                 } else {
-                    this.showToast('Welcome back to PrimeMar!');
+                    this.showToast('Welcome back to PrimeMar!', 'success');
                 }
             }
 
@@ -1358,11 +2020,11 @@
                 if (error) {
                     this.showError(error.message, errorDiv);
                 } else {
-                    this.showToast('Account created! Please check your email for verification.');
+                    this.showToast('Account created! Please check your email for verification.', 'success');
                 }
             }
 
-            // Post Methods (Twitter-like features)
+            // Post Methods
             async post(content) {
                 if (!content.trim()) {
                     this.showToast('Please add some content to your post', 'error');
@@ -1393,7 +2055,7 @@
                 } else {
                     this.clearComposer();
                     await this.loadFeed();
-                    this.showToast('Post published!');
+                    this.showToast('Post published!', 'success');
                 }
             }
 
@@ -1401,6 +2063,7 @@
                 document.getElementById('postTextarea').value = '';
                 document.getElementById('postBtn').disabled = true;
                 document.getElementById('charCount').textContent = '280';
+                document.getElementById('charCount').className = 'char-count';
             }
 
             async loadFeed() {
@@ -1437,7 +2100,13 @@
                 const container = document.getElementById('feedContainer');
                 
                 if (this.posts.length === 0) {
-                    container.innerHTML = '<div class="text-center p-3">No posts yet. Be the first to post!</div>';
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-feather"></i>
+                            <h3>No posts yet</h3>
+                            <p>Be the first to share something!</p>
+                        </div>
+                    `;
                     return;
                 }
 
@@ -1450,26 +2119,35 @@
                     <div class="post" data-post-id="${post.id}">
                         <div class="post-header">
                             <img src="${post.profiles.avatar}" alt="${post.profiles.name}" class="avatar">
-                            <div>
+                            <div class="post-user-info">
                                 <div class="user-name">${post.profiles.name}</div>
                                 <div class="user-handle">@${post.profiles.username}</div>
                             </div>
-                            <div style="flex: 1;"></div>
                             <div class="post-time">${this.formatTime(post.created_at)}</div>
+                            <div class="post-options">
+                                <button class="post-options-btn">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="post-content">${this.formatPostContent(post.content)}</div>
+                        <div class="post-stats">
+                            <span>${likeCount} likes</span>
+                            <span>${commentCount} comments</span>
+                        </div>
                         <div class="post-actions">
                             <button class="post-action" onclick="primeMarApp.commentOnPost(${post.id})">
                                 <i class="fas fa-comment"></i>
-                                <span>${commentCount}</span>
+                                <span>Comment</span>
                             </button>
                             <button class="post-action like-action ${isLiked ? 'liked' : ''}" 
                                     onclick="primeMarApp.likePost(${post.id})">
                                 <i class="fas fa-heart"></i>
-                                <span>${likeCount}</span>
+                                <span>Like</span>
                             </button>
                             <button class="post-action" onclick="primeMarApp.sharePost(${post.id})">
                                 <i class="fas fa-share"></i>
+                                <span>Share</span>
                             </button>
                         </div>
                     </div>
@@ -1477,10 +2155,11 @@
             }
 
             formatPostContent(content) {
-                // Simple formatting for hashtags and mentions
+                // Format hashtags and mentions
                 return content
-                    .replace(/#(\w+)/g, '<span class="hashtag" style="color: var(--primary-color);">#$1</span>')
-                    .replace(/@(\w+)/g, '<span class="mention" style="color: var(--primary-color);">@$1</span>');
+                    .replace(/#(\w+)/g, '<span class="hashtag" style="color: var(--primary-color); font-weight: 500;">#$1</span>')
+                    .replace(/@(\w+)/g, '<span class="mention" style="color: var(--primary-color); font-weight: 500;">@$1</span>')
+                    .replace(/\n/g, '<br>');
             }
 
             async likePost(postId) {
@@ -1507,6 +2186,11 @@
 
                     if (error) {
                         console.error('Error unliking post:', error);
+                        this.showToast('Error unliking post', 'error');
+                    } else {
+                        this.showToast('Post unliked', 'info');
+                    await this.loadFeed();
+                    return;
                     }
                 } else {
                     // Like the post
@@ -1521,10 +2205,13 @@
 
                     if (error) {
                         console.error('Error liking post:', error);
+                        this.showToast('Error liking post', 'error');
+                    } else {
+                        this.showToast('Post liked!', 'success');
+                    await this.loadFeed();
+                        return;
                     }
                 }
-                
-                await this.loadFeed();
             }
 
             async commentOnPost(postId) {
@@ -1544,13 +2231,13 @@
                         console.error('Error adding comment:', error);
                         this.showToast('Error adding comment', 'error');
                     } else {
-                        this.showToast('Comment added!');
+                        this.showToast('Comment added!', 'success');
                         await this.loadFeed();
                     }
                 }
             }
 
-            // Search Functionality (Facebook-like search)
+            // Search Functionality
             async searchUsers(query) {
                 if (!query.trim()) {
                     document.getElementById('searchResults').classList.remove('show');
@@ -1598,7 +2285,7 @@
                 this.loadUserProfileById(userId);
             }
 
-            // Chat Methods (WhatsApp-like messaging)
+            // Chat Methods
             async loadConversations() {
                 // Get conversations from database
                 const { data, error } = await this.supabase
@@ -1625,7 +2312,7 @@
                         avatar: otherUser.avatar,
                         lastMessage: conv.last_message || 'Start a conversation',
                         time: this.formatTime(conv.updated_at),
-                        unread: 0 // You can implement unread count logic
+                        unread: Math.floor(Math.random() * 5) // Mock unread count
                     };
                 });
                 
@@ -1636,12 +2323,18 @@
                 const container = document.getElementById('messagesList');
                 
                 if (this.conversations.length === 0) {
-                    container.innerHTML = '<div class="text-center p-3">No conversations yet. Start a chat!</div>';
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <h3>No conversations</h3>
+                            <p>Start a conversation with someone!</p>
+                        </div>
+                    `;
                     return;
                 }
 
                 container.innerHTML = this.conversations.map(conv => `
-                    <div class="message-item" onclick="primeMarApp.openChat(${conv.id})">
+                    <div class="message-item ${conv.unread > 0 ? 'unread' : ''}" onclick="primeMarApp.openChat(${conv.id})">
                         <img src="${conv.avatar}" alt="${conv.name}" class="avatar">
                         <div class="message-item-info">
                             <div class="user-name">${conv.name}</div>
@@ -1661,7 +2354,6 @@
                 
                 // Show chat interface
                 document.getElementById('messagesList').classList.add('hidden');
-                document.getElementById('activeChatHeader').classList.remove('hidden');
                 document.getElementById('chatMessages').classList.remove('hidden');
                 document.getElementById('chatInputContainer').classList.remove('hidden');
                 
@@ -1806,7 +2498,7 @@
                 document.getElementById('chatInput').value = draft;
             }
 
-            // Follow System (Facebook-like friends)
+            // Follow System
             async loadFollowData() {
                 // Get following list from database
                 const { data: followingData, error: followingError } = await this.supabase
@@ -1859,7 +2551,7 @@
                         this.showToast('Error unfollowing user', 'error');
                     } else {
                         this.following.delete(this.userProfile.id);
-                        this.showToast('Unfollowed user');
+                        this.showToast('Unfollowed user', 'info');
                     }
                 } else {
                     // Follow
@@ -1877,7 +2569,7 @@
                         this.showToast('Error following user', 'error');
                     } else {
                         this.following.add(this.userProfile.id);
-                        this.showToast('Followed user');
+                        this.showToast('Followed user', 'success');
                     }
                 }
                 this.updateFollowUI();
@@ -1889,7 +2581,13 @@
                 const followersCount = document.getElementById('followersCount');
                 
                 if (followBtn) {
-                    followBtn.textContent = this.following.has(this.userProfile.id) ? 'Unfollow' : 'Follow';
+                    const isFollowing = this.following.has(this.userProfile.id);
+                    followBtn.innerHTML = isFollowing ? 
+                        '<i class="fas fa-user-minus"></i> Unfollow' : 
+                        '<i class="fas fa-user-plus"></i> Follow';
+                    followBtn.style.background = isFollowing ? 'var(--bg-secondary)' : 'var(--primary-color)';
+                    followBtn.style.color = isFollowing ? 'var(--text-primary)' : 'white';
+                    followBtn.style.border = isFollowing ? '1.5px solid var(--border-color)' : 'none';
                 }
                 
                 if (followingCount) {
@@ -1912,18 +2610,24 @@
             renderFollowersView() {
                 const container = document.getElementById('followersGrid');
                 if (!this.followerUsers || this.followerUsers.length === 0) {
-                    container.innerHTML = '<div class="text-center p-3">No followers yet</div>';
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <h3>No followers yet</h3>
+                            <p>When someone follows you, they'll appear here</p>
+                        </div>
+                    `;
                     return;
                 }
                 
                 container.innerHTML = this.followerUsers.map(user => `
-                    <div class="user-card">
+                    <div class="user-card" onclick="primeMarApp.viewUserProfile('${user.id}')">
                         <img src="${user.avatar}" alt="${user.name}" class="user-card-avatar">
-                        <h4>${user.name}</h4>
-                        <p class="user-handle">@${user.username}</p>
-                        <p class="profile-bio" style="font-size: 0.8rem; margin-top: 8px;">${user.bio}</p>
-                        <button class="follow-btn" style="margin-top: 12px; padding: 6px 12px; font-size: 0.8rem;" 
-                                onclick="primeMarApp.toggleFollowUser('${user.id}')">
+                        <div class="user-card-name">${user.name}</div>
+                        <div class="user-card-handle">@${user.username}</div>
+                        <div class="user-card-bio">${user.bio || 'No bio yet'}</div>
+                        <button class="follow-btn" style="margin-top: 8px; padding: 8px 16px; font-size: 0.8rem;" 
+                                onclick="event.stopPropagation(); primeMarApp.toggleFollowUser('${user.id}')">
                             ${this.following.has(user.id) ? 'Unfollow' : 'Follow'}
                         </button>
                     </div>
@@ -1933,18 +2637,24 @@
             renderFollowingView() {
                 const container = document.getElementById('followingGrid');
                 if (!this.followingUsers || this.followingUsers.length === 0) {
-                    container.innerHTML = '<div class="text-center p-3">Not following anyone yet</div>';
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-user-plus"></i>
+                            <h3>Not following anyone</h3>
+                            <p>When you follow someone, they'll appear here</p>
+                        </div>
+                    `;
                     return;
                 }
                 
                 container.innerHTML = this.followingUsers.map(user => `
-                    <div class="user-card">
+                    <div class="user-card" onclick="primeMarApp.viewUserProfile('${user.id}')">
                         <img src="${user.avatar}" alt="${user.name}" class="user-card-avatar">
-                        <h4>${user.name}</h4>
-                        <p class="user-handle">@${user.username}</p>
-                        <p class="profile-bio" style="font-size: 0.8rem; margin-top: 8px;">${user.bio}</p>
-                        <button class="follow-btn" style="margin-top: 12px; padding: 6px 12px; font-size: 0.8rem;"
-                                onclick="primeMarApp.toggleFollowUser('${user.id}')">
+                        <div class="user-card-name">${user.name}</div>
+                        <div class="user-card-handle">@${user.username}</div>
+                        <div class="user-card-bio">${user.bio || 'No bio yet'}</div>
+                        <button class="follow-btn" style="margin-top: 8px; padding: 8px 16px; font-size: 0.8rem;"
+                                onclick="event.stopPropagation(); primeMarApp.toggleFollowUser('${user.id}')">
                             ${this.following.has(user.id) ? 'Unfollow' : 'Follow'}
                         </button>
                     </div>
@@ -1965,7 +2675,7 @@
                         this.showToast('Error unfollowing user', 'error');
                     } else {
                         this.following.delete(userId);
-                        this.showToast(`Unfollowed user`);
+                        this.showToast(`Unfollowed user`, 'info');
                     }
                 } else {
                     // Follow
@@ -1983,7 +2693,7 @@
                         this.showToast('Error following user', 'error');
                     } else {
                         this.following.add(userId);
-                        this.showToast(`Followed user`);
+                        this.showToast(`Followed user`, 'success');
                     }
                 }
                 this.updateFollowUI();
@@ -2012,7 +2722,7 @@
                 }
 
                 const stories = [
-                    { id: 0, username: 'You', avatar: this.userProfile?.avatar, isAdd: true }
+                    { id: 0, username: 'You', avatar: this.userProfile?.avatar, isAdd: true, seen: true }
                 ];
 
                 if (data) {
@@ -2020,7 +2730,8 @@
                         stories.push({
                             id: story.id,
                             username: story.profiles.username,
-                            avatar: story.profiles.avatar
+                            avatar: story.profiles.avatar,
+                            seen: Math.random() > 0.5 // Mock seen status
                         });
                     });
                 }
@@ -2031,12 +2742,20 @@
             renderStories(stories) {
                 const container = document.getElementById('storiesContainer');
                 container.innerHTML = stories.map(story => `
-                    <div class="story ${story.isAdd ? 'add-story' : ''}">
+                    <div class="story ${story.isAdd ? 'add-story' : ''} ${story.seen ? 'seen' : 'unseen'}" onclick="${story.isAdd ? 'primeMarApp.addStory()' : 'primeMarApp.viewStory(' + story.id + ')'}">
                         <img src="${story.avatar}" alt="${story.username}" class="story-avatar">
                         ${story.isAdd ? '<div class="add-story-icon"><i class="fas fa-plus"></i></div>' : ''}
                         <div class="story-username">${story.username}</div>
                     </div>
                 `).join('');
+            }
+
+            addStory() {
+                this.showToast('Story feature coming soon!', 'info');
+            }
+
+            viewStory(storyId) {
+                this.showToast('Viewing story...', 'info');
             }
 
             // UI Methods
@@ -2072,7 +2791,10 @@
                 document.getElementById('signupPassword').value = '';
                 
                 const errorDivs = document.querySelectorAll('.error-message');
-                errorDivs.forEach(div => div.textContent = '');
+                errorDivs.forEach(div => {
+                    div.textContent = '';
+                    div.classList.remove('show');
+                });
             }
 
             updateProfileUI() {
@@ -2080,6 +2802,7 @@
 
                 document.getElementById('userNameNav').textContent = this.userProfile.name;
                 document.getElementById('userAvatar').src = this.userProfile.avatar;
+                document.getElementById('headerAvatar').src = this.userProfile.avatar;
                 document.getElementById('profileName').textContent = this.userProfile.name;
                 document.getElementById('profileHandle').textContent = `@${this.userProfile.username}`;
                 document.getElementById('profileBio').textContent = this.userProfile.bio;
@@ -2110,6 +2833,13 @@
                 document.getElementById(pageId).classList.add('active');
 
                 // Update navigation
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.page === pageId) {
+                        btn.classList.add('active');
+                    }
+                });
+
                 document.querySelectorAll('.nav-item').forEach(nav => {
                     nav.classList.remove('active');
                     if (nav.dataset.page === pageId) {
@@ -2152,6 +2882,14 @@
                     }
                 });
 
+                // Navigation buttons
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.showPage(btn.dataset.page);
+                    });
+                });
+
                 // Navigation dropdown
                 document.querySelector('.nav-dropdown-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -2182,11 +2920,22 @@
                 // Post composer
                 const postTextarea = document.getElementById('postTextarea');
                 const postBtn = document.getElementById('postBtn');
+                const charCount = document.getElementById('charCount');
 
                 postTextarea.addEventListener('input', (e) => {
                     const length = e.target.value.length;
-                    document.getElementById('charCount').textContent = 280 - length;
-                    postBtn.disabled = length === 0;
+                    const remaining = 280 - length;
+                    charCount.textContent = remaining;
+                    
+                    if (remaining < 50) {
+                        charCount.className = 'char-count warning';
+                    } else if (remaining < 0) {
+                        charCount.className = 'char-count error';
+                    } else {
+                        charCount.className = 'char-count';
+                    }
+                    
+                    postBtn.disabled = length === 0 || remaining < 0;
                 });
 
                 postBtn.addEventListener('click', () => {
@@ -2196,6 +2945,7 @@
                 // FAB
                 document.getElementById('fabBtn').addEventListener('click', () => {
                     postTextarea.focus();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
 
                 // Chat
@@ -2205,9 +2955,16 @@
 
                 const chatInput = document.getElementById('chatInput');
                 chatInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
                         this.sendMessage(e.target.value);
                     }
+                });
+
+                // Auto-resize chat input
+                chatInput.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
                 });
 
                 // Save draft messages
@@ -2215,14 +2972,6 @@
                     if (this.activeChat) {
                         this.saveDraftMessage(this.activeChat.id, e.target.value);
                     }
-                });
-
-                document.getElementById('backToMessages').addEventListener('click', () => {
-                    document.getElementById('messagesList').classList.remove('hidden');
-                    document.getElementById('activeChatHeader').classList.add('hidden');
-                    document.getElementById('chatMessages').classList.add('hidden');
-                    document.getElementById('chatInputContainer').classList.add('hidden');
-                    this.activeChat = null;
                 });
 
                 // Profile editing
@@ -2254,7 +3003,7 @@
                         
                         this.updateProfileUI();
                         document.getElementById('profileEditModal').classList.remove('active');
-                        this.showToast('Profile updated!');
+                        this.showToast('Profile updated!', 'success');
                     }
                 });
 
@@ -2293,27 +3042,29 @@
             }
 
             toggleTheme() {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('primemar-theme', newTheme);
-                this.showToast(`${newTheme === 'dark' ? 'Dark' : 'Light'} mode enabled`);
+                this.isDarkMode = !this.isDarkMode;
+                localStorage.setItem('primemar-theme', this.isDarkMode ? 'dark' : 'light');
+                this.applyTheme();
+                this.showToast(`${this.isDarkMode ? 'Dark' : 'Light'} mode enabled`, 'info');
             }
 
             async logout() {
                 const { error } = await this.supabase.auth.signOut();
                 if (error) {
                     console.error('Error signing out:', error);
+                    this.showToast('Error signing out', 'error');
                 } else {
-                    this.showToast('Logged out successfully');
-                this.showAuthModal();
-                this.clearAuthForms();
-                this.showLoginForm();
-                document.getElementById('searchInput').value = '';
-                document.getElementById('searchResults').classList.remove('show');
-                document.getElementById('postTextarea').value = '';
-                document.getElementById('charCount').textContent = '280';
-                document.getElementById('postBtn').disabled = true;
+                    this.showToast('Logged out successfully', 'info');
+                    this.showAuthModal();
+                    this.clearAuthForms();
+                    this.showLoginForm();
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('searchResults').classList.remove('show');
+                    document.getElementById('postTextarea').value = '';
+                    document.getElementById('charCount').textContent = '280';
+                    document.getElementById('charCount').className = 'char-count';
+                    document.getElementById('postBtn').disabled = true;
+                }
             }
 
             // Utility Methods
@@ -2331,7 +3082,10 @@
             showToast(message, type = 'success') {
                 const toast = document.createElement('div');
                 toast.className = `toast ${type}`;
-                toast.textContent = message;
+                toast.innerHTML = `
+                    <i class="fas fa-${this.getToastIcon(type)}"></i>
+                    <span>${message}</span>
+                `;
                 
                 document.getElementById('toastContainer').appendChild(toast);
                 
@@ -2339,7 +3093,17 @@
                 setTimeout(() => {
                     toast.classList.remove('show');
                     setTimeout(() => toast.remove(), 300);
-                }, 3000);
+                }, 4000);
+            }
+
+            getToastIcon(type) {
+                const icons = {
+                    success: 'check-circle',
+                    error: 'exclamation-circle',
+                    warning: 'exclamation-triangle',
+                    info: 'info-circle'
+                };
+                return icons[type] || 'info-circle';
             }
 
             showError(message, element) {
@@ -2348,7 +3112,7 @@
             }
 
             sharePost(postId) {
-                this.showToast('Post shared successfully!');
+                this.showToast('Post shared successfully!', 'success');
             }
         }
 

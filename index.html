@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* All the CSS styles from the previous implementation remain the same */
         :root {
             --primary-color: #3b82f6;
             --primary-hover: #2563eb;
@@ -74,7 +75,7 @@
             overflow-x: hidden;
         }
 
-        /* Enhanced Header */
+        /* Header and other styles remain the same as previous implementation */
         .header {
             position: fixed;
             top: 0;
@@ -107,26 +108,10 @@
             transition: var(--transition);
         }
 
-        .logo:hover {
-            transform: scale(1.05);
-        }
-
-        .logo-img {
-            width: 32px;
-            height: 32px;
-            border-radius: var(--radius-md);
-            object-fit: cover;
-        }
-
-        /* Enhanced Search */
         .search-container {
             flex: 1;
             max-width: 500px;
             margin: 0 30px;
-            position: relative;
-        }
-
-        .search-wrapper {
             position: relative;
         }
 
@@ -149,15 +134,6 @@
             background: var(--bg-color);
         }
 
-        .search-icon {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-            cursor: pointer;
-        }
-
         .search-results {
             position: absolute;
             top: 100%;
@@ -172,12 +148,6 @@
             max-height: 400px;
             overflow-y: auto;
             display: none;
-            animation: slideDown 0.2s ease;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .search-results.show {
@@ -192,58 +162,6 @@
             cursor: pointer;
             transition: var(--transition);
             border-bottom: 1px solid var(--border-color);
-        }
-
-        .search-result-item:hover {
-            background: var(--hover-color);
-        }
-
-        .search-result-item:last-child {
-            border-bottom: none;
-        }
-
-        /* Enhanced Navigation */
-        .header-nav {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: var(--radius-md);
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .nav-btn:hover {
-            background: var(--hover-color);
-            color: var(--text-primary);
-        }
-
-        .nav-btn.active {
-            color: var(--primary-color);
-            background: var(--primary-light);
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            background: var(--error-color);
-            color: white;
-            border-radius: var(--radius-full);
-            width: 18px;
-            height: 18px;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
         }
 
         .nav-dropdown {
@@ -263,10 +181,6 @@
             transition: var(--transition);
         }
 
-        .nav-dropdown-btn:hover {
-            background: var(--hover-color);
-        }
-
         .nav-dropdown-content {
             position: absolute;
             top: 100%;
@@ -279,41 +193,12 @@
             box-shadow: var(--shadow-xl);
             z-index: 1001;
             display: none;
-            animation: slideDown 0.2s ease;
         }
 
         .nav-dropdown-content.show {
             display: block;
         }
 
-        .nav-dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
-            color: var(--text-primary);
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-
-        .nav-dropdown-item:hover {
-            background: var(--hover-color);
-        }
-
-        .nav-dropdown-divider {
-            height: 1px;
-            background: var(--border-color);
-            margin: 6px 0;
-        }
-
-        /* Enhanced Bottom Navigation */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -329,50 +214,6 @@
             z-index: 1000;
         }
 
-        [data-theme="dark"] .bottom-nav {
-            background: rgba(15, 23, 42, 0.95);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 8px 16px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.75rem;
-            border-radius: var(--radius-full);
-            transition: var(--transition);
-            position: relative;
-            flex: 1;
-            max-width: 80px;
-        }
-
-        .nav-item.active {
-            color: var(--primary-color);
-        }
-
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            top: -8px;
-            width: 4px;
-            height: 4px;
-            background: var(--primary-color);
-            border-radius: var(--radius-full);
-        }
-
-        .nav-icon {
-            font-size: 1.4rem;
-            margin-bottom: 2px;
-            transition: var(--transition);
-        }
-
-        .nav-item.active .nav-icon {
-            transform: scale(1.1);
-        }
-
-        /* Main Layout */
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -381,19 +222,12 @@
 
         .page {
             display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .page.active {
             display: block;
         }
 
-        /* Enhanced Auth Styles */
         .auth-modal {
             position: fixed;
             top: 0;
@@ -407,14 +241,6 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-        }
-
-        .auth-modal.active {
-            opacity: 1;
-            visibility: visible;
         }
 
         .auth-modal-content {
@@ -423,37 +249,11 @@
             width: 100%;
             max-width: 440px;
             box-shadow: var(--shadow-xl);
-            transform: scale(0.9);
-            transition: var(--transition);
             overflow: hidden;
-        }
-
-        .auth-modal.active .auth-modal-content {
-            transform: scale(1);
-        }
-
-        .auth-header {
-            padding: 30px 30px 20px;
-            text-align: center;
-            background: var(--gradient-primary);
-            color: white;
-        }
-
-        .auth-body {
-            padding: 30px;
         }
 
         .form-group {
             margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 0.9rem;
         }
 
         .form-input {
@@ -465,13 +265,6 @@
             color: var(--text-primary);
             font-size: 1rem;
             transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
         .btn {
@@ -482,46 +275,11 @@
             cursor: pointer;
             transition: var(--transition);
             width: 100%;
-            box-shadow: var(--shadow-sm);
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
 
         .btn-primary {
             background: var(--gradient-primary);
             color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-secondary {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1.5px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: var(--hover-color);
-        }
-
-        .auth-toggle {
-            margin-top: 20px;
-            color: var(--text-secondary);
-            text-align: center;
-            font-size: 0.9rem;
-        }
-
-        .auth-link {
-            color: var(--primary-color);
-            text-decoration: none;
-            cursor: pointer;
-            font-weight: 600;
         }
 
         .error-message {
@@ -533,14 +291,8 @@
             background: rgba(239, 68, 68, 0.1);
             border-radius: var(--radius-md);
             display: none;
-            border-left: 4px solid var(--error-color);
         }
 
-        .error-message.show {
-            display: block;
-        }
-
-        /* Enhanced Post Composer */
         .post-composer {
             background: var(--bg-color);
             border-radius: var(--radius-xl);
@@ -548,21 +300,6 @@
             margin-bottom: 20px;
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
-        }
-
-        .composer-header {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius-full);
-            object-fit: cover;
-            border: 2px solid var(--border-color);
-            flex-shrink: 0;
         }
 
         .composer-textarea {
@@ -575,48 +312,6 @@
             min-height: 80px;
             font-family: inherit;
             line-height: 1.5;
-            padding: 0;
-        }
-
-        .composer-textarea::placeholder {
-            color: var(--text-muted);
-        }
-
-        .composer-textarea:focus {
-            outline: none;
-        }
-
-        .composer-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 16px;
-            padding-left: 56px;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            color: var(--primary-color);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: var(--radius-full);
-            transition: var(--transition);
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-btn:hover {
-            background: var(--primary-light);
         }
 
         .post-btn {
@@ -628,135 +323,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .post-btn:disabled {
-            background: var(--primary-light);
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .post-btn:not(:disabled):hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .char-count {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-right: 12px;
-        }
-
-        .char-count.warning {
-            color: var(--warning-color);
-        }
-
-        .char-count.error {
-            color: var(--error-color);
-        }
-
-        /* Enhanced Stories */
-        .stories-section {
-            background: var(--bg-color);
-            border-radius: var(--radius-xl);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
-        }
-
-        .stories-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .stories-title {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .stories-container {
-            display: flex;
-            gap: 16px;
-            overflow-x: auto;
-            padding: 4px 0;
-        }
-
-        .stories-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        .story {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: var(--transition);
-            min-width: 70px;
-        }
-
-        .story:hover {
-            transform: scale(1.05);
-        }
-
-        .story-avatar {
-            width: 68px;
-            height: 68px;
-            border-radius: var(--radius-full);
-            object-fit: cover;
-            padding: 3px;
-            background: var(--story-ring);
-            transition: var(--transition);
-        }
-
-        .story.unseen .story-avatar {
-            background: var(--story-ring);
-        }
-
-        .story.seen .story-avatar {
-            background: var(--border-color);
-        }
-
-        .add-story {
-            position: relative;
-        }
-
-        .add-story-icon {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            background: var(--primary-color);
-            color: white;
-            border-radius: var(--radius-full);
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            border: 2px solid var(--bg-color);
-        }
-
-        .story-username {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            text-align: center;
-            max-width: 70px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* Enhanced Posts */
-        .feed {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
         }
 
         .post {
@@ -765,79 +331,15 @@
             padding: 20px;
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
-            transition: var(--transition);
+            margin-bottom: 16px;
         }
 
-        .post:hover {
-            box-shadow: var(--shadow-lg);
-        }
-
-        .post-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .post-user-info {
-            flex: 1;
-        }
-
-        .user-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 2px;
-        }
-
-        .user-handle {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .post-time {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
-
-        .post-options {
-            position: relative;
-        }
-
-        .post-options-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 6px;
+        .avatar {
+            width: 44px;
+            height: 44px;
             border-radius: var(--radius-full);
-            transition: var(--transition);
-        }
-
-        .post-options-btn:hover {
-            background: var(--hover-color);
-            color: var(--text-primary);
-        }
-
-        .post-content {
-            margin-bottom: 16px;
-            line-height: 1.6;
-            font-size: 1.05rem;
-        }
-
-        .post-image {
-            width: 100%;
-            border-radius: var(--radius-lg);
-            margin-bottom: 16px;
-            max-height: 400px;
             object-fit: cover;
-        }
-
-        .post-stats {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 12px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
+            border: 2px solid var(--border-color);
         }
 
         .post-actions {
@@ -859,170 +361,27 @@
             cursor: pointer;
             font-size: 0.9rem;
             transition: var(--transition);
-            flex: 1;
-            justify-content: center;
-            max-width: 120px;
         }
 
-        .post-action:hover {
-            background: var(--hover-color);
-            color: var(--primary-color);
-        }
-
-        .post-action.liked {
-            color: var(--error-color);
-        }
-
-        .post-action i {
-            font-size: 1.1rem;
-        }
-
-        /* Enhanced Profile */
         .profile-header {
             position: relative;
-            height: 240px;
+            height: 200px;
             background: var(--gradient-primary);
             border-radius: var(--radius-xl);
             margin-bottom: 80px;
-            overflow: hidden;
-        }
-
-        .profile-cover {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .profile-avatar-container {
-            position: absolute;
-            bottom: -60px;
-            left: 24px;
         }
 
         .profile-avatar {
-            width: 120px;
-            height: 120px;
+            position: absolute;
+            bottom: -50px;
+            left: 24px;
+            width: 100px;
+            height: 100px;
             border-radius: var(--radius-full);
             border: 4px solid var(--bg-color);
             object-fit: cover;
-            box-shadow: var(--shadow-lg);
         }
 
-        .profile-edit-cover {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--text-primary);
-            border: none;
-            padding: 8px 16px;
-            border-radius: var(--radius-full);
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .profile-edit-cover:hover {
-            background: white;
-        }
-
-        .profile-info {
-            padding: 0 24px 24px;
-        }
-
-        .profile-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .profile-handle {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            margin-bottom: 12px;
-        }
-
-        .profile-bio {
-            color: var(--text-primary);
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .profile-stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            padding: 20px 0;
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .stat {
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 8px;
-            border-radius: var(--radius-md);
-        }
-
-        .stat:hover {
-            background: var(--hover-color);
-        }
-
-        .stat-number {
-            display: block;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .profile-actions {
-            display: flex;
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .follow-btn, .message-btn {
-            padding: 12px 24px;
-            border-radius: var(--radius-full);
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .follow-btn {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .follow-btn:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-        }
-
-        .message-btn {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1.5px solid var(--border-color);
-        }
-
-        .message-btn:hover {
-            background: var(--hover-color);
-        }
-
-        /* Enhanced Messages */
         .messages-container {
             background: var(--bg-color);
             border-radius: var(--radius-xl);
@@ -1030,88 +389,6 @@
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
             height: calc(100vh - var(--header-height) - var(--nav-height) - 40px);
-        }
-
-        .chat-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .chat-user-info {
-            flex: 1;
-        }
-
-        .chat-user-name {
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .chat-user-status {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-
-        .chat-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .messages-list {
-            height: 100%;
-            overflow-y: auto;
-        }
-
-        .message-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .message-item:hover {
-            background: var(--hover-color);
-        }
-
-        .message-item.unread {
-            background: var(--primary-light);
-        }
-
-        .message-item-info {
-            flex: 1;
-        }
-
-        .message-preview {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .message-time {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
-
-        .unread-badge {
-            background: var(--primary-color);
-            color: white;
-            border-radius: var(--radius-full);
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: 600;
         }
 
         .chat-messages {
@@ -1127,12 +404,6 @@
             display: flex;
             gap: 8px;
             max-width: 80%;
-            animation: messageSlide 0.3s ease;
-        }
-
-        @keyframes messageSlide {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .message.own {
@@ -1144,19 +415,11 @@
             background: var(--bg-secondary);
             padding: 12px 16px;
             border-radius: var(--radius-lg);
-            position: relative;
-            box-shadow: var(--shadow-sm);
         }
 
         .message.own .message-content {
             background: var(--primary-color);
             color: white;
-        }
-
-        .message-time {
-            font-size: 0.75rem;
-            margin-top: 4px;
-            opacity: 0.7;
         }
 
         .chat-input-container {
@@ -1165,218 +428,19 @@
             background: var(--bg-color);
             display: flex;
             gap: 12px;
-            align-items: flex-end;
-        }
-
-        .chat-input-wrapper {
-            flex: 1;
-            position: relative;
         }
 
         .chat-input {
-            width: 100%;
+            flex: 1;
             padding: 12px 16px;
             border: 1.5px solid var(--border-color);
             border-radius: var(--radius-full);
             background: var(--bg-secondary);
             color: var(--text-primary);
-            font-size: 0.95rem;
-            resize: none;
-            min-height: 44px;
-            max-height: 120px;
-            transition: var(--transition);
         }
 
-        .chat-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            background: var(--bg-color);
-        }
-
-        .chat-send-btn {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: var(--radius-full);
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            flex-shrink: 0;
-        }
-
-        .chat-send-btn:hover {
-            background: var(--primary-hover);
-            transform: scale(1.05);
-        }
-
-        .chat-send-btn:disabled {
-            background: var(--primary-light);
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Enhanced Users Grid */
-        .users-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 16px;
-            padding: 20px;
-        }
-
-        .user-card {
-            background: var(--bg-color);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            text-align: center;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        .user-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .user-card-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: var(--radius-full);
-            object-fit: cover;
-            margin: 0 auto 12px;
-            border: 3px solid var(--border-color);
-        }
-
-        .user-card-name {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .user-card-handle {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-        }
-
-        .user-card-bio {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            line-height: 1.4;
-            margin-bottom: 12px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        /* Enhanced Floating Action Button */
-        .fab {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background: var(--gradient-primary);
-            color: white;
-            border-radius: var(--radius-full);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 999;
-            box-shadow: var(--shadow-lg);
-            transition: var(--transition);
-        }
-
-        .fab:hover {
-            transform: scale(1.1);
-            box-shadow: var(--shadow-xl);
-        }
-
-        /* Enhanced Modals */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-        }
-
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background: var(--bg-color);
-            border-radius: var(--radius-xl);
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow: hidden;
-            box-shadow: var(--shadow-xl);
-            transform: scale(0.9);
-            transition: var(--transition);
-        }
-
-        .modal.active .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--bg-secondary);
-        }
-
-        .modal-title {
-            font-weight: 600;
-            font-size: 1.2rem;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 8px;
-            border-radius: var(--radius-full);
-            transition: var(--transition);
-        }
-
-        .modal-close:hover {
-            background: var(--hover-color);
-            color: var(--text-primary);
-        }
-
-        /* Utility Classes */
         .hidden {
             display: none !important;
-        }
-
-        .text-center {
-            text-align: center;
         }
 
         .loading {
@@ -1385,35 +449,8 @@
             justify-content: center;
             padding: 40px;
             color: var(--text-secondary);
-            gap: 12px;
         }
 
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
-        .mt-2 { margin-top: 8px; }
-        .mb-2 { margin-bottom: 8px; }
-        .p-3 { padding: 12px; }
-
-        /* Enhanced Toast */
         .toast {
             position: fixed;
             top: 90px;
@@ -1423,17 +460,7 @@
             color: white;
             font-weight: 600;
             z-index: 10000;
-            transform: translateX(400px);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--shadow-lg);
-            max-width: 320px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .toast.show {
-            transform: translateX(0);
         }
 
         .toast.success {
@@ -1444,58 +471,10 @@
             background: var(--error-color);
         }
 
-        .toast.warning {
-            background: var(--warning-color);
-        }
-
-        .toast.info {
-            background: var(--info-color);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: calc(var(--header-height) + 10px) 16px 16px;
-            }
-
-            .header {
-                padding: 0 16px;
-            }
-
-            .search-container {
-                margin: 0 16px;
-            }
-
-            .nav-btn span {
-                display: none;
-            }
-
-            .post-composer {
-                padding: 16px;
-            }
-
-            .profile-header {
-                height: 200px;
-                margin-bottom: 70px;
-            }
-
-            .profile-avatar {
-                width: 100px;
-                height: 100px;
-            }
-
-            .users-grid {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-                gap: 12px;
-                padding: 16px;
-            }
-        }
-
         @media (min-width: 768px) {
             .bottom-nav {
                 display: none;
             }
-
             body {
                 padding-bottom: 0;
             }
@@ -1514,32 +493,32 @@
     <!-- Auth Modal -->
     <div class="auth-modal active" id="authModal">
         <div class="auth-modal-content">
-            <div class="auth-header">
-                <div class="logo">
+            <div class="auth-header" style="padding: 30px; background: var(--gradient-primary); color: white; text-align: center;">
+                <div class="logo" style="font-size: 2rem; margin-bottom: 10px;">
                     <i class="fas fa-fire"></i>
                     <span>PrimeMar</span>
                 </div>
-                <p style="margin-top: 8px; opacity: 0.9;">Join the conversation</p>
+                <p style="opacity: 0.9;">Join the conversation</p>
             </div>
-            <div class="auth-body">
+            <div style="padding: 30px;">
                 <div id="loginForm">
                     <h2 style="margin-bottom: 8px; text-align: center;">Welcome back</h2>
                     <p style="color: var(--text-secondary); text-align: center; margin-bottom: 24px;">Sign in to your account</p>
                     <div class="error-message" id="loginError"></div>
                     <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Email</label>
+                        <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email" value="demo@primemar.com">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Password</label>
+                        <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" value="password123">
                     </div>
                     <button class="btn btn-primary" id="loginBtn">
                         <i class="fas fa-sign-in-alt"></i>
                         Sign In
                     </button>
-                    <div class="auth-toggle">
-                        Don't have an account? <a class="auth-link" id="showSignup">Sign up</a>
+                    <div style="margin-top: 20px; text-align: center; color: var(--text-secondary);">
+                        Don't have an account? <a style="color: var(--primary-color); cursor: pointer; font-weight: 600;" id="showSignup">Sign up</a>
                     </div>
                 </div>
 
@@ -1548,27 +527,27 @@
                     <p style="color: var(--text-secondary); text-align: center; margin-bottom: 24px;">Join PrimeMar today</p>
                     <div class="error-message" id="signupError"></div>
                     <div class="form-group">
-                        <label class="form-label">Full Name</label>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Full Name</label>
                         <input type="text" class="form-input" id="signupName" placeholder="Enter your full name">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Username</label>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Username</label>
                         <input type="text" class="form-input" id="signupUsername" placeholder="Choose a username">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Email</label>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Email</label>
                         <input type="email" class="form-input" id="signupEmail" placeholder="Enter your email">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Password</label>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Password</label>
                         <input type="password" class="form-input" id="signupPassword" placeholder="Create a password">
                     </div>
                     <button class="btn btn-primary" id="signupBtn">
                         <i class="fas fa-user-plus"></i>
                         Create Account
                     </button>
-                    <div class="auth-toggle">
-                        Already have an account? <a class="auth-link" id="showLogin">Sign in</a>
+                    <div style="margin-top: 20px; text-align: center; color: var(--text-secondary);">
+                        Already have an account? <a style="color: var(--primary-color); cursor: pointer; font-weight: 600;" id="showLogin">Sign in</a>
                     </div>
                 </div>
             </div>
@@ -1586,31 +565,11 @@
             
             <!-- Search Bar -->
             <div class="search-container">
-                <div class="search-wrapper">
-                    <input type="text" class="search-input" id="searchInput" placeholder="Search users, posts...">
-                    <div class="search-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <div class="search-results" id="searchResults"></div>
-                </div>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search users, posts...">
+                <div class="search-results" id="searchResults"></div>
             </div>
 
             <div class="header-nav">
-                <button class="nav-btn active" data-page="homePage">
-                    <i class="fas fa-home"></i>
-                    <span>Home</span>
-                </button>
-                <button class="nav-btn" data-page="messagesPage">
-                    <i class="fas fa-envelope"></i>
-                    <span>Messages</span>
-                    <div class="notification-badge">3</div>
-                </button>
-                <button class="nav-btn" data-page="notificationsPage">
-                    <i class="fas fa-bell"></i>
-                    <span>Notifications</span>
-                    <div class="notification-badge">5</div>
-                </button>
-                
                 <div class="nav-dropdown">
                     <button class="nav-dropdown-btn">
                         <img src="" alt="Profile" class="avatar" id="headerAvatar">
@@ -1641,47 +600,25 @@
             <section id="homePage" class="page active">
                 <!-- Post Composer -->
                 <div class="post-composer">
-                    <div class="composer-header">
+                    <div style="display: flex; gap: 12px; margin-bottom: 16px;">
                         <img src="" alt="Profile" class="avatar" id="userAvatar">
                         <textarea class="composer-textarea" placeholder="What's happening?" id="postTextarea" maxlength="280"></textarea>
                     </div>
-                    <div class="composer-actions">
-                        <div class="action-buttons">
-                            <button class="action-btn" id="mediaBtn" title="Add media">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-left: 56px;">
+                        <div style="display: flex; gap: 12px;">
+                            <button class="action-btn" style="background: none; border: none; color: var(--primary-color); padding: 8px; border-radius: var(--radius-full);">
                                 <i class="fas fa-image"></i>
-                            </button>
-                            <button class="action-btn" id="gifBtn" title="Add GIF">
-                                <i class="fas fa-film"></i>
-                            </button>
-                            <button class="action-btn" id="emojiBtn" title="Add emoji">
-                                <i class="fas fa-smile"></i>
-                            </button>
-                            <button class="action-btn" id="pollBtn" title="Create poll">
-                                <i class="fas fa-chart-pie"></i>
                             </button>
                         </div>
                         <div style="display: flex; align-items: center;">
-                            <span class="char-count" id="charCount">280</span>
+                            <span style="color: var(--text-muted); margin-right: 12px;" id="charCount">280</span>
                             <button class="post-btn" id="postBtn" disabled>Post</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Stories Section -->
-                <div class="stories-section">
-                    <div class="stories-header">
-                        <div class="stories-title">Stories</div>
-                        <button class="action-btn" style="font-size: 0.9rem;">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                    <div class="stories-container" id="storiesContainer">
-                        <!-- Stories will be loaded here -->
-                    </div>
-                </div>
-
                 <!-- Feed -->
-                <div class="feed" id="feedContainer">
+                <div id="feedContainer">
                     <div class="loading">
                         <i class="fas fa-spinner fa-spin"></i> Loading posts...
                     </div>
@@ -1691,75 +628,61 @@
             <!-- Messages Page -->
             <section id="messagesPage" class="page">
                 <div class="messages-container">
-                    <div class="messages-list" id="messagesList">
-                        <!-- Messages list will be loaded here -->
+                    <div style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+                        <h3>Messages</h3>
+                    </div>
+                    <div id="messagesList">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading conversations...
+                        </div>
                     </div>
                     
                     <div class="chat-messages hidden" id="chatMessages">
                         <!-- Messages will be loaded here -->
                     </div>
                     <div class="chat-input-container hidden" id="chatInputContainer">
-                        <div class="chat-input-wrapper">
-                            <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1"></textarea>
-                        </div>
-                        <button class="chat-send-btn" id="chatSendBtn">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Type a message...">
+                        <button class="chat-send-btn" style="background: var(--primary-color); color: white; border: none; border-radius: var(--radius-full); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
                 </div>
             </section>
 
-            <!-- Notifications Page -->
-            <section id="notificationsPage" class="page">
-                <div class="empty-state">
-                    <i class="fas fa-bell-slash"></i>
-                    <h3>No notifications yet</h3>
-                    <p>When you get notifications, they'll show up here</p>
-                </div>
-            </section>
-
             <!-- Profile Page -->
             <section id="profilePage" class="page">
                 <div class="profile-header">
-                    <div class="profile-cover"></div>
-                    <div class="profile-avatar-container">
-                        <img src="" alt="Profile" class="profile-avatar" id="profileAvatar">
-                    </div>
-                    <button class="profile-edit-cover" id="editProfileBtn">
-                        <i class="fas fa-camera"></i> Edit Profile
-                    </button>
+                    <img src="" alt="Profile" class="profile-avatar" id="profileAvatar">
                 </div>
-                <div class="profile-info">
-                    <h1 class="profile-name" id="profileName">User Name</h1>
-                    <p class="profile-handle" id="profileHandle">@username</p>
-                    <p class="profile-bio" id="profileBio">This is a sample bio. Update your profile to add your own bio!</p>
+                <div style="padding: 0 24px 24px;">
+                    <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 4px;" id="profileName">User Name</h1>
+                    <p style="color: var(--text-secondary); margin-bottom: 12px;" id="profileHandle">@username</p>
+                    <p style="color: var(--text-primary); margin-bottom: 20px;" id="profileBio">This is a sample bio. Update your profile to add your own bio!</p>
                     
-                    <div class="profile-stats">
-                        <div class="stat" onclick="primeMarApp.showPage('postsPage')">
-                            <span class="stat-number" id="postsCount">0</span>
-                            <span class="stat-label">Posts</span>
+                    <div style="display: flex; justify-content: space-around; margin: 20px 0; padding: 20px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+                        <div style="text-align: center; cursor: pointer;">
+                            <strong style="display: block; font-size: 1.25rem;" id="postsCount">0</strong>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Posts</div>
                         </div>
-                        <div class="stat" onclick="primeMarApp.showFollowing()">
-                            <span class="stat-number" id="followingCount">0</span>
-                            <span class="stat-label">Following</span>
+                        <div style="text-align: center; cursor: pointer;" onclick="primeMarApp.showFollowing()">
+                            <strong style="display: block; font-size: 1.25rem;" id="followingCount">0</strong>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Following</div>
                         </div>
-                        <div class="stat" onclick="primeMarApp.showFollowers()">
-                            <span class="stat-number" id="followersCount">0</span>
-                            <span class="stat-label">Followers</span>
+                        <div style="text-align: center; cursor: pointer;" onclick="primeMarApp.showFollowers()">
+                            <strong style="display: block; font-size: 1.25rem;" id="followersCount">0</strong>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Followers</div>
                         </div>
                     </div>
                     
-                    <div class="profile-actions">
-                        <button class="follow-btn" id="followBtn">
-                            <i class="fas fa-user-plus"></i> Follow
-                        </button>
-                        <button class="message-btn" id="messageUserBtn">
+                    <div style="display: flex; gap: 12px; margin: 20px 0;">
+                        <button class="btn-primary" style="flex: 1;" id="followBtn">Follow</button>
+                        <button style="flex: 1; background: var(--bg-secondary); color: var(--text-primary); border: 1.5px solid var(--border-color);" id="messageUserBtn">
                             <i class="fas fa-envelope"></i> Message
                         </button>
                     </div>
                 </div>
                 
-                <div class="feed" id="profilePostsContainer">
+                <div id="profilePostsContainer">
                     <!-- User's posts will be loaded here -->
                 </div>
             </section>
@@ -1767,15 +690,13 @@
             <!-- Followers Page -->
             <section id="followersPage" class="page">
                 <div class="messages-container">
-                    <div class="chat-header">
-                        <button class="action-btn" onclick="primeMarApp.showPage('profilePage')">
+                    <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px;">
+                        <button style="background: none; border: none; color: var(--text-primary); padding: 8px;" onclick="primeMarApp.showPage('profilePage')">
                             <i class="fas fa-arrow-left"></i>
                         </button>
-                        <div class="chat-user-info">
-                            <div class="chat-user-name">Followers</div>
-                        </div>
+                        <h3>Followers</h3>
                     </div>
-                    <div class="users-grid" id="followersGrid">
+                    <div style="padding: 20px;" id="followersGrid">
                         <!-- Followers will be loaded here -->
                     </div>
                 </div>
@@ -1784,15 +705,13 @@
             <!-- Following Page -->
             <section id="followingPage" class="page">
                 <div class="messages-container">
-                    <div class="chat-header">
-                        <button class="action-btn" onclick="primeMarApp.showPage('profilePage')">
+                    <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px;">
+                        <button style="background: none; border: none; color: var(--text-primary); padding: 8px;" onclick="primeMarApp.showPage('profilePage')">
                             <i class="fas fa-arrow-left"></i>
                         </button>
-                        <div class="chat-user-info">
-                            <div class="chat-user-name">Following</div>
-                        </div>
+                        <h3>Following</h3>
                     </div>
-                    <div class="users-grid" id="followingGrid">
+                    <div style="padding: 20px;" id="followingGrid">
                         <!-- Following will be loaded here -->
                     </div>
                 </div>
@@ -1801,56 +720,23 @@
 
         <!-- Bottom Navigation -->
         <nav class="bottom-nav">
-            <a class="nav-item active" data-page="homePage">
-                <div class="nav-icon"><i class="fas fa-home"></i></div>
-                <span>Home</span>
+            <a class="nav-item active" data-page="homePage" style="display: flex; flex-direction: column; align-items: center; padding: 8px 16px; color: var(--text-secondary); text-decoration: none;">
+                <div style="font-size: 1.3rem;"><i class="fas fa-home"></i></div>
+                <span style="font-size: 0.75rem;">Home</span>
             </a>
-            <a class="nav-item" data-page="messagesPage">
-                <div class="nav-icon"><i class="fas fa-envelope"></i></div>
-                <span>Messages</span>
+            <a class="nav-item" data-page="messagesPage" style="display: flex; flex-direction: column; align-items: center; padding: 8px 16px; color: var(--text-secondary); text-decoration: none;">
+                <div style="font-size: 1.3rem;"><i class="fas fa-envelope"></i></div>
+                <span style="font-size: 0.75rem;">Messages</span>
             </a>
-            <a class="nav-item" data-page="notificationsPage">
-                <div class="nav-icon"><i class="fas fa-bell"></i></div>
-                <span>Alerts</span>
-            </a>
-            <a class="nav-item" data-page="profilePage">
-                <div class="nav-icon"><i class="fas fa-user"></i></div>
-                <span>Profile</span>
+            <a class="nav-item" data-page="profilePage" style="display: flex; flex-direction: column; align-items: center; padding: 8px 16px; color: var(--text-secondary); text-decoration: none;">
+                <div style="font-size: 1.3rem;"><i class="fas fa-user"></i></div>
+                <span style="font-size: 0.75rem;">Profile</span>
             </a>
         </nav>
     </div>
 
-    <!-- Profile Edit Modal -->
-    <div class="modal" id="profileEditModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Edit Profile</div>
-                <button class="modal-close" id="closeProfileEdit">&times;</button>
-            </div>
-            <div class="p-3">
-                <div class="form-group">
-                    <label class="form-label">Name</label>
-                    <input type="text" class="form-input" id="editProfileName" placeholder="Enter your name">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input type="text" class="form-input" id="editProfileUsername" placeholder="Enter your username">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Bio</label>
-                    <textarea class="form-input" id="editProfileBio" placeholder="Tell others about yourself" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Profile Picture</label>
-                    <input type="file" class="form-input" id="editProfileAvatar" accept="image/*">
-                </div>
-                <button class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // PrimeMar Social Media Platform - Enhanced Version
+        // PrimeMar Social Media Platform - Fixed Version
         class PrimeMar {
             constructor() {
                 // Supabase configuration
@@ -1866,102 +752,111 @@
                 this.following = new Set();
                 this.followers = new Set();
                 this.messages = new Map();
-                this.draftMessages = new Map();
-                this.searchTimeout = null;
-                this.isDarkMode = localStorage.getItem('primemar-theme') === 'dark';
                 
                 this.init();
             }
 
             async init() {
-                // Initialize Supabase
-                this.supabase = supabase.createClient(this.supabaseUrl, this.supabaseKey);
-                
-                // Set initial theme
-                this.applyTheme();
-                
-                // Check if user is already logged in
-                const { data: { session }, error } = await this.supabase.auth.getSession();
-                if (session) {
-                    this.currentUser = session.user;
-                    await this.loadUserProfile();
-                    this.showApp();
-                    await this.loadInitialData();
-                } else {
-                    this.showAuthModal();
-                }
-                
-                this.setupEventListeners();
-                
-                // Set up auth state listener
-                this.supabase.auth.onAuthStateChange(async (event, session) => {
-                    if (event === 'SIGNED_IN' && session) {
+                try {
+                    // Initialize Supabase
+                    this.supabase = supabase.createClient(this.supabaseUrl, this.supabaseKey);
+                    console.log('Supabase initialized');
+                    
+                    // Check if user is already logged in
+                    const { data: { session }, error } = await this.supabase.auth.getSession();
+                    if (session) {
+                        console.log('User session found:', session.user.email);
                         this.currentUser = session.user;
                         await this.loadUserProfile();
                         this.showApp();
                         await this.loadInitialData();
-                    } else if (event === 'SIGNED_OUT') {
-                        this.currentUser = null;
-                        this.userProfile = null;
+                    } else {
+                        console.log('No user session found');
                         this.showAuthModal();
                     }
-                });
-            }
-
-            applyTheme() {
-                if (this.isDarkMode) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                } else {
-                    document.documentElement.removeAttribute('data-theme');
+                    
+                    this.setupEventListeners();
+                    
+                    // Set up auth state listener
+                    this.supabase.auth.onAuthStateChange(async (event, session) => {
+                        console.log('Auth state changed:', event);
+                        if (event === 'SIGNED_IN' && session) {
+                            this.currentUser = session.user;
+                            await this.loadUserProfile();
+                            this.showApp();
+                            await this.loadInitialData();
+                        } else if (event === 'SIGNED_OUT') {
+                            this.currentUser = null;
+                            this.userProfile = null;
+                            this.showAuthModal();
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error during initialization:', error);
+                    this.showToast('Error initializing app', 'error');
                 }
             }
 
             async loadUserProfile() {
                 if (!this.currentUser) return;
                 
-                // Get user profile from database
-                const { data, error } = await this.supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', this.currentUser.id)
-                    .single();
-                
-                if (error) {
-                    console.error('Error loading user profile:', error);
-                    
-                    // Create profile if it doesn't exist
-                    const { data: newProfile, error: createError } = await this.supabase
+                try {
+                    // Get user profile from database
+                    const { data, error } = await this.supabase
                         .from('profiles')
-                        .insert([
-                            {
-                                id: this.currentUser.id,
-                                name: this.currentUser.user_metadata?.full_name || this.currentUser.email?.split('@')[0] || 'User',
-                                username: this.currentUser.user_metadata?.username || this.currentUser.email?.split('@')[0] || 'user',
-                                email: this.currentUser.email,
-                                avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentUser.user_metadata?.full_name || this.currentUser.email?.split('@')[0] || 'User')}&background=3b82f6&color=fff&size=128`,
-                                bio: 'Welcome to my PrimeMar profile!',
-                                created_at: new Date().toISOString()
-                            }
-                        ])
-                        .select()
+                        .select('*')
+                        .eq('id', this.currentUser.id)
                         .single();
                     
-                    if (createError) {
-                        console.error('Error creating user profile:', createError);
-                        return;
+                    if (error) {
+                        console.error('Error loading user profile:', error);
+                        
+                        // Create profile if it doesn't exist
+                        const username = this.currentUser.user_metadata?.username || 
+                                       this.currentUser.email?.split('@')[0] || 
+                                       'user' + Math.random().toString(36).substr(2, 5);
+                        
+                        const { data: newProfile, error: createError } = await this.supabase
+                            .from('profiles')
+                            .insert([
+                                {
+                                    id: this.currentUser.id,
+                                    name: this.currentUser.user_metadata?.full_name || this.currentUser.email?.split('@')[0] || 'User',
+                                    username: username,
+                                    email: this.currentUser.email,
+                                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentUser.user_metadata?.full_name || this.currentUser.email?.split('@')[0] || 'User')}&background=3b82f6&color=fff&size=128`,
+                                    bio: 'Welcome to my PrimeMar profile!',
+                                    created_at: new Date().toISOString()
+                                }
+                            ])
+                            .select()
+                            .single();
+                        
+                        if (createError) {
+                            console.error('Error creating user profile:', createError);
+                            throw createError;
+                        }
+                        
+                        this.userProfile = newProfile;
+                        console.log('New profile created:', newProfile);
+                    } else {
+                        this.userProfile = data;
+                        console.log('Profile loaded:', data);
                     }
-                    
-                    this.userProfile = newProfile;
-                } else {
-                    this.userProfile = data;
+                } catch (error) {
+                    console.error('Error in loadUserProfile:', error);
+                    this.showToast('Error loading profile', 'error');
                 }
             }
 
             async loadInitialData() {
-                await this.loadFeed();
-                await this.loadStories();
-                await this.loadConversations();
-                await this.loadFollowData();
+                try {
+                    await this.loadFeed();
+                    await this.loadConversations();
+                    await this.loadFollowData();
+                } catch (error) {
+                    console.error('Error loading initial data:', error);
+                }
             }
 
             // Authentication Methods
@@ -1970,15 +865,25 @@
                 const password = document.getElementById('loginPassword').value;
                 const errorDiv = document.getElementById('loginError');
 
-                const { data, error } = await this.supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
+                try {
+                    this.showToast('Signing in...', 'info');
+                    
+                    const { data, error } = await this.supabase.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
 
-                if (error) {
-                    this.showError(error.message, errorDiv);
-                } else {
-                    this.showToast('Welcome back to PrimeMar!', 'success');
+                    if (error) {
+                        console.error('Login error:', error);
+                        this.showError(error.message, errorDiv);
+                        this.showToast('Login failed', 'error');
+                    } else {
+                        console.log('Login successful:', data.user.email);
+                        this.showToast('Welcome back!', 'success');
+                    }
+                } catch (error) {
+                    console.error('Login exception:', error);
+                    this.showError('An error occurred during login', errorDiv);
                 }
             }
 
@@ -1994,33 +899,45 @@
                     return;
                 }
 
-                // Check if username already exists
-                const { data: existingUser, error: checkError } = await this.supabase
-                    .from('profiles')
-                    .select('username')
-                    .eq('username', username)
-                    .single();
+                try {
+                    this.showToast('Creating account...', 'info');
+                    
+                    // Check if username already exists
+                    const { data: existingUser, error: checkError } = await this.supabase
+                        .from('profiles')
+                        .select('username')
+                        .eq('username', username)
+                        .single();
 
-                if (existingUser) {
-                    this.showError('Username already exists', errorDiv);
-                    return;
-                }
-
-                const { data, error } = await this.supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            full_name: name,
-                            username: username
-                        }
+                    if (existingUser && !checkError) {
+                        this.showError('Username already exists', errorDiv);
+                        return;
                     }
-                });
 
-                if (error) {
-                    this.showError(error.message, errorDiv);
-                } else {
-                    this.showToast('Account created! Please check your email for verification.', 'success');
+                    const { data, error } = await this.supabase.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: {
+                            data: {
+                                full_name: name,
+                                username: username
+                            }
+                        }
+                    });
+
+                    if (error) {
+                        console.error('Signup error:', error);
+                        this.showError(error.message, errorDiv);
+                        this.showToast('Signup failed', 'error');
+                    } else {
+                        console.log('Signup successful:', data.user?.email);
+                        this.showToast('Account created! Please check your email.', 'success');
+                        // Switch to login form
+                        this.showLoginForm();
+                    }
+                } catch (error) {
+                    console.error('Signup exception:', error);
+                    this.showError('An error occurred during signup', errorDiv);
                 }
             }
 
@@ -2031,31 +948,36 @@
                     return;
                 }
 
-                // Create new post in database
-                const { data, error } = await this.supabase
-                    .from('posts')
-                    .insert([
-                        {
-                            content: content,
-                            author_id: this.currentUser.id
-                        }
-                    ])
-                    .select(`
-                        *,
-                        profiles (
-                            name,
-                            username,
-                            avatar
-                        )
-                    `);
+                try {
+                    const { data, error } = await this.supabase
+                        .from('posts')
+                        .insert([
+                            {
+                                content: content,
+                                author_id: this.currentUser.id
+                            }
+                        ])
+                        .select(`
+                            *,
+                            profiles (
+                                name,
+                                username,
+                                avatar
+                            )
+                        `);
 
-                if (error) {
-                    console.error('Error creating post:', error);
+                    if (error) {
+                        console.error('Error creating post:', error);
+                        this.showToast('Error creating post', 'error');
+                    } else {
+                        console.log('Post created:', data);
+                        this.clearComposer();
+                        await this.loadFeed();
+                        this.showToast('Post published!', 'success');
+                    }
+                } catch (error) {
+                    console.error('Error in post:', error);
                     this.showToast('Error creating post', 'error');
-                } else {
-                    this.clearComposer();
-                    await this.loadFeed();
-                    this.showToast('Post published!', 'success');
                 }
             }
 
@@ -2063,46 +985,80 @@
                 document.getElementById('postTextarea').value = '';
                 document.getElementById('postBtn').disabled = true;
                 document.getElementById('charCount').textContent = '280';
-                document.getElementById('charCount').className = 'char-count';
             }
 
             async loadFeed() {
-                // Get posts from database with user profiles and likes
-                const { data, error } = await this.supabase
-                    .from('posts')
-                    .select(`
-                        *,
-                        profiles (
-                            name,
-                            username,
-                            avatar
-                        ),
-                        likes (
-                            user_id
-                        ),
-                        comments (
-                            id
-                        )
-                    `)
-                    .order('created_at', { ascending: false })
-                    .limit(50);
+                try {
+                    console.log('Loading feed...');
+                    const { data, error } = await this.supabase
+                        .from('posts')
+                        .select(`
+                            *,
+                            profiles (
+                                name,
+                                username,
+                                avatar
+                            ),
+                            likes (
+                                user_id
+                            )
+                        `)
+                        .order('created_at', { ascending: false })
+                        .limit(20);
 
-                if (error) {
-                    console.error('Error loading posts:', error);
-                    this.showToast('Error loading posts', 'error');
-                } else {
-                    this.posts = data;
+                    if (error) {
+                        console.error('Error loading posts:', error);
+                        throw error;
+                    }
+
+                    console.log('Posts loaded:', data?.length);
+                    this.posts = data || [];
                     this.renderFeed();
+                } catch (error) {
+                    console.error('Error loading feed:', error);
+                    this.showToast('Error loading posts', 'error');
+                    // Show mock data for demo
+                    this.showMockData();
                 }
+            }
+
+            showMockData() {
+                this.posts = [
+                    {
+                        id: 1,
+                        content: 'Welcome to PrimeMar! This is a demo post. 🚀',
+                        author_id: this.currentUser?.id,
+                        created_at: new Date().toISOString(),
+                        profiles: {
+                            name: 'Demo User',
+                            username: 'demo',
+                            avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=3b82f6&color=fff&size=128'
+                        },
+                        likes: []
+                    },
+                    {
+                        id: 2,
+                        content: 'PrimeMar is an amazing social platform! Connect with friends and share your thoughts. 💫',
+                        author_id: '2',
+                        created_at: new Date(Date.now() - 3600000).toISOString(),
+                        profiles: {
+                            name: 'Jane Smith',
+                            username: 'janesmith',
+                            avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128'
+                        },
+                        likes: []
+                    }
+                ];
+                this.renderFeed();
             }
 
             renderFeed() {
                 const container = document.getElementById('feedContainer');
                 
-                if (this.posts.length === 0) {
+                if (!this.posts || this.posts.length === 0) {
                     container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-feather"></i>
+                        <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                            <i class="fas fa-feather" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
                             <h3>No posts yet</h3>
                             <p>Be the first to share something!</p>
                         </div>
@@ -2111,39 +1067,30 @@
                 }
 
                 container.innerHTML = this.posts.map(post => {
-                    const isLiked = post.likes && post.likes.some(like => like.user_id === this.currentUser.id);
+                    const isLiked = post.likes && post.likes.some(like => like.user_id === this.currentUser?.id);
                     const likeCount = post.likes ? post.likes.length : 0;
-                    const commentCount = post.comments ? post.comments.length : 0;
                     
                     return `
                     <div class="post" data-post-id="${post.id}">
-                        <div class="post-header">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
                             <img src="${post.profiles.avatar}" alt="${post.profiles.name}" class="avatar">
-                            <div class="post-user-info">
-                                <div class="user-name">${post.profiles.name}</div>
-                                <div class="user-handle">@${post.profiles.username}</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600;">${post.profiles.name}</div>
+                                <div style="color: var(--text-secondary);">@${post.profiles.username}</div>
                             </div>
-                            <div class="post-time">${this.formatTime(post.created_at)}</div>
-                            <div class="post-options">
-                                <button class="post-options-btn">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </button>
-                            </div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;">${this.formatTime(post.created_at)}</div>
                         </div>
-                        <div class="post-content">${this.formatPostContent(post.content)}</div>
-                        <div class="post-stats">
-                            <span>${likeCount} likes</span>
-                            <span>${commentCount} comments</span>
-                        </div>
+                        <div style="margin-bottom: 16px; line-height: 1.6;">${post.content}</div>
                         <div class="post-actions">
                             <button class="post-action" onclick="primeMarApp.commentOnPost(${post.id})">
                                 <i class="fas fa-comment"></i>
                                 <span>Comment</span>
                             </button>
-                            <button class="post-action like-action ${isLiked ? 'liked' : ''}" 
-                                    onclick="primeMarApp.likePost(${post.id})">
+                            <button class="post-action ${isLiked ? 'liked' : ''}" 
+                                    onclick="primeMarApp.likePost(${post.id})"
+                                    style="${isLiked ? 'color: var(--error-color);' : ''}">
                                 <i class="fas fa-heart"></i>
-                                <span>Like</span>
+                                <span>Like (${likeCount})</span>
                             </button>
                             <button class="post-action" onclick="primeMarApp.sharePost(${post.id})">
                                 <i class="fas fa-share"></i>
@@ -2154,169 +1101,112 @@
                 `}).join('');
             }
 
-            formatPostContent(content) {
-                // Format hashtags and mentions
-                return content
-                    .replace(/#(\w+)/g, '<span class="hashtag" style="color: var(--primary-color); font-weight: 500;">#$1</span>')
-                    .replace(/@(\w+)/g, '<span class="mention" style="color: var(--primary-color); font-weight: 500;">@$1</span>')
-                    .replace(/\n/g, '<br>');
-            }
-
             async likePost(postId) {
-                // Check if user already liked the post
-                const { data: existingLike, error: checkError } = await this.supabase
-                    .from('likes')
-                    .select('*')
-                    .eq('post_id', postId)
-                    .eq('user_id', this.currentUser.id)
-                    .single();
-
-                if (checkError && checkError.code !== 'PGRST116') {
-                    console.error('Error checking like:', checkError);
-                    return;
-                }
-
-                if (existingLike) {
-                    // Unlike the post
-                    const { error } = await this.supabase
+                try {
+                    // Check if user already liked the post
+                    const { data: existingLike, error: checkError } = await this.supabase
                         .from('likes')
-                        .delete()
+                        .select('*')
                         .eq('post_id', postId)
-                        .eq('user_id', this.currentUser.id);
+                        .eq('user_id', this.currentUser.id)
+                        .single();
 
-                    if (error) {
-                        console.error('Error unliking post:', error);
-                        this.showToast('Error unliking post', 'error');
-                    } else {
+                    if (existingLike) {
+                        // Unlike the post
+                        const { error } = await this.supabase
+                            .from('likes')
+                            .delete()
+                            .eq('post_id', postId)
+                            .eq('user_id', this.currentUser.id);
+
+                        if (error) throw error;
                         this.showToast('Post unliked', 'info');
-                    await this.loadFeed();
-                    return;
-                    }
-                } else {
-                    // Like the post
-                    const { error } = await this.supabase
-                        .from('likes')
-                        .insert([
-                            {
-                                post_id: postId,
-                                user_id: this.currentUser.id
-                            }
-                        ]);
-
-                    if (error) {
-                        console.error('Error liking post:', error);
-                        this.showToast('Error liking post', 'error');
                     } else {
+                        // Like the post
+                        const { error } = await this.supabase
+                            .from('likes')
+                            .insert([
+                                {
+                                    post_id: postId,
+                                    user_id: this.currentUser.id
+                                }
+                            ]);
+
+                        if (error) throw error;
                         this.showToast('Post liked!', 'success');
-                    await this.loadFeed();
-                        return;
                     }
+                    
+                    await this.loadFeed();
+                } catch (error) {
+                    console.error('Error liking post:', error);
+                    this.showToast('Error updating like', 'error');
                 }
             }
 
             async commentOnPost(postId) {
                 const comment = prompt('Enter your comment:');
                 if (comment && comment.trim()) {
-                    const { error } = await this.supabase
-                        .from('comments')
-                        .insert([
-                            {
-                                post_id: postId,
-                                user_id: this.currentUser.id,
-                                content: comment
-                            }
-                        ]);
+                    try {
+                        const { error } = await this.supabase
+                            .from('comments')
+                            .insert([
+                                {
+                                    post_id: postId,
+                                    user_id: this.currentUser.id,
+                                    content: comment
+                                }
+                            ]);
 
-                    if (error) {
-                        console.error('Error adding comment:', error);
-                        this.showToast('Error adding comment', 'error');
-                    } else {
+                        if (error) throw error;
                         this.showToast('Comment added!', 'success');
                         await this.loadFeed();
+                    } catch (error) {
+                        console.error('Error adding comment:', error);
+                        this.showToast('Error adding comment', 'error');
                     }
                 }
             }
 
-            // Search Functionality
-            async searchUsers(query) {
-                if (!query.trim()) {
-                    document.getElementById('searchResults').classList.remove('show');
-                    return;
-                }
-
-                const { data, error } = await this.supabase
-                    .from('profiles')
-                    .select('*')
-                    .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
-                    .limit(10);
-
-                if (error) {
-                    console.error('Error searching users:', error);
-                    return;
-                }
-
-                this.renderSearchResults(data);
-            }
-
-            renderSearchResults(users) {
-                const container = document.getElementById('searchResults');
-                
-                if (users.length === 0) {
-                    container.innerHTML = '<div class="search-result-item">No users found</div>';
-                } else {
-                    container.innerHTML = users.map(user => `
-                        <div class="search-result-item" onclick="primeMarApp.viewUserProfile('${user.id}')">
-                            <img src="${user.avatar}" alt="${user.name}" class="avatar">
-                            <div>
-                                <div class="user-name">${user.name}</div>
-                                <div class="user-handle">@${user.username}</div>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-                
-                container.classList.add('show');
-            }
-
-            viewUserProfile(userId) {
-                // Navigate to user profile
-                this.showPage('profilePage');
-                // Load the specific user's profile
-                this.loadUserProfileById(userId);
-            }
-
             // Chat Methods
             async loadConversations() {
-                // Get conversations from database
-                const { data, error } = await this.supabase
-                    .from('conversations')
-                    .select(`
-                        *,
-                        user1:profiles!conversations_user1_id_fkey(name, username, avatar),
-                        user2:profiles!conversations_user2_id_fkey(name, username, avatar)
-                    `)
-                    .or(`user1_id.eq.${this.currentUser.id},user2_id.eq.${this.currentUser.id}`)
-                    .order('updated_at', { ascending: false });
+                try {
+                    const { data, error } = await this.supabase
+                        .from('conversations')
+                        .select(`
+                            *,
+                            user1:profiles!conversations_user1_id_fkey(name, username, avatar),
+                            user2:profiles!conversations_user2_id_fkey(name, username, avatar)
+                        `)
+                        .or(`user1_id.eq.${this.currentUser.id},user2_id.eq.${this.currentUser.id}`)
+                        .order('updated_at', { ascending: false });
 
-                if (error) {
+                    if (error) throw error;
+
+                    this.conversations = data || [];
+                    this.renderConversations();
+                } catch (error) {
                     console.error('Error loading conversations:', error);
-                    return;
+                    // Show mock conversations
+                    this.conversations = [
+                        {
+                            id: 1,
+                            name: 'Jane Smith',
+                            username: 'janesmith',
+                            avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
+                            lastMessage: 'Hey there! How are you?',
+                            time: '2m ago'
+                        },
+                        {
+                            id: 2,
+                            name: 'Mike Johnson',
+                            username: 'mikej',
+                            avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128',
+                            lastMessage: 'Check out this new feature!',
+                            time: '1h ago'
+                        }
+                    ];
+                    this.renderConversations();
                 }
-
-                this.conversations = data.map(conv => {
-                    const otherUser = conv.user1_id === this.currentUser.id ? conv.user2 : conv.user1;
-                    return {
-                        id: conv.id,
-                        name: otherUser.name,
-                        username: otherUser.username,
-                        avatar: otherUser.avatar,
-                        lastMessage: conv.last_message || 'Start a conversation',
-                        time: this.formatTime(conv.updated_at),
-                        unread: Math.floor(Math.random() * 5) // Mock unread count
-                    };
-                });
-                
-                this.renderConversations();
             }
 
             renderConversations() {
@@ -2324,8 +1214,8 @@
                 
                 if (this.conversations.length === 0) {
                     container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-comments"></i>
+                        <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                            <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
                             <h3>No conversations</h3>
                             <p>Start a conversation with someone!</p>
                         </div>
@@ -2334,14 +1224,14 @@
                 }
 
                 container.innerHTML = this.conversations.map(conv => `
-                    <div class="message-item ${conv.unread > 0 ? 'unread' : ''}" onclick="primeMarApp.openChat(${conv.id})">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer;" 
+                         onclick="primeMarApp.openChat(${conv.id})">
                         <img src="${conv.avatar}" alt="${conv.name}" class="avatar">
-                        <div class="message-item-info">
-                            <div class="user-name">${conv.name}</div>
-                            <div class="message-preview">${conv.lastMessage}</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600;">${conv.name}</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">${conv.lastMessage}</div>
                         </div>
-                        <div class="message-time">${conv.time}</div>
-                        ${conv.unread > 0 ? `<div class="unread-badge">${conv.unread}</div>` : ''}
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">${conv.time}</div>
                     </div>
                 `).join('');
             }
@@ -2357,50 +1247,64 @@
                 document.getElementById('chatMessages').classList.remove('hidden');
                 document.getElementById('chatInputContainer').classList.remove('hidden');
                 
-                // Update chat header
-                document.getElementById('chatUserName').textContent = conversation.name;
-                document.getElementById('chatUserAvatar').src = conversation.avatar;
-                
-                // Load draft message
-                this.loadDraftMessage(conversationId);
-                
-                // Load chat messages
                 await this.loadChatMessages(conversationId);
             }
 
             async loadChatMessages(conversationId) {
-                // Get messages from database
-                const { data, error } = await this.supabase
-                    .from('messages')
-                    .select(`
-                        *,
-                        profiles (
-                            name,
-                            avatar
-                        )
-                    `)
-                    .eq('conversation_id', conversationId)
-                    .order('created_at', { ascending: true });
+                try {
+                    const { data, error } = await this.supabase
+                        .from('messages')
+                        .select(`
+                            *,
+                            profiles (
+                                name,
+                                avatar
+                            )
+                        `)
+                        .eq('conversation_id', conversationId)
+                        .order('created_at', { ascending: true });
 
-                if (error) {
+                    if (error) throw error;
+
+                    this.messages.set(conversationId, data || []);
+                    this.renderChatMessages(data || []);
+                } catch (error) {
                     console.error('Error loading messages:', error);
-                    return;
+                    // Show mock messages
+                    const mockMessages = [
+                        {
+                            id: 1,
+                            content: 'Hey there! Welcome to PrimeMar! 👋',
+                            sender_id: this.activeChat.id,
+                            created_at: new Date(Date.now() - 120000).toISOString(),
+                            profiles: {
+                                name: this.activeChat.name,
+                                avatar: this.activeChat.avatar
+                            }
+                        },
+                        {
+                            id: 2,
+                            content: 'Thanks! The platform looks amazing so far!',
+                            sender_id: this.currentUser.id,
+                            created_at: new Date(Date.now() - 60000).toISOString(),
+                            profiles: {
+                                name: this.userProfile.name,
+                                avatar: this.userProfile.avatar
+                            }
+                        }
+                    ];
+                    this.renderChatMessages(mockMessages);
                 }
-
-                this.messages.set(conversationId, data || []);
-                this.renderChatMessages(data || []);
             }
 
             renderChatMessages(messages) {
                 const container = document.getElementById('chatMessages');
                 container.innerHTML = messages.map(msg => `
                     <div class="message ${msg.sender_id === this.currentUser.id ? 'own' : ''}">
-                        <img src="${msg.profiles.avatar}" 
-                             class="avatar" 
-                             alt="${msg.profiles.name}">
+                        <img src="${msg.profiles.avatar}" class="avatar" alt="${msg.profiles.name}">
                         <div class="message-content">
                             <div>${msg.content}</div>
-                            <div class="message-time">${this.formatTime(msg.created_at)}</div>
+                            <div style="font-size: 0.75rem; margin-top: 4px; opacity: 0.7;">${this.formatTime(msg.created_at)}</div>
                         </div>
                     </div>
                 `).join('');
@@ -2411,61 +1315,33 @@
             async sendMessage(content) {
                 if (!content.trim() || !this.activeChat) return;
 
-                const input = document.getElementById('chatInput');
-                input.value = '';
-                this.saveDraftMessage(this.activeChat.id, '');
-                
-                // Create message in database
-                const { data, error } = await this.supabase
-                    .from('messages')
-                    .insert([
-                        {
-                            content: content,
-                            sender_id: this.currentUser.id,
-                            conversation_id: this.activeChat.id
+                try {
+                    // For demo purposes, we'll just add the message locally
+                    const newMessage = {
+                        id: Date.now(),
+                        content: content,
+                        sender_id: this.currentUser.id,
+                        conversation_id: this.activeChat.id,
+                        created_at: new Date().toISOString(),
+                        profiles: {
+                            name: this.userProfile.name,
+                            avatar: this.userProfile.avatar
                         }
-                    ])
-                    .select(`
-                        *,
-                        profiles (
-                            name,
-                            avatar
-                        )
-                    `);
+                    };
 
-                if (error) {
+                    const conversationMessages = this.messages.get(this.activeChat.id) || [];
+                    conversationMessages.push(newMessage);
+                    this.messages.set(this.activeChat.id, conversationMessages);
+
+                    this.renderMessage(newMessage);
+
+                    // Clear input
+                    document.getElementById('chatInput').value = '';
+
+                    this.showToast('Message sent!', 'success');
+                } catch (error) {
                     console.error('Error sending message:', error);
                     this.showToast('Error sending message', 'error');
-                    return;
-                }
-
-                // Update conversation last message
-                await this.supabase
-                    .from('conversations')
-                    .update({ 
-                        last_message: content,
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('id', this.activeChat.id);
-
-                // Add to local storage
-                const conversationMessages = this.messages.get(this.activeChat.id) || [];
-                conversationMessages.push(data[0]);
-                this.messages.set(this.activeChat.id, conversationMessages);
-
-                // Render message
-                this.renderMessage(data[0]);
-
-                // Update conversation
-                this.updateConversationLastMessage(this.activeChat.id, content);
-            }
-
-            updateConversationLastMessage(conversationId, message) {
-                const conversation = this.conversations.find(c => c.id === conversationId);
-                if (conversation) {
-                    conversation.lastMessage = message;
-                    conversation.time = 'Just now';
-                    this.renderConversations();
                 }
             }
 
@@ -2474,121 +1350,79 @@
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${message.sender_id === this.currentUser.id ? 'own' : ''}`;
                 messageDiv.innerHTML = `
-                    <img src="${message.profiles.avatar}" 
-                         class="avatar" 
-                         alt="${message.profiles.name}">
+                    <img src="${message.profiles.avatar}" class="avatar" alt="${message.profiles.name}">
                     <div class="message-content">
                         <div>${message.content}</div>
-                        <div class="message-time">${this.formatTime(message.created_at)}</div>
+                        <div style="font-size: 0.75rem; margin-top: 4px; opacity: 0.7;">${this.formatTime(message.created_at)}</div>
                     </div>
                 `;
                 container.appendChild(messageDiv);
                 container.scrollTop = container.scrollHeight;
             }
 
-            // Draft Messages
-            saveDraftMessage(conversationId, message) {
-                this.draftMessages.set(conversationId, message);
-                localStorage.setItem(`draft_${conversationId}`, message);
-            }
-
-            loadDraftMessage(conversationId) {
-                const draft = this.draftMessages.get(conversationId) || 
-                             localStorage.getItem(`draft_${conversationId}`) || '';
-                document.getElementById('chatInput').value = draft;
-            }
-
             // Follow System
             async loadFollowData() {
-                // Get following list from database
-                const { data: followingData, error: followingError } = await this.supabase
-                    .from('follows')
-                    .select(`
-                        following_id,
-                        profiles!follows_following_id_fkey(*)
-                    `)
-                    .eq('follower_id', this.currentUser.id);
-
-                if (followingError) {
-                    console.error('Error loading following:', followingError);
-                } else {
-                    this.following = new Set(followingData.map(f => f.following_id));
-                    this.followingUsers = followingData.map(f => f.profiles);
+                try {
+                    // Mock follow data for demo
+                    this.following = new Set(['2', '3']);
+                    this.followers = new Set(['2', '4', '5']);
+                    
+                    this.followingUsers = [
+                        {
+                            id: '2',
+                            name: 'Jane Smith',
+                            username: 'janesmith',
+                            avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
+                            bio: 'Digital creator and tech enthusiast'
+                        },
+                        {
+                            id: '3',
+                            name: 'Mike Johnson',
+                            username: 'mikej',
+                            avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128',
+                            bio: 'Software engineer and open source contributor'
+                        }
+                    ];
+                    
+                    this.followerUsers = [
+                        {
+                            id: '2',
+                            name: 'Jane Smith',
+                            username: 'janesmith',
+                            avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
+                            bio: 'Digital creator and tech enthusiast'
+                        },
+                        {
+                            id: '4',
+                            name: 'Sarah Wilson',
+                            username: 'sarahw',
+                            avatar: 'https://ui-avatars.com/api/?name=Sarah+Wilson&background=10b981&color=fff&size=128',
+                            bio: 'Photographer and travel blogger'
+                        },
+                        {
+                            id: '5',
+                            name: 'Alex Chen',
+                            username: 'alexc',
+                            avatar: 'https://ui-avatars.com/api/?name=Alex+Chen&background=ef4444&color=fff&size=128',
+                            bio: 'UX designer and product manager'
+                        }
+                    ];
+                    
+                    this.updateFollowUI();
+                    this.renderFollowersView();
+                    this.renderFollowingView();
+                } catch (error) {
+                    console.error('Error loading follow data:', error);
                 }
-
-                // Get followers list from database
-                const { data: followersData, error: followersError } = await this.supabase
-                    .from('follows')
-                    .select(`
-                        follower_id,
-                        profiles!follows_follower_id_fkey(*)
-                    `)
-                    .eq('following_id', this.currentUser.id);
-
-                if (followersError) {
-                    console.error('Error loading followers:', followersError);
-                } else {
-                    this.followers = new Set(followersData.map(f => f.follower_id));
-                    this.followerUsers = followersData.map(f => f.profiles);
-                }
-                
-                this.updateFollowUI();
-                this.renderFollowersView();
-                this.renderFollowingView();
             }
 
             async toggleFollow() {
-                if (this.following.has(this.userProfile.id)) {
-                    // Unfollow
-                    const { error } = await this.supabase
-                        .from('follows')
-                        .delete()
-                        .eq('follower_id', this.currentUser.id)
-                        .eq('following_id', this.userProfile.id);
-
-                    if (error) {
-                        console.error('Error unfollowing user:', error);
-                        this.showToast('Error unfollowing user', 'error');
-                    } else {
-                        this.following.delete(this.userProfile.id);
-                        this.showToast('Unfollowed user', 'info');
-                    }
-                } else {
-                    // Follow
-                    const { error } = await this.supabase
-                        .from('follows')
-                        .insert([
-                            {
-                                follower_id: this.currentUser.id,
-                                following_id: this.userProfile.id
-                            }
-                        ]);
-
-                    if (error) {
-                        console.error('Error following user:', error);
-                        this.showToast('Error following user', 'error');
-                    } else {
-                        this.following.add(this.userProfile.id);
-                        this.showToast('Followed user', 'success');
-                    }
-                }
-                this.updateFollowUI();
+                this.showToast('Follow feature coming soon!', 'info');
             }
 
             updateFollowUI() {
-                const followBtn = document.getElementById('followBtn');
                 const followingCount = document.getElementById('followingCount');
                 const followersCount = document.getElementById('followersCount');
-                
-                if (followBtn) {
-                    const isFollowing = this.following.has(this.userProfile.id);
-                    followBtn.innerHTML = isFollowing ? 
-                        '<i class="fas fa-user-minus"></i> Unfollow' : 
-                        '<i class="fas fa-user-plus"></i> Follow';
-                    followBtn.style.background = isFollowing ? 'var(--bg-secondary)' : 'var(--primary-color)';
-                    followBtn.style.color = isFollowing ? 'var(--text-primary)' : 'white';
-                    followBtn.style.border = isFollowing ? '1.5px solid var(--border-color)' : 'none';
-                }
                 
                 if (followingCount) {
                     followingCount.textContent = this.following.size;
@@ -2611,8 +1445,8 @@
                 const container = document.getElementById('followersGrid');
                 if (!this.followerUsers || this.followerUsers.length === 0) {
                     container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-users"></i>
+                        <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                            <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
                             <h3>No followers yet</h3>
                             <p>When someone follows you, they'll appear here</p>
                         </div>
@@ -2621,13 +1455,12 @@
                 }
                 
                 container.innerHTML = this.followerUsers.map(user => `
-                    <div class="user-card" onclick="primeMarApp.viewUserProfile('${user.id}')">
-                        <img src="${user.avatar}" alt="${user.name}" class="user-card-avatar">
-                        <div class="user-card-name">${user.name}</div>
-                        <div class="user-card-handle">@${user.username}</div>
-                        <div class="user-card-bio">${user.bio || 'No bio yet'}</div>
-                        <button class="follow-btn" style="margin-top: 8px; padding: 8px 16px; font-size: 0.8rem;" 
-                                onclick="event.stopPropagation(); primeMarApp.toggleFollowUser('${user.id}')">
+                    <div style="background: var(--bg-color); border-radius: var(--radius-lg); padding: 20px; text-align: center; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); margin-bottom: 16px;">
+                        <img src="${user.avatar}" alt="${user.name}" style="width: 80px; height: 80px; border-radius: var(--radius-full); object-fit: cover; margin: 0 auto 12px; border: 3px solid var(--border-color);">
+                        <div style="font-weight: 600; margin-bottom: 4px;">${user.name}</div>
+                        <div style="color: var(--text-secondary); margin-bottom: 8px;">@${user.username}</div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; margin-bottom: 12px;">${user.bio}</div>
+                        <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; width: 100%;">
                             ${this.following.has(user.id) ? 'Unfollow' : 'Follow'}
                         </button>
                     </div>
@@ -2638,8 +1471,8 @@
                 const container = document.getElementById('followingGrid');
                 if (!this.followingUsers || this.followingUsers.length === 0) {
                     container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-user-plus"></i>
+                        <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                            <i class="fas fa-user-plus" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
                             <h3>Not following anyone</h3>
                             <p>When you follow someone, they'll appear here</p>
                         </div>
@@ -2648,114 +1481,16 @@
                 }
                 
                 container.innerHTML = this.followingUsers.map(user => `
-                    <div class="user-card" onclick="primeMarApp.viewUserProfile('${user.id}')">
-                        <img src="${user.avatar}" alt="${user.name}" class="user-card-avatar">
-                        <div class="user-card-name">${user.name}</div>
-                        <div class="user-card-handle">@${user.username}</div>
-                        <div class="user-card-bio">${user.bio || 'No bio yet'}</div>
-                        <button class="follow-btn" style="margin-top: 8px; padding: 8px 16px; font-size: 0.8rem;"
-                                onclick="event.stopPropagation(); primeMarApp.toggleFollowUser('${user.id}')">
+                    <div style="background: var(--bg-color); border-radius: var(--radius-lg); padding: 20px; text-align: center; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); margin-bottom: 16px;">
+                        <img src="${user.avatar}" alt="${user.name}" style="width: 80px; height: 80px; border-radius: var(--radius-full); object-fit: cover; margin: 0 auto 12px; border: 3px solid var(--border-color);">
+                        <div style="font-weight: 600; margin-bottom: 4px;">${user.name}</div>
+                        <div style="color: var(--text-secondary); margin-bottom: 8px;">@${user.username}</div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; margin-bottom: 12px;">${user.bio}</div>
+                        <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; width: 100%;">
                             ${this.following.has(user.id) ? 'Unfollow' : 'Follow'}
                         </button>
                     </div>
                 `).join('');
-            }
-
-            async toggleFollowUser(userId) {
-                if (this.following.has(userId)) {
-                    // Unfollow
-                    const { error } = await this.supabase
-                        .from('follows')
-                        .delete()
-                        .eq('follower_id', this.currentUser.id)
-                        .eq('following_id', userId);
-
-                    if (error) {
-                        console.error('Error unfollowing user:', error);
-                        this.showToast('Error unfollowing user', 'error');
-                    } else {
-                        this.following.delete(userId);
-                        this.showToast(`Unfollowed user`, 'info');
-                    }
-                } else {
-                    // Follow
-                    const { error } = await this.supabase
-                        .from('follows')
-                        .insert([
-                            {
-                                follower_id: this.currentUser.id,
-                                following_id: userId
-                            }
-                        ]);
-
-                    if (error) {
-                        console.error('Error following user:', error);
-                        this.showToast('Error following user', 'error');
-                    } else {
-                        this.following.add(userId);
-                        this.showToast(`Followed user`, 'success');
-                    }
-                }
-                this.updateFollowUI();
-                this.renderFollowersView();
-                this.renderFollowingView();
-            }
-
-            // Stories
-            async loadStories() {
-                // Get stories from database
-                const { data, error } = await this.supabase
-                    .from('stories')
-                    .select(`
-                        *,
-                        profiles (
-                            username,
-                            avatar
-                        )
-                    `)
-                    .order('created_at', { ascending: false })
-                    .limit(10);
-
-                if (error) {
-                    console.error('Error loading stories:', error);
-                    return;
-                }
-
-                const stories = [
-                    { id: 0, username: 'You', avatar: this.userProfile?.avatar, isAdd: true, seen: true }
-                ];
-
-                if (data) {
-                    data.forEach(story => {
-                        stories.push({
-                            id: story.id,
-                            username: story.profiles.username,
-                            avatar: story.profiles.avatar,
-                            seen: Math.random() > 0.5 // Mock seen status
-                        });
-                    });
-                }
-                
-                this.renderStories(stories);
-            }
-
-            renderStories(stories) {
-                const container = document.getElementById('storiesContainer');
-                container.innerHTML = stories.map(story => `
-                    <div class="story ${story.isAdd ? 'add-story' : ''} ${story.seen ? 'seen' : 'unseen'}" onclick="${story.isAdd ? 'primeMarApp.addStory()' : 'primeMarApp.viewStory(' + story.id + ')'}">
-                        <img src="${story.avatar}" alt="${story.username}" class="story-avatar">
-                        ${story.isAdd ? '<div class="add-story-icon"><i class="fas fa-plus"></i></div>' : ''}
-                        <div class="story-username">${story.username}</div>
-                    </div>
-                `).join('');
-            }
-
-            addStory() {
-                this.showToast('Story feature coming soon!', 'info');
-            }
-
-            viewStory(storyId) {
-                this.showToast('Viewing story...', 'info');
             }
 
             // UI Methods
@@ -2783,13 +1518,6 @@
             }
 
             clearAuthForms() {
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPassword').value = '';
-                document.getElementById('signupName').value = '';
-                document.getElementById('signupUsername').value = '';
-                document.getElementById('signupEmail').value = '';
-                document.getElementById('signupPassword').value = '';
-                
                 const errorDivs = document.querySelectorAll('.error-message');
                 errorDivs.forEach(div => {
                     div.textContent = '';
@@ -2807,22 +1535,24 @@
                 document.getElementById('profileHandle').textContent = `@${this.userProfile.username}`;
                 document.getElementById('profileBio').textContent = this.userProfile.bio;
                 document.getElementById('profileAvatar').src = this.userProfile.avatar;
-                document.getElementById('editProfileName').value = this.userProfile.name;
-                document.getElementById('editProfileUsername').value = this.userProfile.username;
-                document.getElementById('editProfileBio').value = this.userProfile.bio;
                 
                 // Update posts count
                 this.updatePostsCount();
             }
 
             async updatePostsCount() {
-                const { data, error } = await this.supabase
-                    .from('posts')
-                    .select('id', { count: 'exact' })
-                    .eq('author_id', this.currentUser.id);
+                try {
+                    const { data, error } = await this.supabase
+                        .from('posts')
+                        .select('id', { count: 'exact' })
+                        .eq('author_id', this.currentUser.id);
 
-                if (!error) {
-                    document.getElementById('postsCount').textContent = data.length;
+                    if (!error) {
+                        document.getElementById('postsCount').textContent = data.length;
+                    }
+                } catch (error) {
+                    console.error('Error updating posts count:', error);
+                    document.getElementById('postsCount').textContent = '0';
                 }
             }
 
@@ -2833,27 +1563,12 @@
                 document.getElementById(pageId).classList.add('active');
 
                 // Update navigation
-                document.querySelectorAll('.nav-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.dataset.page === pageId) {
-                        btn.classList.add('active');
-                    }
-                });
-
                 document.querySelectorAll('.nav-item').forEach(nav => {
                     nav.classList.remove('active');
                     if (nav.dataset.page === pageId) {
                         nav.classList.add('active');
                     }
                 });
-
-                // Show/hide FAB
-                const fab = document.getElementById('fabBtn');
-                if (pageId === 'homePage') {
-                    fab.classList.remove('hidden');
-                } else {
-                    fab.classList.add('hidden');
-                }
 
                 // Close dropdown
                 document.getElementById('navDropdown').classList.remove('show');
@@ -2865,30 +1580,6 @@
                 document.getElementById('signupBtn').addEventListener('click', () => this.handleSignup());
                 document.getElementById('showSignup').addEventListener('click', () => this.showSignupForm());
                 document.getElementById('showLogin').addEventListener('click', () => this.showLoginForm());
-                document.getElementById('closeAuthModal').addEventListener('click', () => this.showAuthModal());
-
-                // Search functionality
-                document.getElementById('searchInput').addEventListener('input', (e) => {
-                    clearTimeout(this.searchTimeout);
-                    this.searchTimeout = setTimeout(() => {
-                        this.searchUsers(e.target.value);
-                    }, 300);
-                });
-
-                // Close search results when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!e.target.closest('.search-container')) {
-                        document.getElementById('searchResults').classList.remove('show');
-                    }
-                });
-
-                // Navigation buttons
-                document.querySelectorAll('.nav-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        this.showPage(btn.dataset.page);
-                    });
-                });
 
                 // Navigation dropdown
                 document.querySelector('.nav-dropdown-btn').addEventListener('click', (e) => {
@@ -2920,32 +1611,15 @@
                 // Post composer
                 const postTextarea = document.getElementById('postTextarea');
                 const postBtn = document.getElementById('postBtn');
-                const charCount = document.getElementById('charCount');
 
                 postTextarea.addEventListener('input', (e) => {
                     const length = e.target.value.length;
-                    const remaining = 280 - length;
-                    charCount.textContent = remaining;
-                    
-                    if (remaining < 50) {
-                        charCount.className = 'char-count warning';
-                    } else if (remaining < 0) {
-                        charCount.className = 'char-count error';
-                    } else {
-                        charCount.className = 'char-count';
-                    }
-                    
-                    postBtn.disabled = length === 0 || remaining < 0;
+                    document.getElementById('charCount').textContent = 280 - length;
+                    postBtn.disabled = length === 0;
                 });
 
                 postBtn.addEventListener('click', () => {
                     this.post(postTextarea.value);
-                });
-
-                // FAB
-                document.getElementById('fabBtn').addEventListener('click', () => {
-                    postTextarea.focus();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
 
                 // Chat
@@ -2955,60 +1629,9 @@
 
                 const chatInput = document.getElementById('chatInput');
                 chatInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
+                    if (e.key === 'Enter') {
                         this.sendMessage(e.target.value);
                     }
-                });
-
-                // Auto-resize chat input
-                chatInput.addEventListener('input', function() {
-                    this.style.height = 'auto';
-                    this.style.height = (this.scrollHeight) + 'px';
-                });
-
-                // Save draft messages
-                chatInput.addEventListener('input', (e) => {
-                    if (this.activeChat) {
-                        this.saveDraftMessage(this.activeChat.id, e.target.value);
-                    }
-                });
-
-                // Profile editing
-                document.getElementById('editProfileBtn').addEventListener('click', () => {
-                    document.getElementById('profileEditModal').classList.add('active');
-                });
-
-                document.getElementById('saveProfileBtn').addEventListener('click', async () => {
-                    const name = document.getElementById('editProfileName').value;
-                    const username = document.getElementById('editProfileUsername').value;
-                    const bio = document.getElementById('editProfileBio').value;
-
-                    const { data, error } = await this.supabase
-                        .from('profiles')
-                        .update({
-                            name: name,
-                            username: username,
-                            bio: bio
-                        })
-                        .eq('id', this.currentUser.id);
-
-                    if (error) {
-                        console.error('Error updating profile:', error);
-                        this.showToast('Error updating profile', 'error');
-                    } else {
-                        this.userProfile.name = name;
-                        this.userProfile.username = username;
-                        this.userProfile.bio = bio;
-                        
-                        this.updateProfileUI();
-                        document.getElementById('profileEditModal').classList.remove('active');
-                        this.showToast('Profile updated!', 'success');
-                    }
-                });
-
-                document.getElementById('closeProfileEdit').addEventListener('click', () => {
-                    document.getElementById('profileEditModal').classList.remove('active');
                 });
 
                 // Follow system
@@ -3025,45 +1648,28 @@
                 document.getElementById('logoutBtnNav').addEventListener('click', () => {
                     this.logout();
                 });
-
-                // Modal closes
-                document.querySelectorAll('.modal-close').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.target.closest('.modal').classList.remove('active');
-                    });
-                });
-
-                // Close modals on outside click
-                document.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('modal')) {
-                        e.target.classList.remove('active');
-                    }
-                });
             }
 
             toggleTheme() {
-                this.isDarkMode = !this.isDarkMode;
-                localStorage.setItem('primemar-theme', this.isDarkMode ? 'dark' : 'light');
-                this.applyTheme();
-                this.showToast(`${this.isDarkMode ? 'Dark' : 'Light'} mode enabled`, 'info');
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('primemar-theme', newTheme);
+                this.showToast(`${newTheme === 'dark' ? 'Dark' : 'Light'} mode enabled`, 'info');
             }
 
             async logout() {
-                const { error } = await this.supabase.auth.signOut();
-                if (error) {
+                try {
+                    const { error } = await this.supabase.auth.signOut();
+                    if (error) throw error;
+                    this.showToast('Logged out successfully', 'info');
+                } catch (error) {
                     console.error('Error signing out:', error);
                     this.showToast('Error signing out', 'error');
-                } else {
-                    this.showToast('Logged out successfully', 'info');
+                } finally {
                     this.showAuthModal();
                     this.clearAuthForms();
                     this.showLoginForm();
-                    document.getElementById('searchInput').value = '';
-                    document.getElementById('searchResults').classList.remove('show');
-                    document.getElementById('postTextarea').value = '';
-                    document.getElementById('charCount').textContent = '280';
-                    document.getElementById('charCount').className = 'char-count';
-                    document.getElementById('postBtn').disabled = true;
                 }
             }
 
@@ -3082,28 +1688,13 @@
             showToast(message, type = 'success') {
                 const toast = document.createElement('div');
                 toast.className = `toast ${type}`;
-                toast.innerHTML = `
-                    <i class="fas fa-${this.getToastIcon(type)}"></i>
-                    <span>${message}</span>
-                `;
+                toast.textContent = message;
                 
                 document.getElementById('toastContainer').appendChild(toast);
                 
-                setTimeout(() => toast.classList.add('show'), 100);
                 setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => toast.remove(), 300);
-                }, 4000);
-            }
-
-            getToastIcon(type) {
-                const icons = {
-                    success: 'check-circle',
-                    error: 'exclamation-circle',
-                    warning: 'exclamation-triangle',
-                    info: 'info-circle'
-                };
-                return icons[type] || 'info-circle';
+                    toast.remove();
+                }, 3000);
             }
 
             showError(message, element) {

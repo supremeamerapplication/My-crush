@@ -31,6 +31,12 @@
             color: var(--text-dark);
             min-height: 100vh;
             padding-bottom: 80px;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, var(--light-bg) 60%, #f7b733 100%);
+            color: var(--text-light);
         }
 
         /* Auth Modal */
@@ -62,6 +68,10 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
+        body.light-mode .auth-modal-content {
+            background: var(--card-bg-light);
+        }
+
         .auth-header {
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             padding: 30px;
@@ -85,6 +95,10 @@
             color: var(--secondary-color);
         }
 
+        body.light-mode .form-label {
+            color: var(--primary-color);
+        }
+
         .form-input {
             width: 100%;
             padding: 14px;
@@ -93,6 +107,12 @@
             background: rgba(255,255,255,0.1);
             color: white;
             font-size: 16px;
+        }
+
+        body.light-mode .form-input {
+            border: 2px solid rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.05);
+            color: var(--text-light);
         }
 
         .form-input:focus {
@@ -133,6 +153,10 @@
             color: var(--secondary-color);
         }
 
+        body.light-mode .auth-switch {
+            color: var(--text-light);
+        }
+
         .auth-link {
             color: var(--primary-color);
             cursor: pointer;
@@ -161,6 +185,11 @@
             z-index: 100;
         }
 
+        body.light-mode .header {
+            background: rgba(255,255,255,0.9);
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
         .logo {
             font-size: 24px;
             font-weight: bold;
@@ -173,6 +202,7 @@
             flex: 1;
             max-width: 400px;
             margin: 0 20px;
+            position: relative;
         }
 
         .search-input {
@@ -182,6 +212,12 @@
             border-radius: 20px;
             background: rgba(255,255,255,0.1);
             color: white;
+        }
+
+        body.light-mode .search-input {
+            border: 2px solid rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.05);
+            color: var(--text-light);
         }
 
         .header-actions {
@@ -201,6 +237,77 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+
+        body.light-mode .notification-btn,
+        body.light-mode .profile-btn {
+            background: rgba(0,0,0,0.1);
+            color: var(--primary-color);
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--card-bg-dark);
+            border-radius: 15px;
+            padding: 10px 0;
+            min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 1000;
+            margin-top: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        body.light-mode .profile-dropdown {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .profile-dropdown.active {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: inherit;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        body.light-mode .dropdown-item:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            color: var(--primary-color);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            margin: 8px 0;
+        }
+
+        body.light-mode .dropdown-divider {
+            background: rgba(0,0,0,0.1);
         }
 
         /* Main Content */
@@ -255,9 +362,17 @@
             color: var(--primary-color);
         }
 
+        body.light-mode .story-avatar-inner {
+            background: var(--card-bg-light);
+        }
+
         .story-name {
             font-size: 12px;
             color: var(--secondary-color);
+        }
+
+        body.light-mode .story-name {
+            color: var(--text-light);
         }
 
         /* Post Composer */
@@ -267,6 +382,11 @@
             border-radius: 15px;
             margin-bottom: 20px;
             border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        body.light-mode .post-composer {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
         .composer-header {
@@ -296,6 +416,10 @@
             resize: none;
             min-height: 80px;
             font-family: inherit;
+        }
+
+        body.light-mode .composer-textarea {
+            color: var(--text-light);
         }
 
         .composer-textarea:focus {
@@ -348,6 +472,11 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
+        body.light-mode .post {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
         .post-header {
             display: flex;
             align-items: center;
@@ -369,9 +498,17 @@
             font-size: 14px;
         }
 
+        body.light-mode .user-handle {
+            color: var(--text-light);
+        }
+
         .post-time {
             color: var(--secondary-color);
             font-size: 12px;
+        }
+
+        body.light-mode .post-time {
+            color: var(--text-light);
         }
 
         .post-content {
@@ -392,11 +529,19 @@
             color: var(--secondary-color);
         }
 
+        body.light-mode .post-image {
+            background: rgba(0,0,0,0.1);
+        }
+
         .post-actions {
             display: flex;
             justify-content: space-around;
             border-top: 1px solid rgba(255,255,255,0.1);
             padding-top: 15px;
+        }
+
+        body.light-mode .post-actions {
+            border-top: 1px solid rgba(0,0,0,0.1);
         }
 
         .post-action {
@@ -416,6 +561,10 @@
             background: rgba(255,255,255,0.1);
         }
 
+        body.light-mode .post-action:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
         .post-action.liked {
             color: var(--accent-color);
         }
@@ -428,10 +577,19 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
+        body.light-mode .messages-container {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
         .chat-header {
             padding: 20px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             background: rgba(255,152,0,0.1);
+        }
+
+        body.light-mode .chat-header {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
 
         .messages-list {
@@ -448,8 +606,16 @@
             cursor: pointer;
         }
 
+        body.light-mode .message-item {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
         .message-item:hover {
             background: rgba(255,255,255,0.05);
+        }
+
+        body.light-mode .message-item:hover {
+            background: rgba(0,0,0,0.05);
         }
 
         .message-item-info {
@@ -460,6 +626,10 @@
             color: var(--secondary-color);
             font-size: 14px;
             margin-top: 4px;
+        }
+
+        body.light-mode .message-preview {
+            color: var(--text-light);
         }
 
         .unread-badge {
@@ -511,6 +681,10 @@
             border-radius: 15px;
         }
 
+        body.light-mode .message-content {
+            background: rgba(0,0,0,0.1);
+        }
+
         .message.own .message-content {
             background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
             color: #222;
@@ -523,6 +697,10 @@
             gap: 10px;
         }
 
+        body.light-mode .chat-input-container {
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
         .chat-input {
             flex: 1;
             padding: 12px;
@@ -530,6 +708,12 @@
             border-radius: 20px;
             background: rgba(255,255,255,0.1);
             color: white;
+        }
+
+        body.light-mode .chat-input {
+            border: 2px solid rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.05);
+            color: var(--text-light);
         }
 
         .send-btn {
@@ -571,6 +755,10 @@
             font-size: 24px;
         }
 
+        body.light-mode .profile-avatar {
+            border: 4px solid var(--card-bg-light);
+        }
+
         .profile-info {
             padding: 0 20px 20px;
         }
@@ -587,6 +775,10 @@
             font-size: 16px;
         }
 
+        body.light-mode .profile-handle {
+            color: var(--text-light);
+        }
+
         .profile-bio {
             margin-bottom: 20px;
             line-height: 1.5;
@@ -601,6 +793,11 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
+        body.light-mode .profile-stats {
+            border-top: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
         .stat {
             text-align: center;
             cursor: pointer;
@@ -613,9 +810,17 @@
             color: var(--secondary-color);
         }
 
+        body.light-mode .stat-number {
+            color: var(--primary-color);
+        }
+
         .stat-label {
             font-size: 14px;
             color: var(--text-dark);
+        }
+
+        body.light-mode .stat-label {
+            color: var(--text-light);
         }
 
         .profile-actions {
@@ -644,12 +849,23 @@
             border: 2px solid rgba(255,255,255,0.2);
         }
 
+        body.light-mode .message-btn {
+            background: rgba(0,0,0,0.1);
+            color: var(--text-light);
+            border: 2px solid rgba(0,0,0,0.2);
+        }
+
         /* Notifications */
         .notifications-container {
             background: var(--card-bg-dark);
             border-radius: 15px;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        body.light-mode .notifications-container {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
         .notification-item {
@@ -660,6 +876,10 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
+        body.light-mode .notification-item {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
         .notification-content {
             flex: 1;
         }
@@ -667,6 +887,10 @@
         .notification-time {
             color: var(--secondary-color);
             font-size: 12px;
+        }
+
+        body.light-mode .notification-time {
+            color: var(--text-light);
         }
 
         /* Navigation */
@@ -683,12 +907,21 @@
             z-index: 100;
         }
 
+        body.light-mode .bottom-nav {
+            background: rgba(255,255,255,0.9);
+            border-top: 2px solid var(--secondary-color);
+        }
+
         .nav-item {
             color: var(--secondary-color);
             text-align: center;
             cursor: pointer;
             padding: 8px 15px;
             border-radius: 10px;
+        }
+
+        body.light-mode .nav-item {
+            color: var(--text-light);
         }
 
         .nav-item.active {
@@ -748,6 +981,12 @@
             display: none;
             max-height: 300px;
             overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        body.light-mode .search-results {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
         .search-results.active {
@@ -763,8 +1002,16 @@
             gap: 12px;
         }
 
+        body.light-mode .search-result-item {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
         .search-result-item:hover {
             background: rgba(255,255,255,0.05);
+        }
+
+        body.light-mode .search-result-item:hover {
+            background: rgba(0,0,0,0.05);
         }
     </style>
 </head>
@@ -865,9 +1112,26 @@
                 <button class="notification-btn" id="notificationBtn">
                     <i class="fas fa-bell"></i>
                 </button>
-                <button class="profile-btn" id="profileBtn">
-                    <i class="fas fa-user"></i>
-                </button>
+                <div style="position: relative;">
+                    <button class="profile-btn" id="profileBtn">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <button class="dropdown-item" onclick="primeMarApp.showPage('profilePage')">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </button>
+                        <button class="dropdown-item" id="themeToggleBtn">
+                            <i class="fas fa-moon"></i>
+                            <span id="themeText">Dark Mode</span>
+                        </button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -1029,6 +1293,7 @@
                 this.stories = [];
                 this.activeChat = null;
                 this.searchResults = [];
+                this.isDarkMode = true; // Default to dark mode
                 
                 this.init();
             }
@@ -1037,6 +1302,9 @@
                 try {
                     // Initialize Supabase
                     this.supabase = supabase.createClient(this.supabaseUrl, this.supabaseKey);
+                    
+                    // Load theme preference
+                    this.loadThemePreference();
                     
                     // Check for existing session
                     const { data: { session } } = await this.supabase.auth.getSession();
@@ -1067,6 +1335,48 @@
                 } catch (error) {
                     console.error('Initialization error:', error);
                     this.showToast('Failed to initialize app', 'error');
+                }
+            }
+
+            // Theme Management
+            loadThemePreference() {
+                const savedTheme = localStorage.getItem('primemar-theme');
+                if (savedTheme === 'light') {
+                    this.toggleTheme(false); // Switch to light mode
+                }
+            }
+
+            toggleTheme(showToast = true) {
+                this.isDarkMode = !this.isDarkMode;
+                
+                if (this.isDarkMode) {
+                    document.body.classList.remove('light-mode');
+                    document.getElementById('themeText').textContent = 'Dark Mode';
+                    localStorage.setItem('primemar-theme', 'dark');
+                    if (showToast) this.showToast('Dark mode enabled', 'info');
+                } else {
+                    document.body.classList.add('light-mode');
+                    document.getElementById('themeText').textContent = 'Light Mode';
+                    localStorage.setItem('primemar-theme', 'light');
+                    if (showToast) this.showToast('Light mode enabled', 'info');
+                }
+            }
+
+            // Logout functionality
+            async logout() {
+                try {
+                    const { error } = await this.supabase.auth.signOut();
+                    if (error) throw error;
+                    
+                    this.currentUser = null;
+                    this.userProfile = null;
+                    this.showAuth();
+                    this.showLoginForm();
+                    this.showToast('Logged out successfully', 'info');
+                    
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    this.showToast('Logout failed', 'error');
                 }
             }
 
@@ -1668,6 +1978,18 @@
                 if (pageId !== 'searchPage') {
                     this.hideSearchResults();
                 }
+
+                // Hide profile dropdown
+                this.hideProfileDropdown();
+            }
+
+            toggleProfileDropdown() {
+                const dropdown = document.getElementById('profileDropdown');
+                dropdown.classList.toggle('active');
+            }
+
+            hideProfileDropdown() {
+                document.getElementById('profileDropdown').classList.remove('active');
             }
 
             // Utility Methods
@@ -1744,8 +2066,28 @@
                 document.getElementById('notificationBtn').addEventListener('click', () => {
                     this.showPage('notificationsPage');
                 });
-                document.getElementById('profileBtn').addEventListener('click', () => {
-                    this.showPage('profilePage');
+
+                // Profile dropdown
+                document.getElementById('profileBtn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleProfileDropdown();
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', () => {
+                    this.hideProfileDropdown();
+                });
+
+                // Theme toggle
+                document.getElementById('themeToggleBtn').addEventListener('click', () => {
+                    this.toggleTheme();
+                    this.hideProfileDropdown();
+                });
+
+                // Logout
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    this.logout();
+                    this.hideProfileDropdown();
                 });
 
                 // Post composer

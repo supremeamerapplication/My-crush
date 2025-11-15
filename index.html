@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrimeMar - Social Media</title>
+    <title>PrimeMar - Complete Social Media</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -93,13 +93,11 @@
             background: rgba(255,255,255,0.1);
             color: white;
             font-size: 16px;
-            transition: all 0.3s;
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--primary-color);
-            background: rgba(255,255,255,0.15);
         }
 
         .btn {
@@ -112,13 +110,7 @@
             font-weight: bold;
             font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s;
             margin-top: 10px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
         }
 
         .error-message {
@@ -175,9 +167,6 @@
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .search-container {
@@ -195,15 +184,23 @@
             color: white;
         }
 
-        .profile-btn {
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .notification-btn, .profile-btn {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: rgba(255,255,255,0.1);
             border: none;
-            color: #222;
-            font-weight: bold;
+            color: var(--secondary-color);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* Main Content */
@@ -219,6 +216,48 @@
 
         .page.active {
             display: block;
+        }
+
+        /* Stories */
+        .stories-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        .story {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .story-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff9800, #fdc500, #ff3333);
+            padding: 3px;
+            margin-bottom: 5px;
+        }
+
+        .story-avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--card-bg-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .story-name {
+            font-size: 12px;
+            color: var(--secondary-color);
         }
 
         /* Post Composer */
@@ -283,11 +322,6 @@
             cursor: pointer;
             padding: 8px;
             border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .action-btn:hover {
-            background: rgba(255,152,0,0.1);
         }
 
         .post-btn {
@@ -298,19 +332,11 @@
             border-radius: 20px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .post-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255,152,0,0.4);
         }
 
         .post-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
         }
 
         /* Posts */
@@ -354,6 +380,18 @@
             font-size: 16px;
         }
 
+        .post-image {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.1);
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary-color);
+        }
+
         .post-actions {
             display: flex;
             justify-content: space-around;
@@ -368,7 +406,6 @@
             cursor: pointer;
             padding: 8px 15px;
             border-radius: 8px;
-            transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -377,14 +414,13 @@
 
         .post-action:hover {
             background: rgba(255,255,255,0.1);
-            color: var(--primary-color);
         }
 
         .post-action.liked {
             color: var(--accent-color);
         }
 
-        /* Messages Page */
+        /* Messages */
         .messages-container {
             background: var(--card-bg-dark);
             border-radius: 15px;
@@ -410,7 +446,6 @@
             padding: 15px 20px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             cursor: pointer;
-            transition: all 0.3s;
         }
 
         .message-item:hover {
@@ -425,6 +460,89 @@
             color: var(--secondary-color);
             font-size: 14px;
             margin-top: 4px;
+        }
+
+        .unread-badge {
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Chat View */
+        .chat-view {
+            display: none;
+            flex-direction: column;
+            height: 500px;
+        }
+
+        .chat-view.active {
+            display: flex;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            max-width: 80%;
+        }
+
+        .message.own {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-content {
+            background: rgba(255,255,255,0.1);
+            padding: 12px 16px;
+            border-radius: 15px;
+        }
+
+        .message.own .message-content {
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            color: #222;
+        }
+
+        .chat-input-container {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .send-btn {
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #222;
+            cursor: pointer;
         }
 
         /* Profile Page */
@@ -513,7 +631,6 @@
             border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
         }
 
         .follow-btn {
@@ -527,8 +644,29 @@
             border: 2px solid rgba(255,255,255,0.2);
         }
 
-        .follow-btn:hover, .message-btn:hover {
-            transform: translateY(-2px);
+        /* Notifications */
+        .notifications-container {
+            background: var(--card-bg-dark);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-time {
+            color: var(--secondary-color);
+            font-size: 12px;
         }
 
         /* Navigation */
@@ -549,7 +687,6 @@
             color: var(--secondary-color);
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
             padding: 8px 15px;
             border-radius: 10px;
         }
@@ -597,6 +734,37 @@
 
         .toast.info {
             background: #2196F3;
+        }
+
+        /* Search Results */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg-dark);
+            border-radius: 10px;
+            margin-top: 5px;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-result-item:hover {
+            background: rgba(255,255,255,0.05);
         }
     </style>
 </head>
@@ -689,18 +857,29 @@
             </div>
             
             <div class="search-container">
-                <input type="text" class="search-input" placeholder="Search users, posts...">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search users, posts...">
+                <div class="search-results" id="searchResults"></div>
             </div>
             
-            <button class="profile-btn" id="profileBtn">
-                <i class="fas fa-user"></i>
-            </button>
+            <div class="header-actions">
+                <button class="notification-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <button class="profile-btn" id="profileBtn">
+                    <i class="fas fa-user"></i>
+                </button>
+            </div>
         </header>
 
         <!-- Main Content -->
         <main class="container">
             <!-- Home Page -->
             <section id="homePage" class="page active">
+                <!-- Stories -->
+                <div class="stories-container" id="storiesContainer">
+                    <!-- Stories will be loaded here -->
+                </div>
+
                 <!-- Post Composer -->
                 <div class="post-composer">
                     <div class="composer-header">
@@ -709,13 +888,13 @@
                     </div>
                     <div class="composer-actions">
                         <div class="action-buttons">
-                            <button class="action-btn">
+                            <button class="action-btn" onclick="primeMarApp.addImage()">
                                 <i class="fas fa-image"></i>
                             </button>
-                            <button class="action-btn">
+                            <button class="action-btn" onclick="primeMarApp.addEmoji()">
                                 <i class="fas fa-smile"></i>
                             </button>
-                            <button class="action-btn">
+                            <button class="action-btn" onclick="primeMarApp.addLocation()">
                                 <i class="fas fa-map-marker-alt"></i>
                             </button>
                         </div>
@@ -729,6 +908,13 @@
                 </div>
             </section>
 
+            <!-- Search Page -->
+            <section id="searchPage" class="page">
+                <div class="search-results-full" id="searchResultsFull">
+                    <!-- Full search results will be loaded here -->
+                </div>
+            </section>
+
             <!-- Messages Page -->
             <section id="messagesPage" class="page">
                 <div class="messages-container">
@@ -737,6 +923,29 @@
                     </div>
                     <div class="messages-list" id="messagesList">
                         <!-- Conversations will be loaded here -->
+                    </div>
+                    <div class="chat-view" id="chatView">
+                        <div class="chat-messages" id="chatMessages">
+                            <!-- Chat messages will be loaded here -->
+                        </div>
+                        <div class="chat-input-container">
+                            <input type="text" class="chat-input" id="chatInput" placeholder="Type a message...">
+                            <button class="send-btn" id="sendBtn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notifications Page -->
+            <section id="notificationsPage" class="page">
+                <div class="notifications-container">
+                    <div class="chat-header">
+                        <h3><i class="fas fa-bell"></i> Notifications</h3>
+                    </div>
+                    <div id="notificationsList">
+                        <!-- Notifications will be loaded here -->
                     </div>
                 </div>
             </section>
@@ -752,23 +961,23 @@
                     <p class="profile-bio" id="profileBio">Welcome to my PrimeMar profile! Connect with me and let's share amazing content together.</p>
                     
                     <div class="profile-stats">
-                        <div class="stat">
+                        <div class="stat" onclick="primeMarApp.showUserPosts()">
                             <span class="stat-number" id="postsCount">12</span>
                             <span class="stat-label">Posts</span>
                         </div>
-                        <div class="stat">
+                        <div class="stat" onclick="primeMarApp.showFollowing()">
                             <span class="stat-number" id="followingCount">45</span>
                             <span class="stat-label">Following</span>
                         </div>
-                        <div class="stat">
+                        <div class="stat" onclick="primeMarApp.showFollowers()">
                             <span class="stat-number" id="followersCount">128</span>
                             <span class="stat-label">Followers</span>
                         </div>
                     </div>
                     
                     <div class="profile-actions">
-                        <button class="follow-btn">Follow</button>
-                        <button class="message-btn">
+                        <button class="follow-btn" id="followBtn">Follow</button>
+                        <button class="message-btn" onclick="primeMarApp.startChat()">
                             <i class="fas fa-envelope"></i> Message
                         </button>
                     </div>
@@ -786,9 +995,17 @@
                 <div class="nav-icon"><i class="fas fa-home"></i></div>
                 <div class="nav-label">Home</div>
             </div>
+            <div class="nav-item" data-page="searchPage">
+                <div class="nav-icon"><i class="fas fa-search"></i></div>
+                <div class="nav-label">Search</div>
+            </div>
             <div class="nav-item" data-page="messagesPage">
                 <div class="nav-icon"><i class="fas fa-envelope"></i></div>
                 <div class="nav-label">Messages</div>
+            </div>
+            <div class="nav-item" data-page="notificationsPage">
+                <div class="nav-icon"><i class="fas fa-bell"></i></div>
+                <div class="nav-label">Alerts</div>
             </div>
             <div class="nav-item" data-page="profilePage">
                 <div class="nav-icon"><i class="fas fa-user"></i></div>
@@ -798,7 +1015,7 @@
     </div>
 
     <script>
-        // Complete PrimeMar Social Media App
+        // Complete PrimeMar Social Media App with ALL Features
         class PrimeMar {
             constructor() {
                 this.supabaseUrl = 'https://qsiwjjqxpegfmgkmtjje.supabase.co';
@@ -808,6 +1025,10 @@
                 this.userProfile = null;
                 this.posts = [];
                 this.conversations = [];
+                this.notifications = [];
+                this.stories = [];
+                this.activeChat = null;
+                this.searchResults = [];
                 
                 this.init();
             }
@@ -824,7 +1045,7 @@
                         this.currentUser = session.user;
                         await this.loadUserProfile();
                         this.showApp();
-                        await this.loadInitialData();
+                        await this.loadAllData();
                     }
                     
                     this.setupEventListeners();
@@ -835,7 +1056,7 @@
                             this.currentUser = session.user;
                             this.loadUserProfile().then(() => {
                                 this.showApp();
-                                this.loadInitialData();
+                                this.loadAllData();
                             });
                         } else if (event === 'SIGNED_OUT') {
                             this.currentUser = null;
@@ -847,6 +1068,15 @@
                     console.error('Initialization error:', error);
                     this.showToast('Failed to initialize app', 'error');
                 }
+            }
+
+            async loadAllData() {
+                await Promise.all([
+                    this.loadStories(),
+                    this.loadFeed(),
+                    this.loadConversations(),
+                    this.loadNotifications()
+                ]);
             }
 
             async loadUserProfile() {
@@ -863,54 +1093,67 @@
                 };
             }
 
-            async loadInitialData() {
-                await Promise.all([
-                    this.loadFeed(),
-                    this.loadConversations()
-                ]);
+            async loadStories() {
+                // Demo stories
+                this.stories = [
+                    { id: 1, user: { name: 'You', username: 'yourstory' }, hasNew: true },
+                    { id: 2, user: { name: 'Jane', username: 'jane' }, hasNew: true },
+                    { id: 3, user: { name: 'Mike', username: 'mike' }, hasNew: false },
+                    { id: 4, user: { name: 'Sarah', username: 'sarah' }, hasNew: true },
+                    { id: 5, user: { name: 'Alex', username: 'alex' }, hasNew: false }
+                ];
+                this.renderStories();
+            }
+
+            renderStories() {
+                const container = document.getElementById('storiesContainer');
+                container.innerHTML = this.stories.map(story => `
+                    <div class="story" onclick="primeMarApp.viewStory(${story.id})">
+                        <div class="story-avatar">
+                            <div class="story-avatar-inner">
+                                ${story.user.name.charAt(0)}
+                            </div>
+                        </div>
+                        <div class="story-name">${story.user.username}</div>
+                    </div>
+                `).join('');
             }
 
             async loadFeed() {
-                // Demo posts
+                // Demo posts with images
                 this.posts = [
                     {
                         id: 1,
                         content: 'Welcome to PrimeMar! This is a demo post. 🚀 Excited to connect with everyone!',
                         author_id: '1',
                         created_at: new Date().toISOString(),
-                        profiles: {
-                            name: 'Demo User',
-                            username: 'demo'
-                        },
+                        profiles: { name: 'Demo User', username: 'demo' },
                         likes: ['2', '3'],
                         comments: 5,
-                        shares: 2
+                        shares: 2,
+                        hasImage: true
                     },
                     {
                         id: 2,
                         content: 'Just discovered this amazing platform! The design is so clean and modern. Loving it! ✨',
                         author_id: '2',
                         created_at: new Date(Date.now() - 3600000).toISOString(),
-                        profiles: {
-                            name: 'Jane Smith',
-                            username: 'janesmith'
-                        },
+                        profiles: { name: 'Jane Smith', username: 'janesmith' },
                         likes: ['1'],
                         comments: 3,
-                        shares: 1
+                        shares: 1,
+                        hasImage: false
                     },
                     {
                         id: 3,
                         content: 'Beautiful sunset today! 🌅 Sometimes you just need to appreciate the little things in life.',
                         author_id: '3',
                         created_at: new Date(Date.now() - 7200000).toISOString(),
-                        profiles: {
-                            name: 'Mike Johnson',
-                            username: 'mikej'
-                        },
+                        profiles: { name: 'Mike Johnson', username: 'mikej' },
                         likes: ['1', '2'],
                         comments: 8,
-                        shares: 4
+                        shares: 4,
+                        hasImage: true
                     }
                 ];
                 
@@ -946,8 +1189,13 @@
                                 <div class="post-time">${this.formatTime(post.created_at)}</div>
                             </div>
                             <div class="post-content">${post.content}</div>
+                            ${post.hasImage ? `
+                                <div class="post-image">
+                                    <i class="fas fa-image"></i> Image attached
+                                </div>
+                            ` : ''}
                             <div class="post-actions">
-                                <button class="post-action">
+                                <button class="post-action" onclick="primeMarApp.commentOnPost(${post.id})">
                                     <i class="fas fa-comment"></i>
                                     <span>${post.comments}</span>
                                 </button>
@@ -955,7 +1203,7 @@
                                     <i class="fas fa-heart"></i>
                                     <span>${likeCount}</span>
                                 </button>
-                                <button class="post-action">
+                                <button class="post-action" onclick="primeMarApp.sharePost(${post.id})">
                                     <i class="fas fa-share"></i>
                                     <span>${post.shares}</span>
                                 </button>
@@ -972,10 +1220,7 @@
                         id: 1,
                         user1_id: this.currentUser.id,
                         user2_id: '2',
-                        user2: {
-                            name: 'Jane Smith',
-                            username: 'janesmith'
-                        },
+                        user2: { name: 'Jane Smith', username: 'janesmith' },
                         last_message: 'Hey! How are you doing?',
                         updated_at: new Date().toISOString(),
                         unread: 2
@@ -984,10 +1229,7 @@
                         id: 2,
                         user1_id: '3',
                         user2_id: this.currentUser.id,
-                        user1: {
-                            name: 'Mike Johnson',
-                            username: 'mikej'
-                        },
+                        user1: { name: 'Mike Johnson', username: 'mikej' },
                         last_message: 'Check out this new feature!',
                         updated_at: new Date(Date.now() - 3600000).toISOString(),
                         unread: 0
@@ -1014,13 +1256,74 @@
                 container.innerHTML = this.conversations.map(conv => {
                     const otherUser = conv.user1_id === this.currentUser.id ? conv.user2 : conv.user1;
                     return `
-                        <div class="message-item">
+                        <div class="message-item" onclick="primeMarApp.openChat(${conv.id})">
                             <div class="avatar">${otherUser.name.charAt(0)}</div>
                             <div class="message-item-info">
                                 <div class="user-name">${otherUser.name}</div>
                                 <div class="message-preview">${conv.last_message}</div>
                             </div>
                             <div class="post-time">${this.formatTime(conv.updated_at)}</div>
+                            ${conv.unread > 0 ? `<div class="unread-badge">${conv.unread}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            async loadNotifications() {
+                // Demo notifications
+                this.notifications = [
+                    {
+                        id: 1,
+                        type: 'like',
+                        user: { name: 'Jane Smith', username: 'janesmith' },
+                        post_id: 1,
+                        created_at: new Date().toISOString(),
+                        read: false
+                    },
+                    {
+                        id: 2,
+                        type: 'follow',
+                        user: { name: 'Mike Johnson', username: 'mikej' },
+                        created_at: new Date(Date.now() - 3600000).toISOString(),
+                        read: false
+                    },
+                    {
+                        id: 3,
+                        type: 'comment',
+                        user: { name: 'Sarah Wilson', username: 'sarahw' },
+                        post_id: 2,
+                        created_at: new Date(Date.now() - 7200000).toISOString(),
+                        read: true
+                    }
+                ];
+                
+                this.renderNotifications();
+            }
+
+            renderNotifications() {
+                const container = document.getElementById('notificationsList');
+                
+                container.innerHTML = this.notifications.map(notif => {
+                    let content = '';
+                    switch(notif.type) {
+                        case 'like':
+                            content = `${notif.user.name} liked your post`;
+                            break;
+                        case 'follow':
+                            content = `${notif.user.name} started following you`;
+                            break;
+                        case 'comment':
+                            content = `${notif.user.name} commented on your post`;
+                            break;
+                    }
+                    
+                    return `
+                        <div class="notification-item ${!notif.read ? 'unread' : ''}">
+                            <div class="avatar">${notif.user.name.charAt(0)}</div>
+                            <div class="notification-content">
+                                <div>${content}</div>
+                                <div class="notification-time">${this.formatTime(notif.created_at)}</div>
+                            </div>
                         </div>
                     `;
                 }).join('');
@@ -1092,6 +1395,224 @@
                 }
             }
 
+            // Post Features
+            async createPost(content) {
+                if (!content.trim()) return;
+
+                const newPost = {
+                    id: Date.now(),
+                    content: content,
+                    author_id: this.currentUser.id,
+                    created_at: new Date().toISOString(),
+                    profiles: this.userProfile,
+                    likes: [],
+                    comments: 0,
+                    shares: 0,
+                    hasImage: Math.random() > 0.5 // Randomly add images
+                };
+
+                this.posts.unshift(newPost);
+                this.renderFeed();
+                this.showToast('Post published!', 'success');
+                
+                // Clear composer
+                document.getElementById('postTextarea').value = '';
+                document.getElementById('postBtn').disabled = true;
+            }
+
+            likePost(postId) {
+                const post = this.posts.find(p => p.id === postId);
+                if (!post) return;
+
+                const likeIndex = post.likes.indexOf(this.currentUser.id);
+                if (likeIndex > -1) {
+                    post.likes.splice(likeIndex, 1);
+                    this.showToast('Post unliked', 'info');
+                } else {
+                    post.likes.push(this.currentUser.id);
+                    this.showToast('Post liked!', 'success');
+                }
+                
+                this.renderFeed();
+            }
+
+            commentOnPost(postId) {
+                const comment = prompt('Enter your comment:');
+                if (comment) {
+                    const post = this.posts.find(p => p.id === postId);
+                    if (post) {
+                        post.comments++;
+                        this.renderFeed();
+                        this.showToast('Comment added!', 'success');
+                    }
+                }
+            }
+
+            sharePost(postId) {
+                const post = this.posts.find(p => p.id === postId);
+                if (post) {
+                    post.shares++;
+                    this.renderFeed();
+                    this.showToast('Post shared!', 'success');
+                }
+            }
+
+            // Message Features
+            openChat(conversationId) {
+                const conversation = this.conversations.find(c => c.id === conversationId);
+                if (!conversation) return;
+
+                this.activeChat = conversation;
+                document.getElementById('messagesList').style.display = 'none';
+                document.getElementById('chatView').classList.add('active');
+                
+                this.renderChatMessages();
+            }
+
+            renderChatMessages() {
+                const container = document.getElementById('chatMessages');
+                const otherUser = this.activeChat.user1_id === this.currentUser.id ? this.activeChat.user2 : this.activeChat.user1;
+                
+                // Demo chat messages
+                const messages = [
+                    { id: 1, content: 'Hey there! 👋', sender_id: otherUser.id, created_at: new Date(Date.now() - 3600000).toISOString() },
+                    { id: 2, content: 'Hello! How are you?', sender_id: this.currentUser.id, created_at: new Date(Date.now() - 3500000).toISOString() },
+                    { id: 3, content: 'I\'m doing great! Just exploring this awesome app!', sender_id: otherUser.id, created_at: new Date().toISOString() }
+                ];
+                
+                container.innerHTML = messages.map(msg => `
+                    <div class="message ${msg.sender_id === this.currentUser.id ? 'own' : ''}">
+                        <div class="avatar">${msg.sender_id === this.currentUser.id ? this.userProfile.name.charAt(0) : otherUser.name.charAt(0)}</div>
+                        <div class="message-content">${msg.content}</div>
+                    </div>
+                `).join('');
+            }
+
+            sendMessage() {
+                const input = document.getElementById('chatInput');
+                const content = input.value.trim();
+                
+                if (!content) return;
+
+                // Add message to chat
+                const messagesContainer = document.getElementById('chatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message own';
+                messageDiv.innerHTML = `
+                    <div class="avatar">${this.userProfile.name.charAt(0)}</div>
+                    <div class="message-content">${content}</div>
+                `;
+                messagesContainer.appendChild(messageDiv);
+                
+                // Clear input
+                input.value = '';
+                
+                // Auto reply after 1 second
+                setTimeout(() => {
+                    const otherUser = this.activeChat.user1_id === this.currentUser.id ? this.activeChat.user2 : this.activeChat.user1;
+                    const replyDiv = document.createElement('div');
+                    replyDiv.className = 'message';
+                    replyDiv.innerHTML = `
+                        <div class="avatar">${otherUser.name.charAt(0)}</div>
+                        <div class="message-content">Thanks for your message! 😊</div>
+                    `;
+                    messagesContainer.appendChild(replyDiv);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 1000);
+
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            // Search Features
+            performSearch(query) {
+                if (!query.trim()) {
+                    this.hideSearchResults();
+                    return;
+                }
+
+                // Demo search results
+                this.searchResults = [
+                    { type: 'user', name: 'Jane Smith', username: 'janesmith' },
+                    { type: 'user', name: 'John Doe', username: 'johndoe' },
+                    { type: 'post', content: 'Just posted about PrimeMar!', author: 'Demo User' },
+                    { type: 'hashtag', tag: '#primemar' }
+                ];
+
+                this.renderSearchResults();
+            }
+
+            renderSearchResults() {
+                const container = document.getElementById('searchResults');
+                container.innerHTML = this.searchResults.map(result => {
+                    if (result.type === 'user') {
+                        return `
+                            <div class="search-result-item">
+                                <div class="avatar">${result.name.charAt(0)}</div>
+                                <div>
+                                    <div class="user-name">${result.name}</div>
+                                    <div class="user-handle">@${result.username}</div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (result.type === 'post') {
+                        return `
+                            <div class="search-result-item">
+                                <i class="fas fa-file-alt"></i>
+                                <div>${result.content}</div>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="search-result-item">
+                                <i class="fas fa-hashtag"></i>
+                                <div>${result.tag}</div>
+                            </div>
+                        `;
+                    }
+                }).join('');
+
+                container.classList.add('active');
+            }
+
+            hideSearchResults() {
+                document.getElementById('searchResults').classList.remove('active');
+            }
+
+            // Story Features
+            viewStory(storyId) {
+                this.showToast(`Viewing story ${storyId}`, 'info');
+            }
+
+            // Additional Features
+            addImage() {
+                this.showToast('Image attachment feature', 'info');
+            }
+
+            addEmoji() {
+                this.showToast('Emoji picker opened', 'info');
+            }
+
+            addLocation() {
+                this.showToast('Location sharing feature', 'info');
+            }
+
+            startChat() {
+                this.showPage('messagesPage');
+                this.showToast('Start a new conversation', 'info');
+            }
+
+            showUserPosts() {
+                this.showToast('Showing user posts', 'info');
+            }
+
+            showFollowing() {
+                this.showToast('Showing following list', 'info');
+            }
+
+            showFollowers() {
+                this.showToast('Showing followers list', 'info');
+            }
+
             // UI Methods
             showAuth() {
                 document.getElementById('authModal').classList.remove('hidden');
@@ -1142,46 +1663,11 @@
                         nav.classList.add('active');
                     }
                 });
-            }
 
-            // Post functionality
-            async createPost(content) {
-                if (!content.trim()) return;
-
-                const newPost = {
-                    id: Date.now(),
-                    content: content,
-                    author_id: this.currentUser.id,
-                    created_at: new Date().toISOString(),
-                    profiles: this.userProfile,
-                    likes: [],
-                    comments: 0,
-                    shares: 0
-                };
-
-                this.posts.unshift(newPost);
-                this.renderFeed();
-                this.showToast('Post published!', 'success');
-                
-                // Clear composer
-                document.getElementById('postTextarea').value = '';
-                document.getElementById('postBtn').disabled = true;
-            }
-
-            likePost(postId) {
-                const post = this.posts.find(p => p.id === postId);
-                if (!post) return;
-
-                const likeIndex = post.likes.indexOf(this.currentUser.id);
-                if (likeIndex > -1) {
-                    post.likes.splice(likeIndex, 1);
-                    this.showToast('Post unliked', 'info');
-                } else {
-                    post.likes.push(this.currentUser.id);
-                    this.showToast('Post liked!', 'success');
+                // Hide search results when navigating away
+                if (pageId !== 'searchPage') {
+                    this.hideSearchResults();
                 }
-                
-                this.renderFeed();
             }
 
             // Utility Methods
@@ -1254,6 +1740,14 @@
                     });
                 });
 
+                // Header buttons
+                document.getElementById('notificationBtn').addEventListener('click', () => {
+                    this.showPage('notificationsPage');
+                });
+                document.getElementById('profileBtn').addEventListener('click', () => {
+                    this.showPage('profilePage');
+                });
+
                 // Post composer
                 const postTextarea = document.getElementById('postTextarea');
                 const postBtn = document.getElementById('postBtn');
@@ -1267,9 +1761,26 @@
                     this.createPost(postTextarea.value);
                 });
 
-                // Profile button
-                document.getElementById('profileBtn').addEventListener('click', () => {
-                    this.showPage('profilePage');
+                // Search
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    this.performSearch(e.target.value);
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.search-container')) {
+                        this.hideSearchResults();
+                    }
+                });
+
+                // Messages
+                document.getElementById('sendBtn').addEventListener('click', () => {
+                    this.sendMessage();
+                });
+
+                document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
                 });
             }
         }

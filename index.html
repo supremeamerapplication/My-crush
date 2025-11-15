@@ -1860,13 +1860,14 @@
                 }
             }
 
-            // UI Methods
+            // UI Methods - FIXED AUTH MODAL ISSUE
             showAuthModal() {
                 document.getElementById('authModal').classList.add('active');
                 document.getElementById('appContainer').classList.add('hidden');
             }
 
             showApp() {
+                console.log('Showing app, hiding auth modal');
                 document.getElementById('authModal').classList.remove('active');
                 document.getElementById('appContainer').classList.remove('hidden');
                 this.updateProfileUI();

@@ -4,250 +4,319 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="PrimeMar - A modern social media platform">
-    <meta name="theme-color" content="#3b82f6">
+    <meta name="theme-color" content="#ff9800">
     <title>PrimeMar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* CSS remains the same as your original code */
         :root {
-            --primary-color: #3b82f6;
-            --primary-hover: #2563eb;
-            --primary-light: rgba(59, 130, 246, 0.1);
-            --secondary-color: #8b5cf6;
-            --accent-color: #f59e0b;
-            --text-primary: #0f1419;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --border-color: #e2e8f0;
-            --bg-color: #ffffff;
-            --bg-secondary: #f8fafc;
-            --bg-tertiary: #f1f5f9;
-            --hover-color: #f1f5f9;
-            --success-color: #10b981;
-            --error-color: #ef4444;
-            --warning-color: #f59e0b;
-            --info-color: #3b82f6;
-            --story-ring: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 14px;
-            --radius-xl: 18px;
-            --radius-full: 9999px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --header-height: 64px;
-            --nav-height: 60px;
-        }
-
-        [data-theme="dark"] {
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border-color: #334155;
-            --bg-color: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #1e293b;
-            --hover-color: #1e293b;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+            --primary-color: #ff9800;
+            --secondary-color: #fdc500;
+            --accent-color: #ff3333;
+            --dark-bg: #111;
+            --light-bg: #fffde4;
+            --text-dark: #fff;
+            --text-light: #333;
+            --card-bg-dark: rgba(30, 30, 40, 0.95);
+            --card-bg-light: rgba(255,255,255,0.90);
+            --success-color: #4CAF50;
+            --warning-color: #ffc107;
+            --info-color: #2196F3;
+            --header-height: 80px;
         }
 
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: var(--bg-color);
-            color: var(--text-primary);
-            line-height: 1.6;
-            padding-bottom: var(--nav-height);
-            transition: var(--transition);
-        }
-
-        /* Header */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: var(--header-height);
-            background: var(--bg-color);
-            border-bottom: 1px solid var(--border-color);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .search-container {
-            flex: 1;
-            max-width: 500px;
-            margin: 0 30px;
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1.5px solid var(--border-color);
-            border-radius: var(--radius-full);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-size: 0.95rem;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .nav-dropdown {
-            position: relative;
-        }
-
-        .nav-dropdown-btn {
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-dropdown-content {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            padding: 8px;
-            min-width: 200px;
-            box-shadow: var(--shadow-xl);
-            z-index: 1001;
-            display: none;
-        }
-
-        .nav-dropdown-content.show {
-            display: block;
-        }
-
-        .nav-dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            color: var(--text-primary);
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-        }
-
-        .nav-dropdown-item:hover {
-            background: var(--hover-color);
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: var(--nav-height);
-            background: var(--bg-color);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .nav-item {
+            font-family: 'Montserrat', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, var(--dark-bg) 70%, var(--primary-color) 100%);
+            color: var(--text-dark);
+            transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 8px 16px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.75rem;
-            border-radius: var(--radius-full);
-            transition: var(--transition);
+            overflow-x: hidden;
+            padding-top: var(--header-height);
         }
 
-        .nav-item.active {
+        body.light {
+            background: linear-gradient(135deg, var(--light-bg) 60%, #f7b733 100%);
+            color: var(--text-light);
+        }
+
+        /* Enhanced Header Styles */
+        .header {
+            width: 100%;
+            height: var(--header-height);
+            padding: 0 20px;
+            background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(30,30,40,0.9) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(255, 152, 0, 0.3);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        body.light .header {
+            background: linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(240,240,245,0.95) 100%);
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5em;
+            color: var(--primary-color);
+            filter: drop-shadow(0 0 5px rgba(255, 152, 0, 0.5));
+        }
+
+        .header-title {
+            font-size: 1.8em;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+        }
+
+        body.light .header-title {
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Enhanced Profile Dropdown */
+        .profile-container {
+            position: relative;
+        }
+
+        .profile-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: #222;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3);
+        }
+
+        .profile-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(255, 152, 0, 0.5);
+        }
+
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 60px;
+            background: rgba(40, 40, 50, 0.95);
+            min-width: 220px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            color: #fff;
+            font-size: 1em;
+            animation: fadeIn 0.3s;
+            text-align: left;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        body.light .profile-dropdown {
+            background: rgba(255, 255, 255, 0.95);
+            color: #222;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(-10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        .profile-header {
+            padding: 15px 20px;
+            background: rgba(255, 152, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light .profile-header {
+            background: rgba(255, 152, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-email {
+            font-size: 0.9em;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.light .profile-email {
+            color: #666;
+        }
+
+        .profile-menu {
+            padding: 10px 0;
+        }
+
+        .profile-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .profile-menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.light .profile-menu-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-menu-item i {
+            width: 20px;
+            text-align: center;
             color: var(--primary-color);
         }
 
-        .nav-icon {
-            font-size: 1.3rem;
-            margin-bottom: 2px;
+        .profile-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 8px 0;
         }
 
-        /* Main Layout */
+        body.light .profile-divider {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Main Container */
         .container {
+            background: var(--card-bg-dark);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
             max-width: 600px;
-            margin: 0 auto;
-            padding: calc(var(--header-height) + 20px) 20px 20px;
+            width: 90%;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            margin: 20px 0 100px 0;
         }
 
-        .page {
-            display: none;
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 184, 0, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            animation: rotate 60s linear infinite;
         }
 
-        .page.active {
-            display: block;
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        /* Auth Styles */
+        body.light .container {
+            background: var(--card-bg-light);
+            color: var(--text-light);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Auth Modal */
         .auth-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            backdrop-filter: blur(5px);
         }
 
         .auth-modal-content {
-            background: var(--bg-color);
-            border-radius: var(--radius-xl);
+            background: var(--card-bg-dark);
+            border-radius: 20px;
             width: 100%;
             max-width: 440px;
-            box-shadow: var(--shadow-xl);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
             overflow: hidden;
+            position: relative;
+            transform: scale(0.95);
+            animation: modalAppear 0.3s forwards;
+        }
+
+        @keyframes modalAppear {
+            to { transform: scale(1); }
+        }
+
+        body.light .auth-modal-content {
+            background: var(--card-bg-light);
+        }
+
+        .auth-header {
+            padding: 30px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: #222;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .auth-body {
+            padding: 30px;
         }
 
         .form-group {
@@ -258,51 +327,73 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        body.light .form-label {
+            color: var(--text-light);
         }
 
         .form-input {
             width: 100%;
             padding: 14px 16px;
-            border: 1.5px solid var(--border-color);
-            border-radius: var(--radius-md);
-            background: var(--bg-color);
-            color: var(--text-primary);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
             font-size: 1rem;
+            transition: all 0.3s;
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        body.light .form-input {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-light);
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light .form-input:focus {
+            background: rgba(0, 0, 0, 0.08);
         }
 
         .btn {
             padding: 14px 24px;
-            border-radius: var(--radius-full);
+            border-radius: 12px;
             border: none;
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s;
             width: 100%;
+            font-size: 1rem;
         }
 
         .btn-primary {
-            background: var(--primary-color);
-            color: white;
+            background: linear-gradient(90deg, var(--secondary-color) 40%, var(--primary-color) 100%);
+            color: #111;
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
         }
 
         .btn-primary:hover {
-            background: var(--primary-hover);
+            background: linear-gradient(90deg, var(--primary-color) 40%, var(--secondary-color) 100%);
+            box-shadow: 0 8px 25px rgba(255, 152, 0, 0.6);
+            transform: translateY(-3px);
         }
 
         .error-message {
-            color: var(--error-color);
+            color: var(--accent-color);
             font-size: 0.85rem;
             margin-top: 8px;
             text-align: center;
             padding: 10px;
-            background: rgba(239, 68, 68, 0.1);
-            border-radius: var(--radius-md);
+            background: rgba(255, 51, 51, 0.1);
+            border-radius: 12px;
             display: none;
+            font-weight: 600;
         }
 
         .error-message.show {
@@ -311,12 +402,17 @@
 
         /* Post Composer */
         .post-composer {
-            background: var(--bg-color);
-            border-radius: var(--radius-xl);
+            background: var(--card-bg-dark);
+            border-radius: 20px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light .post-composer {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .composer-header {
@@ -328,9 +424,9 @@
         .avatar {
             width: 44px;
             height: 44px;
-            border-radius: var(--radius-full);
+            border-radius: 50%;
             object-fit: cover;
-            border: 2px solid var(--border-color);
+            border: 2px solid var(--primary-color);
         }
 
         .composer-textarea {
@@ -339,10 +435,14 @@
             resize: none;
             font-size: 1.2rem;
             background: transparent;
-            color: var(--text-primary);
+            color: var(--text-dark);
             min-height: 80px;
             font-family: inherit;
             line-height: 1.5;
+        }
+
+        body.light .composer-textarea {
+            color: var(--text-light);
         }
 
         .composer-textarea:focus {
@@ -358,33 +458,49 @@
         }
 
         .post-btn {
-            background: var(--primary-color);
-            color: white;
+            background: linear-gradient(90deg, var(--secondary-color) 40%, var(--primary-color) 100%);
+            color: #111;
             border: none;
             padding: 10px 24px;
-            border-radius: var(--radius-full);
+            border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .post-btn:hover {
+            background: linear-gradient(90deg, var(--primary-color) 40%, var(--secondary-color) 100%);
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.5);
+            transform: translateY(-3px);
         }
 
         .post-btn:disabled {
-            background: var(--primary-light);
+            background: #ccc;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .char-count {
-            color: var(--text-muted);
+            color: var(--secondary-color);
             margin-right: 12px;
+            font-weight: 600;
         }
 
         /* Posts */
         .post {
-            background: var(--bg-color);
-            border-radius: var(--radius-xl);
+            background: var(--card-bg-dark);
+            border-radius: 20px;
             padding: 20px;
             margin-bottom: 16px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light .post {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .post-header {
@@ -400,28 +516,44 @@
 
         .user-name {
             font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        body.light .user-name {
+            color: var(--text-light);
         }
 
         .user-handle {
-            color: var(--text-secondary);
+            color: var(--secondary-color);
             font-size: 0.9rem;
+            font-weight: 600;
         }
 
         .post-time {
-            color: var(--text-muted);
+            color: var(--secondary-color);
             font-size: 0.8rem;
+            font-weight: 600;
         }
 
         .post-content {
             margin-bottom: 16px;
             line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        body.light .post-content {
+            color: var(--text-light);
         }
 
         .post-actions {
             display: flex;
             justify-content: space-around;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 12px;
+        }
+
+        body.light .post-actions {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .post-action {
@@ -430,27 +562,34 @@
             gap: 6px;
             background: none;
             border: none;
-            color: var(--text-secondary);
+            color: var(--secondary-color);
             padding: 8px 16px;
-            border-radius: var(--radius-full);
+            border-radius: 12px;
             cursor: pointer;
             font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
         }
 
         .post-action:hover {
-            background: var(--hover-color);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        body.light .post-action:hover {
+            background: rgba(0, 0, 0, 0.05);
         }
 
         .post-action.liked {
-            color: var(--error-color);
+            color: var(--accent-color);
         }
 
         /* Profile */
         .profile-header {
             position: relative;
             height: 200px;
-            background: var(--gradient-primary);
-            border-radius: var(--radius-xl);
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 20px;
             margin-bottom: 80px;
         }
 
@@ -460,9 +599,13 @@
             left: 24px;
             width: 100px;
             height: 100px;
-            border-radius: var(--radius-full);
-            border: 4px solid var(--bg-color);
+            border-radius: 50%;
+            border: 4px solid var(--card-bg-dark);
             object-fit: cover;
+        }
+
+        body.light .profile-avatar {
+            border-color: var(--card-bg-light);
         }
 
         .profile-info {
@@ -473,15 +616,26 @@
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 4px;
+            color: var(--text-dark);
+        }
+
+        body.light .profile-name {
+            color: var(--text-light);
         }
 
         .profile-handle {
-            color: var(--text-secondary);
+            color: var(--secondary-color);
             margin-bottom: 12px;
+            font-weight: 600;
         }
 
         .profile-bio {
             margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        body.light .profile-bio {
+            color: var(--text-light);
         }
 
         .profile-stats {
@@ -489,24 +643,40 @@
             justify-content: space-around;
             margin: 20px 0;
             padding: 20px 0;
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light .profile-stats {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .stat {
             text-align: center;
             cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .stat:hover {
+            transform: translateY(-5px);
         }
 
         .stat-number {
             display: block;
             font-size: 1.25rem;
             font-weight: 700;
+            color: var(--secondary-color);
         }
 
         .stat-label {
             font-size: 0.85rem;
-            color: var(--text-secondary);
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        body.light .stat-label {
+            color: var(--text-light);
         }
 
         .profile-actions {
@@ -517,39 +687,72 @@
 
         .follow-btn, .message-btn {
             padding: 12px 24px;
-            border-radius: var(--radius-full);
+            border-radius: 12px;
             border: none;
             font-weight: 600;
             cursor: pointer;
             flex: 1;
+            transition: all 0.3s;
         }
 
         .follow-btn {
-            background: var(--primary-color);
-            color: white;
+            background: linear-gradient(90deg, var(--secondary-color) 40%, var(--primary-color) 100%);
+            color: #111;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .follow-btn:hover {
+            background: linear-gradient(90deg, var(--primary-color) 40%, var(--secondary-color) 100%);
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.5);
+            transform: translateY(-3px);
         }
 
         .message-btn {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1.5px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+        }
+
+        body.light .message-btn {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-light);
+            border: 1.5px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .message-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        body.light .message-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
         }
 
         /* Messages */
         .messages-container {
-            background: var(--bg-color);
-            border-radius: var(--radius-xl);
+            background: var(--card-bg-dark);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light .messages-container {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .chat-header {
             padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             gap: 12px;
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        body.light .chat-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .messages-list {
@@ -562,12 +765,21 @@
             align-items: center;
             gap: 12px;
             padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             cursor: pointer;
+            transition: all 0.3s;
         }
 
         .message-item:hover {
-            background: var(--hover-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.light .message-item {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.light .message-item:hover {
+            background: rgba(0, 0, 0, 0.05);
         }
 
         .message-item-info {
@@ -575,13 +787,15 @@
         }
 
         .message-preview {
-            color: var(--text-secondary);
+            color: var(--secondary-color);
             font-size: 0.9rem;
+            font-weight: 600;
         }
 
         .message-time {
-            color: var(--text-muted);
+            color: var(--secondary-color);
             font-size: 0.8rem;
+            font-weight: 600;
         }
 
         .chat-messages {
@@ -605,44 +819,69 @@
         }
 
         .message-content {
-            background: var(--bg-secondary);
+            background: rgba(255, 255, 255, 0.1);
             padding: 12px 16px;
-            border-radius: var(--radius-lg);
+            border-radius: 12px;
+            color: var(--text-dark);
+        }
+
+        body.light .message-content {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-light);
         }
 
         .message.own .message-content {
-            background: var(--primary-color);
-            color: white;
+            background: linear-gradient(90deg, var(--secondary-color) 40%, var(--primary-color) 100%);
+            color: #111;
         }
 
         .chat-input-container {
             padding: 16px 20px;
-            border-top: 1px solid var(--border-color);
-            background: var(--bg-color);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--card-bg-dark);
             display: flex;
             gap: 12px;
+        }
+
+        body.light .chat-input-container {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            background: var(--card-bg-light);
         }
 
         .chat-input {
             flex: 1;
             padding: 12px 16px;
-            border: 1.5px solid var(--border-color);
-            border-radius: var(--radius-full);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+
+        body.light .chat-input {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-light);
+            border-color: rgba(0, 0, 0, 0.2);
         }
 
         .chat-send-btn {
-            background: var(--primary-color);
-            color: white;
+            background: linear-gradient(90deg, var(--secondary-color) 40%, var(--primary-color) 100%);
+            color: #111;
             border: none;
-            border-radius: var(--radius-full);
+            border-radius: 12px;
             width: 44px;
             height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .chat-send-btn:hover {
+            background: linear-gradient(90deg, var(--primary-color) 40%, var(--secondary-color) 100%);
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.5);
+            transform: translateY(-3px);
         }
 
         /* Utility Classes */
@@ -655,13 +894,13 @@
             align-items: center;
             justify-content: center;
             padding: 40px;
-            color: var(--text-secondary);
+            color: var(--secondary-color);
         }
 
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: var(--text-secondary);
+            color: var(--secondary-color);
         }
 
         .empty-state i {
@@ -672,14 +911,23 @@
 
         .toast {
             position: fixed;
-            top: 90px;
+            top: 100px;
             right: 20px;
             padding: 16px 20px;
-            border-radius: var(--radius-lg);
+            border-radius: 12px;
             color: white;
             font-weight: 600;
             z-index: 10000;
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transform: translateX(200%);
+            transition: transform 0.4s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
         }
 
         .toast.success {
@@ -687,19 +935,113 @@
         }
 
         .toast.error {
-            background: var(--error-color);
+            background: var(--accent-color);
         }
 
         .toast.info {
             background: var(--info-color);
         }
 
-        @media (min-width: 768px) {
-            .bottom-nav {
-                display: none;
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: rgba(30, 30, 40, 0.95);
+            border-top: 2px solid var(--primary-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        body.light .bottom-nav {
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 2px solid var(--secondary-color);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 16px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-size: 0.75rem;
+            border-radius: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            margin-bottom: 2px;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            width: 100%;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 15px;
+                height: 80px;
             }
-            body {
-                padding-bottom: 0;
+
+            .header-title {
+                font-size: 1.5em;
+            }
+
+            .logo-icon {
+                font-size: 2em;
+            }
+
+            .profile-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3em;
+            }
+
+            .container {
+                padding: 25px 20px;
+                margin: 15px 0 100px 0;
+            }
+
+            .bottom-nav {
+                height: 70px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-title {
+                font-size: 1.3em;
+            }
+
+            .logo-icon {
+                font-size: 1.8em;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+
+            .auth-modal-content {
+                padding: 20px;
             }
         }
     </style>
@@ -711,17 +1053,17 @@
     <!-- Auth Modal -->
     <div class="auth-modal active" id="authModal">
         <div class="auth-modal-content">
-            <div style="padding: 30px; background: var(--gradient-primary); color: white; text-align: center;">
-                <div class="logo" style="font-size: 2rem; margin-bottom: 10px;">
+            <div class="auth-header">
+                <div style="font-size: 2rem; margin-bottom: 10px;">
                     <i class="fas fa-fire"></i>
                     <span>PrimeMar</span>
                 </div>
-                <p style="opacity: 0.9;">Join the conversation</p>
+                <p style="opacity: 0.9; font-weight: 600;">Join the conversation</p>
             </div>
-            <div style="padding: 30px;">
+            <div class="auth-body">
                 <div id="loginForm">
                     <h2 style="margin-bottom: 8px; text-align: center;">Welcome back</h2>
-                    <p style="color: var(--text-secondary); text-align: center; margin-bottom: 24px;">Sign in to your account</p>
+                    <p style="color: var(--secondary-color); text-align: center; margin-bottom: 24px; font-weight: 600;">Sign in to your account</p>
                     <div class="error-message" id="loginError"></div>
                     <div class="form-group">
                         <label class="form-label">Email</label>
@@ -735,14 +1077,14 @@
                         <i class="fas fa-sign-in-alt"></i>
                         Sign In
                     </button>
-                    <div style="margin-top: 20px; text-align: center; color: var(--text-secondary);">
+                    <div style="margin-top: 20px; text-align: center; color: var(--secondary-color); font-weight: 600;">
                         Don't have an account? <a style="color: var(--primary-color); cursor: pointer; font-weight: 600;" id="showSignup">Sign up</a>
                     </div>
                 </div>
 
                 <div id="signupForm" class="hidden">
                     <h2 style="margin-bottom: 8px; text-align: center;">Create account</h2>
-                    <p style="color: var(--text-secondary); text-align: center; margin-bottom: 24px;">Join PrimeMar today</p>
+                    <p style="color: var(--secondary-color); text-align: center; margin-bottom: 24px; font-weight: 600;">Join PrimeMar today</p>
                     <div class="error-message" id="signupError"></div>
                     <div class="form-group">
                         <label class="form-label">Full Name</label>
@@ -764,7 +1106,7 @@
                         <i class="fas fa-user-plus"></i>
                         Create Account
                     </button>
-                    <div style="margin-top: 20px; text-align: center; color: var(--text-secondary);">
+                    <div style="margin-top: 20px; text-align: center; color: var(--secondary-color); font-weight: 600;">
                         Already have an account? <a style="color: var(--primary-color); cursor: pointer; font-weight: 600;" id="showLogin">Sign in</a>
                     </div>
                 </div>
@@ -776,37 +1118,48 @@
     <div id="appContainer" class="hidden">
         <!-- Header -->
         <header class="header">
-            <div class="logo">
-                <i class="fas fa-fire"></i>
-                <span>PrimeMar</span>
+            <div class="logo-section">
+                <i class="fas fa-fire logo-icon"></i>
+                <h1 class="header-title">PrimeMar</h1>
             </div>
             
             <!-- Search Bar -->
             <div class="search-container">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search users, posts...">
+                <input type="text" class="form-input" id="searchInput" placeholder="Search users, posts...">
                 <div class="search-results" id="searchResults"></div>
             </div>
 
-            <div class="header-nav">
-                <div class="nav-dropdown">
-                    <button class="nav-dropdown-btn">
+            <div class="header-actions">
+                <div class="profile-container">
+                    <button class="profile-btn">
                         <img src="" alt="Profile" class="avatar" id="headerAvatar">
-                        <i class="fas fa-chevron-down"></i>
                     </button>
-                    <div class="nav-dropdown-content" id="navDropdown">
-                        <button class="nav-dropdown-item" data-page="profilePage">
-                            <i class="fas fa-user"></i>
-                            <span>Profile</span>
-                        </button>
-                        <button class="nav-dropdown-item" id="themeToggleNav">
-                            <i class="fas fa-moon"></i>
-                            <span>Dark Mode</span>
-                        </button>
-                        <div class="nav-dropdown-divider"></div>
-                        <button class="nav-dropdown-item" id="logoutBtnNav">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </button>
+                    <div class="profile-dropdown" id="navDropdown">
+                        <div class="profile-header">
+                            <div class="profile-name">
+                                <i class="fas fa-user"></i>
+                                <span id="userNameNav">User Name</span>
+                            </div>
+                            <div class="profile-email">
+                                <i class="fas fa-envelope"></i>
+                                <span id="userEmailNav">user@example.com</span>
+                            </div>
+                        </div>
+                        <div class="profile-menu">
+                            <button class="profile-menu-item" data-page="profilePage">
+                                <i class="fas fa-user"></i>
+                                <span>Profile</span>
+                            </button>
+                            <button class="profile-menu-item" id="themeToggleNav">
+                                <i class="fas fa-moon"></i>
+                                <span>Dark Mode</span>
+                            </button>
+                            <div class="profile-divider"></div>
+                            <button class="profile-menu-item" id="logoutBtnNav">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -824,10 +1177,10 @@
                     </div>
                     <div class="composer-actions">
                         <div style="display: flex; gap: 12px;">
-                            <button class="action-btn" style="background: none; border: none; color: var(--primary-color); padding: 8px; border-radius: var(--radius-full);">
+                            <button class="action-btn" style="background: none; border: none; color: var(--primary-color); padding: 8px; border-radius: 12px;">
                                 <i class="fas fa-image"></i>
                             </button>
-                            <button class="action-btn" style="background: none; border: none; color: var(--primary-color); padding: 8px; border-radius: var(--radius-full);">
+                            <button class="action-btn" style="background: none; border: none; color: var(--primary-color); padding: 8px; border-radius: 12px;">
                                 <i class="fas fa-smile"></i>
                             </button>
                         </div>
@@ -907,36 +1260,6 @@
                     <!-- User's posts will be loaded here -->
                 </div>
             </section>
-
-            <!-- Followers Page -->
-            <section id="followersPage" class="page">
-                <div class="messages-container">
-                    <div class="chat-header">
-                        <button style="background: none; border: none; color: var(--text-primary); padding: 8px;" onclick="primeMarApp.showPage('profilePage')">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <h3>Followers</h3>
-                    </div>
-                    <div style="padding: 20px;" id="followersGrid">
-                        <!-- Followers will be loaded here -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Following Page -->
-            <section id="followingPage" class="page">
-                <div class="messages-container">
-                    <div class="chat-header">
-                        <button style="background: none; border: none; color: var(--text-primary); padding: 8px;" onclick="primeMarApp.showPage('profilePage')">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <h3>Following</h3>
-                    </div>
-                    <div style="padding: 20px;" id="followingGrid">
-                        <!-- Following will be loaded here -->
-                    </div>
-                </div>
-            </section>
         </main>
 
         <!-- Bottom Navigation -->
@@ -957,7 +1280,7 @@
     </div>
 
     <script>
-        // PrimeMar Social Media Platform - Fixed Version
+        // PrimeMar Social Media Platform - Fixed Authentication with New CSS
         class PrimeMar {
             constructor() {
                 this.supabaseUrl = 'https://qsiwjjqxpegfmgkmtjje.supabase.co';
@@ -1037,7 +1360,7 @@
                         name: this.currentUser.user_metadata?.full_name || 'Demo User',
                         username: this.currentUser.user_metadata?.username || 'demo',
                         email: this.currentUser.email,
-                        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentUser.user_metadata?.full_name || 'Demo User')}&background=3b82f6&color=fff&size=128`,
+                        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentUser.user_metadata?.full_name || 'Demo User')}&background=ff9800&color=fff&size=128`,
                         bio: 'Welcome to my PrimeMar profile!',
                         created_at: new Date().toISOString()
                     };
@@ -1052,7 +1375,7 @@
                         name: 'Demo User',
                         username: 'demo',
                         email: this.currentUser.email,
-                        avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=3b82f6&color=fff&size=128',
+                        avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=ff9800&color=fff&size=128',
                         bio: 'Welcome to my PrimeMar profile!'
                     };
                 }
@@ -1202,7 +1525,7 @@
                             profiles: {
                                 name: 'Demo User',
                                 username: 'demo',
-                                avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=3b82f6&color=fff&size=128'
+                                avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=ff9800&color=fff&size=128'
                             },
                             likes: []
                         },
@@ -1214,7 +1537,7 @@
                             profiles: {
                                 name: 'Jane Smith',
                                 username: 'janesmith',
-                                avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128'
+                                avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=fdc500&color=fff&size=128'
                             },
                             likes: []
                         },
@@ -1226,7 +1549,7 @@
                             profiles: {
                                 name: 'Mike Johnson',
                                 username: 'mikej',
-                                avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128'
+                                avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=ff3333&color=fff&size=128'
                             },
                             likes: []
                         }
@@ -1331,7 +1654,7 @@
                             user2: {
                                 name: 'Jane Smith',
                                 username: 'janesmith',
-                                avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128'
+                                avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=fdc500&color=fff&size=128'
                             },
                             last_message: 'Hey there! How are you?',
                             updated_at: new Date().toISOString()
@@ -1343,7 +1666,7 @@
                             user1: {
                                 name: 'Mike Johnson',
                                 username: 'mikej',
-                                avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128'
+                                avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=ff3333&color=fff&size=128'
                             },
                             last_message: 'Check out this new feature!',
                             updated_at: new Date(Date.now() - 3600000).toISOString()
@@ -1506,47 +1829,6 @@
                 this.following = new Set(['2', '3']);
                 this.followers = new Set(['2', '4', '5']);
                 
-                this.followingUsers = [
-                    {
-                        id: '2',
-                        name: 'Jane Smith',
-                        username: 'janesmith',
-                        avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
-                        bio: 'Digital creator and tech enthusiast'
-                    },
-                    {
-                        id: '3',
-                        name: 'Mike Johnson',
-                        username: 'mikej',
-                        avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff&size=128',
-                        bio: 'Software engineer and open source contributor'
-                    }
-                ];
-                
-                this.followerUsers = [
-                    {
-                        id: '2',
-                        name: 'Jane Smith',
-                        username: 'janesmith',
-                        avatar: 'https://ui-avatars.com/api/?name=Jane+Smith&background=8b5cf6&color=fff&size=128',
-                        bio: 'Digital creator and tech enthusiast'
-                    },
-                    {
-                        id: '4',
-                        name: 'Sarah Wilson',
-                        username: 'sarahw',
-                        avatar: 'https://ui-avatars.com/api/?name=Sarah+Wilson&background=10b981&color=fff&size=128',
-                        bio: 'Photographer and travel blogger'
-                    },
-                    {
-                        id: '5',
-                        name: 'Alex Chen',
-                        username: 'alexc',
-                        avatar: 'https://ui-avatars.com/api/?name=Alex+Chen&background=ef4444&color=fff&size=128',
-                        bio: 'UX designer and product manager'
-                    }
-                ];
-                
                 this.updateFollowUI();
             }
 
@@ -1554,16 +1836,6 @@
                 document.getElementById('followingCount').textContent = this.following.size;
                 document.getElementById('followersCount').textContent = this.followers.size;
                 document.getElementById('postsCount').textContent = this.posts.filter(p => p.author_id === this.currentUser?.id).length;
-            }
-
-            showFollowers() {
-                this.renderUsersGrid(this.followerUsers, 'followersGrid');
-                this.showPage('followersPage');
-            }
-
-            showFollowing() {
-                this.renderUsersGrid(this.followingUsers, 'followingGrid');
-                this.showPage('followingPage');
             }
 
             showUserPosts() {
@@ -1586,21 +1858,6 @@
                         </div>
                     `).join('');
                 }
-            }
-
-            renderUsersGrid(users, containerId) {
-                const container = document.getElementById(containerId);
-                container.innerHTML = users.map(user => `
-                    <div style="background: var(--bg-color); border-radius: var(--radius-lg); padding: 20px; text-align: center; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); margin-bottom: 16px;">
-                        <img src="${user.avatar}" alt="${user.name}" style="width: 80px; height: 80px; border-radius: var(--radius-full); object-fit: cover; margin: 0 auto 12px;">
-                        <div style="font-weight: 600; margin-bottom: 4px;">${user.name}</div>
-                        <div style="color: var(--text-secondary); margin-bottom: 8px;">@${user.username}</div>
-                        <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 12px;">${user.bio}</div>
-                        <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; width: 100%;">
-                            ${this.following.has(user.id) ? 'Unfollow' : 'Follow'}
-                        </button>
-                    </div>
-                `).join('');
             }
 
             // UI Methods
@@ -1641,6 +1898,8 @@
             updateProfileUI() {
                 if (!this.userProfile) return;
 
+                document.getElementById('userNameNav').textContent = this.userProfile.name;
+                document.getElementById('userEmailNav').textContent = this.userProfile.email;
                 document.getElementById('userAvatar').src = this.userProfile.avatar;
                 document.getElementById('headerAvatar').src = this.userProfile.avatar;
                 document.getElementById('profileName').textContent = this.userProfile.name;
@@ -1671,7 +1930,7 @@
                 document.getElementById('showLogin').addEventListener('click', () => this.showLoginForm());
 
                 // Navigation
-                document.querySelector('.nav-dropdown-btn').addEventListener('click', (e) => {
+                document.querySelector('.profile-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
                     document.getElementById('navDropdown').classList.toggle('show');
                 });
@@ -1687,7 +1946,7 @@
                     });
                 });
 
-                document.querySelectorAll('.nav-dropdown-item[data-page]').forEach(item => {
+                document.querySelectorAll('.profile-menu-item[data-page]').forEach(item => {
                     item.addEventListener('click', (e) => {
                         e.preventDefault();
                         this.showPage(item.dataset.page);
@@ -1736,9 +1995,15 @@
             }
 
             toggleTheme() {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const currentTheme = document.body.classList.contains('light') ? 'light' : 'dark';
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', newTheme);
+                
+                if (newTheme === 'light') {
+                    document.body.classList.add('light');
+                } else {
+                    document.body.classList.remove('light');
+                }
+                
                 localStorage.setItem('primemar-theme', newTheme);
                 this.showToast(`${newTheme === 'dark' ? 'Dark' : 'Light'} mode enabled`, 'info');
             }
@@ -1769,7 +2034,17 @@
                 toast.className = `toast ${type}`;
                 toast.textContent = message;
                 document.getElementById('toastContainer').appendChild(toast);
-                setTimeout(() => toast.remove(), 3000);
+                
+                // Show the toast
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 10);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 400);
+                }, 3000);
             }
 
             showError(message, element) {

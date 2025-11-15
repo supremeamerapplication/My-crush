@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* CSS remains the same as your original code */
         :root {
             --primary-color: #3b82f6;
             --primary-hover: #2563eb;
@@ -956,7 +957,7 @@
     </div>
 
     <script>
-        // PrimeMar Social Media Platform - Fixed Authentication
+        // PrimeMar Social Media Platform - Fixed Version
         class PrimeMar {
             constructor() {
                 this.supabaseUrl = 'https://qsiwjjqxpegfmgkmtjje.supabase.co';
@@ -1640,7 +1641,6 @@
             updateProfileUI() {
                 if (!this.userProfile) return;
 
-                document.getElementById('userNameNav').textContent = this.userProfile.name;
                 document.getElementById('userAvatar').src = this.userProfile.avatar;
                 document.getElementById('headerAvatar').src = this.userProfile.avatar;
                 document.getElementById('profileName').textContent = this.userProfile.name;

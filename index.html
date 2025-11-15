@@ -888,7 +888,6 @@
             justify-content: center;
             font-weight: bold;
             color: #222;
-            font-size: 24px;
             cursor: pointer;
             overflow: hidden;
         }
@@ -1222,6 +1221,23 @@
             color: var(--text-light);
         }
 
+        /* Search Results Full */
+        .search-results-full {
+            display: grid;
+            gap: 15px;
+        }
+
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .search-section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
         /* Groups and Communities */
         .groups-container, .communities-container {
             display: grid;
@@ -1549,11 +1565,11 @@
                             <i class="fas fa-user"></i>
                             <span>Profile</span>
                         </button>
-                        <button class="dropdown-item" onclick="primeMarApp.showGroups()">
+                        <button class="dropdown-item" onclick="primeMarApp.showGroupsPage()">
                             <i class="fas fa-users"></i>
                             <span>Groups</span>
                         </button>
-                        <button class="dropdown-item" onclick="primeMarApp.showCommunities()">
+                        <button class="dropdown-item" onclick="primeMarApp.showCommunitiesPage()">
                             <i class="fas fa-globe"></i>
                             <span>Communities</span>
                         </button>
@@ -1622,7 +1638,8 @@
             <section id="searchPage" class="page">
                 <input type="text" class="search-page-input" id="searchPageInput" placeholder="Search users, posts, groups...">
                 <div class="search-tabs">
-                    <div class="search-tab active" data-type="users">Users</div>
+                    <div class="search-tab active" data-type="all">All</div>
+                    <div class="search-tab" data-type="users">Users</div>
                     <div class="search-tab" data-type="posts">Posts</div>
                     <div class="search-tab" data-type="groups">Groups</div>
                     <div class="search-tab" data-type="communities">Communities</div>
@@ -1630,7 +1647,7 @@
                 <div class="search-results-full" id="searchResultsFull">
                     <div class="empty-state">
                         <i class="fas fa-search"></i>
-                        <h3>Search for users and posts</h3>
+                        <h3>Search for users, posts, groups and communities</h3>
                         <p>Use the search bar to find content</p>
                     </div>
                 </div>
@@ -1798,7 +1815,7 @@
     </div>
 
     <!-- Modals -->
-    <div class="modal" id="editProfileModal">
+    <div class="modal hidden" id="editProfileModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">Edit Profile</h2>
@@ -1822,7 +1839,7 @@
         </div>
     </div>
 
-    <div class="modal" id="shareModal">
+    <div class="modal hidden" id="shareModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">Share Post</h2>
@@ -1859,7 +1876,7 @@
         </div>
     </div>
 
-    <div class="modal" id="createGroupModal">
+    <div class="modal hidden" id="createGroupModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">Create New Group</h2>
@@ -1884,7 +1901,7 @@
         </div>
     </div>
 
-    <div class="modal" id="createCommunityModal">
+    <div class="modal hidden" id="createCommunityModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">Create New Community</h2>
@@ -1949,6 +1966,7 @@
                 this.activeCall = null;
                 this.groups = [];
                 this.communities = [];
+                this.currentSearchType = 'all';
                 
                 this.init();
             }
@@ -2091,9 +2109,7 @@
                     this.loadStories(),
                     this.loadFeed(),
                     this.loadConversations(),
-                    this.loadNotifications(),
-                    this.loadGroups(),
-                    this.loadCommunities()
+                    this.loadNotifications()
                 ]);
             }
 
@@ -2485,10 +2501,12 @@
                     };
 
                     if (this.currentMedia) {
+                        // In a real app, you would upload to Supabase Storage
+                        // For demo, we'll use a placeholder
                         if (this.currentMedia.type.startsWith('image')) {
-                            postData.image_url = URL.createObjectURL(this.currentMedia);
+                            postData.image_url = 'https://via.placeholder.com/600x400/ff9800/ffffff?text=Uploaded+Image';
                         } else if (this.currentMedia.type.startsWith('video')) {
-                            postData.video_url = URL.createObjectURL(this.currentMedia);
+                            postData.video_url = 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4';
                         }
                     }
 
@@ -2724,9 +2742,9 @@
                             <div>${msg.content}</div>
                             ${msg.media_url ? `
                                 <div class="message-media">
-                                    ${msg.media_type.startsWith('image') ? 
+                                    ${msg.media_type && msg.media_type.startsWith('image') ? 
                                         `<img src="${msg.media_url}" alt="Shared image">` : 
-                                        msg.media_type.startsWith('video') ?
+                                        msg.media_type && msg.media_type.startsWith('video') ?
                                         `<video controls><source src="${msg.media_url}" type="video/mp4"></video>` :
                                         `<a href="${msg.media_url}" target="_blank">Download file</a>`
                                     }
@@ -2789,40 +2807,230 @@
             async performSearch(query) {
                 if (!query.trim()) {
                     this.hideSearchResults();
+                    document.getElementById('searchResultsFull').innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>Search for users, posts, groups and communities</h3>
+                            <p>Use the search bar to find content</p>
+                        </div>
+                    `;
                     return;
                 }
 
                 try {
-                    const { data: users, error } = await this.supabase
+                    let results = {
+                        users: [],
+                        posts: [],
+                        groups: [],
+                        communities: []
+                    };
+
+                    // Search users
+                    const { data: users, error: usersError } = await this.supabase
                         .from('profiles')
                         .select('id, name, username, avatar_url')
-                        .ilike('username', `%${query}%`)
+                        .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
                         .limit(5);
 
-                    if (error) throw error;
+                    if (!usersError) results.users = users || [];
 
-                    this.searchResults = users || [];
+                    // Search posts
+                    const { data: posts, error: postsError } = await this.supabase
+                        .from('posts')
+                        .select(`
+                            *,
+                            profiles:author_id (
+                                name,
+                                username,
+                                avatar_url
+                            )
+                        `)
+                        .ilike('content', `%${query}%`)
+                        .limit(5);
+
+                    if (!postsError) results.posts = posts || [];
+
+                    // For groups and communities, we'll use mock data
+                    results.groups = [
+                        { id: 1, name: 'Tech Enthusiasts', members: 45 },
+                        { id: 2, name: 'Travel Buddies', members: 32 }
+                    ].filter(g => g.name.toLowerCase().includes(query.toLowerCase()));
+
+                    results.communities = [
+                        { id: 1, name: 'PrimeMar Developers', members: 120, type: 'public' },
+                        { id: 2, name: 'Digital Artists', members: 85, type: 'public' }
+                    ].filter(c => c.name.toLowerCase().includes(query.toLowerCase()));
+
+                    this.searchResults = results;
                     this.renderSearchResults();
+                    this.renderSearchResultsFull();
                 } catch (error) {
                     console.error('Error searching:', error);
-                    this.searchResults = [];
+                    this.searchResults = {
+                        users: [],
+                        posts: [],
+                        groups: [],
+                        communities: []
+                    };
                     this.renderSearchResults();
+                    this.renderSearchResultsFull();
                 }
             }
 
             renderSearchResults() {
                 const container = document.getElementById('searchResults');
-                container.innerHTML = this.searchResults.map(user => `
-                    <div class="search-result-item" onclick="primeMarApp.viewProfile('${user.id}')">
-                        <div class="avatar">${user.name.charAt(0)}</div>
-                        <div>
-                            <div class="user-name">${user.name}</div>
-                            <div class="user-handle">@${user.username}</div>
-                        </div>
-                    </div>
-                `).join('');
+                const allResults = [
+                    ...this.searchResults.users.map(u => ({...u, type: 'user'})),
+                    ...this.searchResults.posts.map(p => ({...p, type: 'post'})),
+                    ...this.searchResults.groups.map(g => ({...g, type: 'group'})),
+                    ...this.searchResults.communities.map(c => ({...c, type: 'community'}))
+                ].slice(0, 5);
+
+                container.innerHTML = allResults.map(item => {
+                    if (item.type === 'user') {
+                        return `
+                            <div class="search-result-item" onclick="primeMarApp.viewProfile('${item.id}')">
+                                <div class="avatar">${item.name.charAt(0)}</div>
+                                <div>
+                                    <div class="user-name">${item.name}</div>
+                                    <div class="user-handle">@${item.username}</div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (item.type === 'post') {
+                        return `
+                            <div class="search-result-item" onclick="primeMarApp.viewPost('${item.id}')">
+                                <div class="avatar">${item.profiles.name.charAt(0)}</div>
+                                <div>
+                                    <div class="user-name">${item.profiles.name}</div>
+                                    <div class="user-handle">${item.content.substring(0, 50)}...</div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (item.type === 'group') {
+                        return `
+                            <div class="search-result-item" onclick="primeMarApp.viewGroup('${item.id}')">
+                                <div class="avatar">${item.name.charAt(0)}</div>
+                                <div>
+                                    <div class="user-name">${item.name}</div>
+                                    <div class="user-handle">Group • ${item.members} members</div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (item.type === 'community') {
+                        return `
+                            <div class="search-result-item" onclick="primeMarApp.viewCommunity('${item.id}')">
+                                <div class="avatar">${item.name.charAt(0)}</div>
+                                <div>
+                                    <div class="user-name">${item.name}</div>
+                                    <div class="user-handle">Community • ${item.members} members</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }).join('');
 
                 container.classList.add('active');
+            }
+
+            renderSearchResultsFull() {
+                const container = document.getElementById('searchResultsFull');
+                const { users, posts, groups, communities } = this.searchResults;
+                
+                let html = '';
+                
+                // Show results based on current search type
+                if (this.currentSearchType === 'all' || this.currentSearchType === 'users') {
+                    if (users.length > 0) {
+                        html += `
+                            <div class="search-section">
+                                <h3 class="search-section-title">Users</h3>
+                                ${users.map(user => `
+                                    <div class="search-result-item" onclick="primeMarApp.viewProfile('${user.id}')">
+                                        <div class="avatar">${user.name.charAt(0)}</div>
+                                        <div>
+                                            <div class="user-name">${user.name}</div>
+                                            <div class="user-handle">@${user.username}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                }
+                
+                if (this.currentSearchType === 'all' || this.currentSearchType === 'posts') {
+                    if (posts.length > 0) {
+                        html += `
+                            <div class="search-section">
+                                <h3 class="search-section-title">Posts</h3>
+                                ${posts.map(post => `
+                                    <div class="post">
+                                        <div class="post-header">
+                                            <div class="avatar">${post.profiles.name.charAt(0)}</div>
+                                            <div class="post-user-info">
+                                                <div class="user-name">${post.profiles.name}</div>
+                                                <div class="user-handle">@${post.profiles.username}</div>
+                                            </div>
+                                        </div>
+                                        <div class="post-content">${post.content}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                }
+                
+                if (this.currentSearchType === 'all' || this.currentSearchType === 'groups') {
+                    if (groups.length > 0) {
+                        html += `
+                            <div class="search-section">
+                                <h3 class="search-section-title">Groups</h3>
+                                <div class="groups-container">
+                                    ${groups.map(group => `
+                                        <div class="group-card" onclick="primeMarApp.viewGroup('${group.id}')">
+                                            <div class="group-avatar">${group.name.charAt(0)}</div>
+                                            <div class="group-name">${group.name}</div>
+                                            <div class="group-members">${group.members} members</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                if (this.currentSearchType === 'all' || this.currentSearchType === 'communities') {
+                    if (communities.length > 0) {
+                        html += `
+                            <div class="search-section">
+                                <h3 class="search-section-title">Communities</h3>
+                                <div class="communities-container">
+                                    ${communities.map(community => `
+                                        <div class="community-card" onclick="primeMarApp.viewCommunity('${community.id}')">
+                                            <div class="community-avatar">${community.name.charAt(0)}</div>
+                                            <div class="community-name">${community.name}</div>
+                                            <div class="community-members">${community.members} members</div>
+                                            <div class="community-type">${community.type}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                if (!html) {
+                    html = `
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>No results found</h3>
+                            <p>Try different search terms</p>
+                        </div>
+                    `;
+                }
+                
+                container.innerHTML = html;
             }
 
             hideSearchResults() {
@@ -2867,7 +3075,8 @@
             }
 
             editAvatar() {
-                document.getElementById('avatarUpload').click();
+                // In a real app, this would open file picker
+                this.showToast('Avatar upload coming soon!', 'info');
             }
 
             // Call Features
@@ -2886,14 +3095,16 @@
             }
 
             // Group and Community Features
-            showGroups() {
+            showGroupsPage() {
                 this.showPage('groupsPage');
                 this.hideProfileDropdown();
+                this.loadGroups();
             }
 
-            showCommunities() {
+            showCommunitiesPage() {
                 this.showPage('communitiesPage');
                 this.hideProfileDropdown();
+                this.loadCommunities();
             }
 
             async loadGroups() {
@@ -2927,7 +3138,7 @@
                 }
 
                 container.innerHTML = this.groups.map(group => `
-                    <div class="group-card" onclick="primeMarApp.openGroup('${group.id}')">
+                    <div class="group-card" onclick="primeMarApp.viewGroup('${group.id}')">
                         <div class="group-avatar">${group.name.charAt(0)}</div>
                         <div class="group-name">${group.name}</div>
                         <div class="group-members">${group.members} members</div>
@@ -2966,7 +3177,7 @@
                 }
 
                 container.innerHTML = this.communities.map(community => `
-                    <div class="community-card" onclick="primeMarApp.openCommunity('${community.id}')">
+                    <div class="community-card" onclick="primeMarApp.viewCommunity('${community.id}')">
                         <div class="community-avatar">${community.name.charAt(0)}</div>
                         <div class="community-name">${community.name}</div>
                         <div class="community-members">${community.members} members</div>
@@ -2976,75 +3187,39 @@
             }
 
             createGroup() {
-                this.showModal('createGroupModal');
+                // Redirect to group creation page
+                window.location.href = 'group.html';
             }
 
             createCommunity() {
-                this.showModal('createCommunityModal');
+                // Redirect to community creation page
+                window.location.href = 'community.html';
             }
 
             async saveGroup() {
-                const name = document.getElementById('groupName').value;
-                const description = document.getElementById('groupDescription').value;
-
-                if (!name) {
-                    this.showToast('Please enter a group name', 'error');
-                    return;
-                }
-
-                try {
-                    // In a real app, this would save to the database
-                    this.groups.push({
-                        id: Date.now(),
-                        name: name,
-                        description: description,
-                        members: 1
-                    });
-                    
-                    this.renderGroups();
-                    this.closeModal('createGroupModal');
-                    this.showToast('Group created successfully!', 'success');
-                } catch (error) {
-                    console.error('Error creating group:', error);
-                    this.showToast('Error creating group', 'error');
-                }
+                // This would be handled in group.html
+                this.showToast('Redirecting to group creation...', 'info');
             }
 
             async saveCommunity() {
-                const name = document.getElementById('communityName').value;
-                const description = document.getElementById('communityDescription').value;
-                const type = document.getElementById('communityType').value;
-
-                if (!name) {
-                    this.showToast('Please enter a community name', 'error');
-                    return;
-                }
-
-                try {
-                    // In a real app, this would save to the database
-                    this.communities.push({
-                        id: Date.now(),
-                        name: name,
-                        description: description,
-                        type: type,
-                        members: 1
-                    });
-                    
-                    this.renderCommunities();
-                    this.closeModal('createCommunityModal');
-                    this.showToast('Community created successfully!', 'success');
-                } catch (error) {
-                    console.error('Error creating community:', error);
-                    this.showToast('Error creating community', 'error');
-                }
+                // This would be handled in community.html
+                this.showToast('Redirecting to community creation...', 'info');
             }
 
-            openGroup(groupId) {
-                this.showToast(`Opening group ${groupId}`, 'info');
+            viewGroup(groupId) {
+                // Redirect to group page
+                window.location.href = `group.html?id=${groupId}`;
             }
 
-            openCommunity(communityId) {
-                this.showToast(`Opening community ${communityId}`, 'info');
+            viewCommunity(communityId) {
+                // Redirect to community page
+                window.location.href = `community.html?id=${communityId}`;
+            }
+
+            viewPost(postId) {
+                // Scroll to post or show post details
+                this.showToast(`Viewing post ${postId}`, 'info');
+                this.hideSearchResults();
             }
 
             // Additional Features
@@ -3053,6 +3228,7 @@
             }
 
             viewProfile(userId) {
+                // In a real app, this would show the user's profile
                 this.showToast(`Viewing profile ${userId}`, 'info');
                 this.hideSearchResults();
             }
@@ -3176,6 +3352,19 @@
                 }
 
                 this.hideProfileDropdown();
+
+                // Load specific data when pages are shown
+                if (pageId === 'searchPage') {
+                    // Reset search when opening search page
+                    document.getElementById('searchPageInput').value = '';
+                    document.getElementById('searchResultsFull').innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>Search for users, posts, groups and communities</h3>
+                            <p>Use the search bar to find content</p>
+                        </div>
+                    `;
+                }
             }
 
             showModal(modalId) {
@@ -3335,7 +3524,8 @@
                     tab.addEventListener('click', () => {
                         document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
                         tab.classList.add('active');
-                        // In a real app, this would load different content based on the tab
+                        this.currentSearchType = tab.dataset.type;
+                        this.renderSearchResultsFull();
                     });
                 });
 

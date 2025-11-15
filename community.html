@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Community - PrimeMar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff9800;
+            --secondary-color: #fdc500;
+            --accent-color: #ff3333;
+            --dark-bg: #111;
+            --light-bg: #fffde4;
+            --text-dark: #fff;
+            --text-light: #333;
+            --card-bg-dark: rgba(30, 30, 40, 0.95);
+            --card-bg-light: rgba(255,255,255,0.90);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 70%, var(--primary-color) 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, var(--light-bg) 60%, #f7b733 100%);
+            color: var(--text-light);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(0,0,0,0.9);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        body.light-mode .header {
+            background: rgba(255,255,255,0.9);
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .community-creation-container {
+            background: var(--card-bg-dark);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        body.light-mode .community-creation-container {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: var(--secondary-color);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+            font-size: 16px;
+        }
+
+        body.light-mode .form-label {
+            color: var(--primary-color);
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        body.light-mode .form-input,
+        body.light-mode .form-textarea,
+        body.light-mode .form-select {
+            border: 2px solid rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.05);
+            color: var(--text-light);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .cover-upload {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .cover-preview {
+            width: 100%;
+            height: 200px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #222;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            border: 2px dashed rgba(255,255,255,0.3);
+        }
+
+        .cover-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .upload-text {
+            color: var(--secondary-color);
+            font-size: 14px;
+        }
+
+        .category-section {
+            margin: 30px 0;
+        }
+
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .category-option {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode .category-option {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .category-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(255,152,0,0.2);
+        }
+
+        .category-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .category-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .privacy-settings {
+            margin: 30px 0;
+        }
+
+        .privacy-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .privacy-option {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode .privacy-option {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .privacy-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(255,152,0,0.2);
+        }
+
+        .privacy-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .privacy-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .privacy-description {
+            font-size: 12px;
+            color: var(--secondary-color);
+        }
+
+        .rules-section {
+            margin: 30px 0;
+        }
+
+        .rules-list {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        body.light-mode .rules-list {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+
+        .rule-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 5px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        body.light-mode .rule-input {
+            border: 1px solid rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.05);
+            color: var(--text-light);
+        }
+
+        .add-rule-btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            color: var(--secondary-color);
+            margin-top: 10px;
+        }
+
+        body.light-mode .add-rule-btn {
+            background: rgba(0,0,0,0.1);
+            border: 2px dashed rgba(0,0,0,0.3);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            color: #222;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-upload {
+            display: none;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(200%);
+            transition: transform 0.3s;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: #4CAF50;
+        }
+
+        .toast.error {
+            background: var(--accent-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--secondary-color);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .remove-rule {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <button class="back-btn" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="logo">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); display: flex; align-items: center; justify-content: center; color: #222; font-weight: bold; font-size: 16px;">PM</div>
+            <span>Create Community</span>
+        </div>
+        <div style="width: 40px;"></div> <!-- Spacer for alignment -->
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="community-creation-container">
+            <h1 class="page-title">Build Your Community</h1>
+            
+            <form id="communityForm">
+                <!-- Community Cover -->
+                <div class="cover-upload">
+                    <div class="cover-preview" onclick="document.getElementById('communityCover').click()">
+                        <i class="fas fa-camera"></i>
+                        <img id="coverPreview" style="display: none;">
+                    </div>
+                    <div class="upload-text">Tap to add community cover photo</div>
+                    <input type="file" id="communityCover" class="file-upload" accept="image/*">
+                </div>
+
+                <!-- Community Name -->
+                <div class="form-group">
+                    <label class="form-label">Community Name</label>
+                    <input type="text" class="form-input" id="communityName" placeholder="Enter community name" required maxlength="100">
+                </div>
+
+                <!-- Community Description -->
+                <div class="form-group">
+                    <label class="form-label">Community Description</label>
+                    <textarea class="form-textarea" id="communityDescription" placeholder="Describe your community's purpose and goals..." maxlength="1000"></textarea>
+                </div>
+
+                <!-- Category Selection -->
+                <div class="category-section">
+                    <h3 class="section-title">Category</h3>
+                    <div class="category-grid" id="categoryGrid">
+                        <!-- Categories will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Privacy Settings -->
+                <div class="privacy-settings">
+                    <h3 class="section-title">Privacy Settings</h3>
+                    <div class="privacy-options">
+                        <div class="privacy-option selected" data-type="public">
+                            <div class="privacy-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="privacy-title">Public</div>
+                            <div class="privacy-description">Anyone can join and see content</div>
+                        </div>
+                        <div class="privacy-option" data-type="private">
+                            <div class="privacy-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="privacy-title">Private</div>
+                            <div class="privacy-description">Membership requires approval</div>
+                        </div>
+                        <div class="privacy-option" data-type="restricted">
+                            <div class="privacy-icon">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="privacy-title">Restricted</div>
+                            <div class="privacy-description">Anyone can view, members can post</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Community Rules -->
+                <div class="rules-section">
+                    <h3 class="section-title">Community Rules</h3>
+                    <div class="rules-list" id="rulesList">
+                        <div class="rule-item">
+                            <input type="text" class="rule-input" placeholder="Be respectful to all members" maxlength="200">
+                            <button type="button" class="remove-rule" onclick="removeRule(this)" style="display: none;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="add-rule-btn" onclick="addRule()">
+                        <i class="fas fa-plus"></i> Add Rule
+                    </div>
+                </div>
+
+                <!-- Additional Settings -->
+                <div class="form-group">
+                    <label class="form-label">Community Settings</label>
+                    <div style="display: grid; gap: 15px; margin-top: 10px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="allowImages" checked style="transform: scale(1.2);">
+                            <span>Allow image posts</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="allowVideos" checked style="transform: scale(1.2);">
+                            <span>Allow video posts</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="allowLinks" checked style="transform: scale(1.2);">
+                            <span>Allow link sharing</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="moderatePosts" style="transform: scale(1.2);">
+                            <span>Moderate all posts</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="sendNotifications" checked style="transform: scale(1.2);">
+                            <span>Send community notifications</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Create Button -->
+                <button type="submit" class="btn" id="createCommunityBtn">
+                    <i class="fas fa-globe"></i> Create Community
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        class CommunityCreator {
+            constructor() {
+                this.selectedCategory = null;
+                this.selectedPrivacy = 'public';
+                this.communityCover = null;
+                this.categories = [
+                    { id: 'tech', name: 'Technology', icon: 'fas fa-laptop-code' },
+                    { id: 'gaming', name: 'Gaming', icon: 'fas fa-gamepad' },
+                    { id: 'art', name: 'Art & Design', icon: 'fas fa-palette' },
+                    { id: 'music', name: 'Music', icon: 'fas fa-music' },
+                    { id: 'sports', name: 'Sports', icon: 'fas fa-basketball-ball' },
+                    { id: 'food', name: 'Food & Cooking', icon: 'fas fa-utensils' },
+                    { id: 'travel', name: 'Travel', icon: 'fas fa-plane' },
+                    { id: 'education', name: 'Education', icon: 'fas fa-graduation-cap' },
+                    { id: 'health', name: 'Health & Fitness', icon: 'fas fa-heartbeat' },
+                    { id: 'business', name: 'Business', icon: 'fas fa-briefcase' },
+                    { id: 'entertainment', name: 'Entertainment', icon: 'fas fa-film' },
+                    { id: 'science', name: 'Science', icon: 'fas fa-flask' }
+                ];
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.renderCategories();
+            }
+
+            setupEventListeners() {
+                // Form submission
+                document.getElementById('communityForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.createCommunity();
+                });
+
+                // Cover upload
+                document.getElementById('communityCover').addEventListener('change', (e) => {
+                    this.handleCoverUpload(e);
+                });
+
+                // Privacy options
+                document.querySelectorAll('.privacy-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        this.selectPrivacy(option.dataset.type);
+                    });
+                });
+            }
+
+            renderCategories() {
+                const container = document.getElementById('categoryGrid');
+                container.innerHTML = this.categories.map(category => `
+                    <div class="category-option" data-category="${category.id}">
+                        <div class="category-icon">
+                            <i class="${category.icon}"></i>
+                        </div>
+                        <div class="category-name">${category.name}</div>
+                    </div>
+                `).join('');
+
+                // Add click listeners to categories
+                container.querySelectorAll('.category-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        this.selectCategory(option.dataset.category);
+                    });
+                });
+            }
+
+            selectCategory(categoryId) {
+                this.selectedCategory = categoryId;
+                document.querySelectorAll('.category-option').forEach(option => {
+                    option.classList.toggle('selected', option.dataset.category === categoryId);
+                });
+            }
+
+            selectPrivacy(type) {
+                this.selectedPrivacy = type;
+                document.querySelectorAll('.privacy-option').forEach(option => {
+                    option.classList.toggle('selected', option.dataset.type === type);
+                });
+            }
+
+            handleCoverUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    this.communityCover = file;
+                    const preview = document.getElementById('coverPreview');
+                    preview.src = URL.createObjectURL(file);
+                    preview.style.display = 'block';
+                    document.querySelector('.cover-preview i').style.display = 'none';
+                }
+            }
+
+            getRules() {
+                const rules = [];
+                document.querySelectorAll('.rule-input').forEach(input => {
+                    if (input.value.trim()) {
+                        rules.push(input.value.trim());
+                    }
+                });
+                return rules;
+            }
+
+            async createCommunity() {
+                const communityName = document.getElementById('communityName').value.trim();
+                const communityDescription = document.getElementById('communityDescription').value.trim();
+
+                if (!communityName) {
+                    this.showToast('Please enter a community name', 'error');
+                    return;
+                }
+
+                if (!this.selectedCategory) {
+                    this.showToast('Please select a category', 'error');
+                    return;
+                }
+
+                const rules = this.getRules();
+                if (rules.length === 0) {
+                    this.showToast('Please add at least one community rule', 'error');
+                    return;
+                }
+
+                const communityData = {
+                    name: communityName,
+                    description: communityDescription,
+                    category: this.selectedCategory,
+                    privacy: this.selectedPrivacy,
+                    rules: rules,
+                    settings: {
+                        allowImages: document.getElementById('allowImages').checked,
+                        allowVideos: document.getElementById('allowVideos').checked,
+                        allowLinks: document.getElementById('allowLinks').checked,
+                        moderatePosts: document.getElementById('moderatePosts').checked,
+                        sendNotifications: document.getElementById('sendNotifications').checked
+                    },
+                    cover: this.communityCover
+                };
+
+                try {
+                    // Show loading state
+                    const btn = document.getElementById('createCommunityBtn');
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Community...';
+
+                    // In a real app, this would send to your backend
+                    await this.saveCommunity(communityData);
+
+                    this.showToast('Community created successfully!', 'success');
+                    
+                    // Redirect to community page after success
+                    setTimeout(() => {
+                        window.location.href = 'index.html?page=communities';
+                    }, 1500);
+
+                } catch (error) {
+                    console.error('Error creating community:', error);
+                    this.showToast('Error creating community', 'error');
+                    
+                    // Reset button
+                    const btn = document.getElementById('createCommunityBtn');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-globe"></i> Create Community';
+                }
+            }
+
+            async saveCommunity(communityData) {
+                // Simulate API call
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        console.log('Community created:', communityData);
+                        resolve({ success: true, communityId: Date.now() });
+                    }, 2000);
+                });
+            }
+
+            showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.getElementById('toastContainer').appendChild(toast);
+                
+                setTimeout(() => toast.classList.add('show'), 10);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        function addRule() {
+            const rulesList = document.getElementById('rulesList');
+            const ruleItem = document.createElement('div');
+            ruleItem.className = 'rule-item';
+            ruleItem.innerHTML = `
+                <input type="text" class="rule-input" placeholder="Add a community rule" maxlength="200">
+                <button type="button" class="remove-rule" onclick="removeRule(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            rulesList.appendChild(ruleItem);
+
+            // Show remove buttons when there are multiple rules
+            document.querySelectorAll('.remove-rule').forEach(btn => {
+                btn.style.display = 'block';
+            });
+        }
+
+        function removeRule(button) {
+            const ruleItem = button.closest('.rule-item');
+            ruleItem.remove();
+
+            // Hide remove button if only one rule remains
+            const rules = document.querySelectorAll('.rule-item');
+            if (rules.length === 1) {
+                rules[0].querySelector('.remove-rule').style.display = 'none';
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        // Initialize the community creator
+        document.addEventListener('DOMContentLoaded', () => {
+            window.communityCreator = new CommunityCreator();
+        });
+    </script>
+</body>
+</html>

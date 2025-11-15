@@ -191,11 +191,27 @@
         }
 
         .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-size: 24px;
             font-weight: bold;
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        .logo-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #222;
+            font-weight: bold;
+            font-size: 16px;
         }
 
         .search-container {
@@ -463,6 +479,30 @@
             cursor: not-allowed;
         }
 
+        /* Media Preview */
+        .media-preview {
+            margin-top: 15px;
+            position: relative;
+        }
+
+        .media-preview img, .media-preview video {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .remove-media {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+
         /* Posts */
         .post {
             background: var(--card-bg-dark);
@@ -517,20 +557,17 @@
             font-size: 16px;
         }
 
-        .post-image {
+        .post-media {
             width: 100%;
             border-radius: 10px;
             margin-bottom: 15px;
-            background: rgba(255,255,255,0.1);
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--secondary-color);
+            overflow: hidden;
         }
 
-        body.light-mode .post-image {
-            background: rgba(0,0,0,0.1);
+        .post-media img, .post-media video {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
         }
 
         .post-actions {
@@ -567,6 +604,77 @@
 
         .post-action.liked {
             color: var(--accent-color);
+        }
+
+        /* Comments Section */
+        .comments-section {
+            margin-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+
+        .comment {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .comment-content {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 15px;
+            border-radius: 15px;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .comment-user {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .comment-time {
+            color: var(--secondary-color);
+            font-size: 12px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .comment-action {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .add-comment {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .comment-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        body.light-mode .comment-input {
+            border: 1px solid rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.05);
+            color: var(--text-light);
         }
 
         /* Messages */
@@ -679,6 +787,7 @@
             background: rgba(255,255,255,0.1);
             padding: 12px 16px;
             border-radius: 15px;
+            max-width: 100%;
         }
 
         body.light-mode .message-content {
@@ -688,6 +797,17 @@
         .message.own .message-content {
             background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
             color: #222;
+        }
+
+        .message-media {
+            max-width: 200px;
+            margin-top: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .message-media img, .message-media video {
+            width: 100%;
         }
 
         .chat-input-container {
@@ -729,6 +849,22 @@
             cursor: pointer;
         }
 
+        .chat-actions {
+            display: flex;
+            gap: 10px;
+            margin-left: 10px;
+        }
+
+        .chat-action-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+        }
+
         /* Profile Page */
         .profile-header {
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
@@ -753,6 +889,14 @@
             font-weight: bold;
             color: #222;
             font-size: 24px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         body.light-mode .profile-avatar {
@@ -829,7 +973,7 @@
             margin: 20px 0;
         }
 
-        .follow-btn, .message-btn {
+        .follow-btn, .message-btn, .call-btn {
             flex: 1;
             padding: 12px;
             border: none;
@@ -843,16 +987,44 @@
             color: #222;
         }
 
-        .message-btn {
+        .follow-btn.following {
             background: rgba(255,255,255,0.1);
             color: white;
             border: 2px solid rgba(255,255,255,0.2);
         }
 
-        body.light-mode .message-btn {
+        body.light-mode .follow-btn.following {
             background: rgba(0,0,0,0.1);
             color: var(--text-light);
             border: 2px solid rgba(0,0,0,0.2);
+        }
+
+        .message-btn, .call-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        body.light-mode .message-btn,
+        body.light-mode .call-btn {
+            background: rgba(0,0,0,0.1);
+            color: var(--text-light);
+            border: 2px solid rgba(0,0,0,0.2);
+        }
+
+        .edit-profile-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         /* Notifications */
@@ -982,6 +1154,7 @@
             max-height: 300px;
             overflow-y: auto;
             border: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
         }
 
         body.light-mode .search-results {
@@ -1014,6 +1187,146 @@
             background: rgba(0,0,0,0.05);
         }
 
+        /* Search Page */
+        .search-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .search-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .search-tab.active {
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .search-page-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        body.light-mode .search-page-input {
+            border: 2px solid rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.05);
+            color: var(--text-light);
+        }
+
+        /* Groups and Communities */
+        .groups-container, .communities-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .group-card, .community-card {
+            background: var(--card-bg-dark);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        body.light-mode .group-card,
+        body.light-mode .community-card {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .group-avatar, .community-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #222;
+        }
+
+        .create-group-btn, .create-community-btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            color: var(--secondary-color);
+        }
+
+        body.light-mode .create-group-btn,
+        body.light-mode .create-community-btn {
+            background: rgba(0,0,0,0.1);
+            border: 2px dashed rgba(0,0,0,0.3);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: var(--card-bg-dark);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        body.light-mode .modal-content {
+            background: var(--card-bg-light);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
         /* Loading States */
         .loading {
             display: flex;
@@ -1033,6 +1346,99 @@
             font-size: 3rem;
             margin-bottom: 16px;
             opacity: 0.5;
+        }
+
+        /* Share Modal */
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .share-option {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        body.light-mode .share-option {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .share-option i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Call Interface */
+        .call-interface {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .call-interface.active {
+            display: flex;
+        }
+
+        .call-video {
+            flex: 1;
+            background: #333;
+            position: relative;
+        }
+
+        .call-controls {
+            padding: 20px;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .call-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .call-end {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .call-mute, .call-video-toggle {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        /* File Upload */
+        .file-upload {
+            display: none;
+        }
+
+        .upload-preview {
+            margin-top: 15px;
+        }
+
+        .upload-preview img, .upload-preview video {
+            max-width: 100%;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -1121,7 +1527,8 @@
         <!-- Header -->
         <header class="header">
             <div class="logo">
-                <i class="fas fa-fire"></i> PrimeMar
+                <div class="logo-img">PM</div>
+                <span>PrimeMar</span>
             </div>
             
             <div class="search-container">
@@ -1141,6 +1548,14 @@
                         <button class="dropdown-item" onclick="primeMarApp.showPage('profilePage')">
                             <i class="fas fa-user"></i>
                             <span>Profile</span>
+                        </button>
+                        <button class="dropdown-item" onclick="primeMarApp.showGroups()">
+                            <i class="fas fa-users"></i>
+                            <span>Groups</span>
+                        </button>
+                        <button class="dropdown-item" onclick="primeMarApp.showCommunities()">
+                            <i class="fas fa-globe"></i>
+                            <span>Communities</span>
                         </button>
                         <button class="dropdown-item" id="themeToggleBtn">
                             <i class="fas fa-moon"></i>
@@ -1173,10 +1588,14 @@
                         <div class="avatar" id="userAvatar">U</div>
                         <textarea class="composer-textarea" placeholder="What's happening?" id="postTextarea" maxlength="280"></textarea>
                     </div>
+                    <div class="media-preview" id="mediaPreview"></div>
                     <div class="composer-actions">
                         <div class="action-buttons">
-                            <button class="action-btn" onclick="primeMarApp.addImage()">
+                            <button class="action-btn" onclick="document.getElementById('imageUpload').click()">
                                 <i class="fas fa-image"></i>
+                            </button>
+                            <button class="action-btn" onclick="document.getElementById('videoUpload').click()">
+                                <i class="fas fa-video"></i>
                             </button>
                             <button class="action-btn" onclick="primeMarApp.addEmoji()">
                                 <i class="fas fa-smile"></i>
@@ -1187,6 +1606,8 @@
                         </div>
                         <button class="post-btn" id="postBtn" disabled>Post</button>
                     </div>
+                    <input type="file" id="imageUpload" class="file-upload" accept="image/*">
+                    <input type="file" id="videoUpload" class="file-upload" accept="video/*">
                 </div>
 
                 <!-- Feed -->
@@ -1199,6 +1620,13 @@
 
             <!-- Search Page -->
             <section id="searchPage" class="page">
+                <input type="text" class="search-page-input" id="searchPageInput" placeholder="Search users, posts, groups...">
+                <div class="search-tabs">
+                    <div class="search-tab active" data-type="users">Users</div>
+                    <div class="search-tab" data-type="posts">Posts</div>
+                    <div class="search-tab" data-type="groups">Groups</div>
+                    <div class="search-tab" data-type="communities">Communities</div>
+                </div>
                 <div class="search-results-full" id="searchResultsFull">
                     <div class="empty-state">
                         <i class="fas fa-search"></i>
@@ -1225,10 +1653,26 @@
                         </div>
                         <div class="chat-input-container">
                             <input type="text" class="chat-input" id="chatInput" placeholder="Type a message...">
+                            <div class="chat-actions">
+                                <button class="chat-action-btn" onclick="document.getElementById('chatImageUpload').click()">
+                                    <i class="fas fa-image"></i>
+                                </button>
+                                <button class="chat-action-btn" onclick="document.getElementById('chatFileUpload').click()">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                                <button class="chat-action-btn" onclick="primeMarApp.startCall()">
+                                    <i class="fas fa-phone"></i>
+                                </button>
+                                <button class="chat-action-btn" onclick="primeMarApp.startVideoCall()">
+                                    <i class="fas fa-video"></i>
+                                </button>
+                            </div>
                             <button class="send-btn" id="sendBtn">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
+                        <input type="file" id="chatImageUpload" class="file-upload" accept="image/*">
+                        <input type="file" id="chatFileUpload" class="file-upload" accept="*/*">
                     </div>
                 </div>
             </section>
@@ -1250,7 +1694,12 @@
             <!-- Profile Page -->
             <section id="profilePage" class="page">
                 <div class="profile-header">
-                    <div class="profile-avatar" id="profileAvatar">U</div>
+                    <div class="profile-avatar" id="profileAvatar" onclick="primeMarApp.editAvatar()">
+                        <span id="profileAvatarText">U</span>
+                    </div>
+                    <button class="edit-profile-btn" onclick="primeMarApp.editProfile()">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
                 </div>
                 <div class="profile-info">
                     <h1 class="profile-name" id="profileName">Loading...</h1>
@@ -1277,12 +1726,47 @@
                         <button class="message-btn" onclick="primeMarApp.startChat()">
                             <i class="fas fa-envelope"></i> Message
                         </button>
+                        <button class="call-btn" onclick="primeMarApp.startCallFromProfile()">
+                            <i class="fas fa-phone"></i> Call
+                        </button>
                     </div>
                 </div>
                 
                 <div id="profilePostsContainer">
                     <div class="loading">
                         <i class="fas fa-spinner fa-spin"></i> Loading user posts...
+                    </div>
+                </div>
+            </section>
+
+            <!-- Groups Page -->
+            <section id="groupsPage" class="page">
+                <div class="chat-header">
+                    <h3><i class="fas fa-users"></i> Groups</h3>
+                </div>
+                <div class="create-group-btn" onclick="primeMarApp.createGroup()">
+                    <i class="fas fa-plus"></i>
+                    <div>Create New Group</div>
+                </div>
+                <div class="groups-container" id="groupsContainer">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading groups...
+                    </div>
+                </div>
+            </section>
+
+            <!-- Communities Page -->
+            <section id="communitiesPage" class="page">
+                <div class="chat-header">
+                    <h3><i class="fas fa-globe"></i> Communities</h3>
+                </div>
+                <div class="create-community-btn" onclick="primeMarApp.createCommunity()">
+                    <i class="fas fa-plus"></i>
+                    <div>Create New Community</div>
+                </div>
+                <div class="communities-container" id="communitiesContainer">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading communities...
                     </div>
                 </div>
             </section>
@@ -1313,6 +1797,138 @@
         </nav>
     </div>
 
+    <!-- Modals -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Profile</h2>
+                <button class="close-modal" onclick="primeMarApp.closeModal('editProfileModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-input" id="editProfileName" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-input" id="editProfileUsername" placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Bio</label>
+                <textarea class="form-input" id="editProfileBio" placeholder="Tell us about yourself" rows="4"></textarea>
+            </div>
+            <button class="btn" onclick="primeMarApp.saveProfile()">Save Changes</button>
+        </div>
+    </div>
+
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Share Post</h2>
+                <button class="close-modal" onclick="primeMarApp.closeModal('shareModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="share-options">
+                <div class="share-option" onclick="primeMarApp.shareToFacebook()">
+                    <i class="fab fa-facebook"></i>
+                    <span>Facebook</span>
+                </div>
+                <div class="share-option" onclick="primeMarApp.shareToTwitter()">
+                    <i class="fab fa-twitter"></i>
+                    <span>Twitter</span>
+                </div>
+                <div class="share-option" onclick="primeMarApp.shareToWhatsApp()">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </div>
+                <div class="share-option" onclick="primeMarApp.shareToLinkedIn()">
+                    <i class="fab fa-linkedin"></i>
+                    <span>LinkedIn</span>
+                </div>
+                <div class="share-option" onclick="primeMarApp.copyLink()">
+                    <i class="fas fa-link"></i>
+                    <span>Copy Link</span>
+                </div>
+                <div class="share-option" onclick="primeMarApp.shareToEmail()">
+                    <i class="fas fa-envelope"></i>
+                    <span>Email</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="createGroupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Group</h2>
+                <button class="close-modal" onclick="primeMarApp.closeModal('createGroupModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Group Name</label>
+                <input type="text" class="form-input" id="groupName" placeholder="Enter group name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Group Description</label>
+                <textarea class="form-input" id="groupDescription" placeholder="Enter group description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Add Members</label>
+                <input type="text" class="form-input" id="groupMembers" placeholder="Search users to add">
+                <div id="groupMembersList" style="margin-top: 10px;"></div>
+            </div>
+            <button class="btn" onclick="primeMarApp.saveGroup()">Create Group</button>
+        </div>
+    </div>
+
+    <div class="modal" id="createCommunityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Community</h2>
+                <button class="close-modal" onclick="primeMarApp.closeModal('createCommunityModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Community Name</label>
+                <input type="text" class="form-input" id="communityName" placeholder="Enter community name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Community Description</label>
+                <textarea class="form-input" id="communityDescription" placeholder="Enter community description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Community Type</label>
+                <select class="form-input" id="communityType">
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
+            <button class="btn" onclick="primeMarApp.saveCommunity()">Create Community</button>
+        </div>
+    </div>
+
+    <!-- Call Interface -->
+    <div class="call-interface" id="callInterface">
+        <div class="call-video" id="callVideo">
+            <!-- Video streams will be displayed here -->
+        </div>
+        <div class="call-controls">
+            <button class="call-btn call-mute" id="callMuteBtn">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="call-btn call-video-toggle" id="callVideoToggleBtn">
+                <i class="fas fa-video"></i>
+            </button>
+            <button class="call-btn call-end" id="callEndBtn">
+                <i class="fas fa-phone"></i>
+            </button>
+        </div>
+    </div>
+
     <script>
         // Complete Real Social Media App with Supabase
         class PrimeMar {
@@ -1329,6 +1945,10 @@
                 this.activeChat = null;
                 this.searchResults = [];
                 this.isDarkMode = true;
+                this.currentMedia = null;
+                this.activeCall = null;
+                this.groups = [];
+                this.communities = [];
                 
                 this.init();
             }
@@ -1471,7 +2091,9 @@
                     this.loadStories(),
                     this.loadFeed(),
                     this.loadConversations(),
-                    this.loadNotifications()
+                    this.loadNotifications(),
+                    this.loadGroups(),
+                    this.loadCommunities()
                 ]);
             }
 
@@ -1535,7 +2157,14 @@
                                 user_id
                             ),
                             comments (
-                                id
+                                id,
+                                content,
+                                user_id,
+                                created_at,
+                                profiles:user_id (
+                                    name,
+                                    username
+                                )
                             )
                         `)
                         .order('created_at', { ascending: false })
@@ -1583,12 +2212,20 @@
                             </div>
                             <div class="post-content">${post.content}</div>
                             ${post.image_url ? `
-                                <div class="post-image">
-                                    <i class="fas fa-image"></i> Image attached
+                                <div class="post-media">
+                                    <img src="${post.image_url}" alt="Post image">
+                                </div>
+                            ` : ''}
+                            ${post.video_url ? `
+                                <div class="post-media">
+                                    <video controls>
+                                        <source src="${post.video_url}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
                                 </div>
                             ` : ''}
                             <div class="post-actions">
-                                <button class="post-action" onclick="primeMarApp.commentOnPost('${post.id}')">
+                                <button class="post-action" onclick="primeMarApp.toggleComments('${post.id}')">
                                     <i class="fas fa-comment"></i>
                                     <span>${commentCount}</span>
                                 </button>
@@ -1601,9 +2238,41 @@
                                     <span>Share</span>
                                 </button>
                             </div>
+                            <div class="comments-section" id="comments-${post.id}" style="display: none;">
+                                ${this.renderComments(post.comments || [])}
+                                <div class="add-comment">
+                                    <input type="text" class="comment-input" id="comment-input-${post.id}" placeholder="Add a comment...">
+                                    <button class="post-btn" onclick="primeMarApp.addComment('${post.id}')">Post</button>
+                                </div>
+                            </div>
                         </div>
                     `;
                 }).join('');
+            }
+
+            renderComments(comments) {
+                if (comments.length === 0) {
+                    return '<p style="text-align: center; color: var(--secondary-color);">No comments yet</p>';
+                }
+
+                return comments.map(comment => `
+                    <div class="comment">
+                        <div class="avatar">${comment.profiles.name.charAt(0)}</div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <div class="comment-user">${comment.profiles.name}</div>
+                                <div class="comment-time">${this.formatTime(comment.created_at)}</div>
+                            </div>
+                            <div class="comment-text">${comment.content}</div>
+                            <div class="comment-actions">
+                                <button class="comment-action" onclick="primeMarApp.replyToComment('${comment.id}')">Reply</button>
+                                ${comment.user_id === this.currentUser.id ? `
+                                    <button class="comment-action" onclick="primeMarApp.deleteComment('${comment.id}')">Delete</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
             }
 
             async loadConversations() {
@@ -1806,16 +2475,26 @@
 
             // Post Features
             async createPost(content) {
-                if (!content.trim()) return;
+                if (!content.trim() && !this.currentMedia) return;
 
                 try {
+                    const postData = {
+                        content: content,
+                        author_id: this.currentUser.id,
+                        created_at: new Date().toISOString()
+                    };
+
+                    if (this.currentMedia) {
+                        if (this.currentMedia.type.startsWith('image')) {
+                            postData.image_url = URL.createObjectURL(this.currentMedia);
+                        } else if (this.currentMedia.type.startsWith('video')) {
+                            postData.video_url = URL.createObjectURL(this.currentMedia);
+                        }
+                    }
+
                     const { data: post, error } = await this.supabase
                         .from('posts')
-                        .insert([{
-                            content: content,
-                            author_id: this.currentUser.id,
-                            created_at: new Date().toISOString()
-                        }])
+                        .insert([postData])
                         .select(`
                             *,
                             profiles:author_id (
@@ -1841,6 +2520,8 @@
                     // Clear composer
                     document.getElementById('postTextarea').value = '';
                     document.getElementById('postBtn').disabled = true;
+                    this.currentMedia = null;
+                    document.getElementById('mediaPreview').innerHTML = '';
                 } catch (error) {
                     console.error('Error creating post:', error);
                     this.showToast('Error creating post', 'error');
@@ -1890,46 +2571,112 @@
                 }
             }
 
-            async commentOnPost(postId) {
-                const comment = prompt('Enter your comment:');
-                if (comment) {
-                    try {
-                        const { error } = await this.supabase
-                            .from('comments')
-                            .insert([{
-                                post_id: postId,
-                                user_id: this.currentUser.id,
-                                content: comment,
-                                created_at: new Date().toISOString()
-                            }]);
-
-                        if (error) throw error;
-
-                        // Create notification
-                        const post = this.posts.find(p => p.id === postId);
-                        if (post && post.author_id !== this.currentUser.id) {
-                            await this.supabase
-                                .from('notifications')
-                                .insert([{
-                                    from_user_id: this.currentUser.id,
-                                    to_user_id: post.author_id,
-                                    type: 'comment',
-                                    post_id: postId,
-                                    created_at: new Date().toISOString()
-                                }]);
-                        }
-
-                        await this.loadFeed();
-                        this.showToast('Comment added!', 'success');
-                    } catch (error) {
-                        console.error('Error adding comment:', error);
-                        this.showToast('Error adding comment', 'error');
-                    }
+            toggleComments(postId) {
+                const commentsSection = document.getElementById(`comments-${postId}`);
+                if (commentsSection.style.display === 'none') {
+                    commentsSection.style.display = 'block';
+                } else {
+                    commentsSection.style.display = 'none';
                 }
             }
 
+            async addComment(postId) {
+                const input = document.getElementById(`comment-input-${postId}`);
+                const content = input.value.trim();
+                
+                if (!content) return;
+
+                try {
+                    const { error } = await this.supabase
+                        .from('comments')
+                        .insert([{
+                            post_id: postId,
+                            user_id: this.currentUser.id,
+                            content: content,
+                            created_at: new Date().toISOString()
+                        }]);
+
+                    if (error) throw error;
+
+                    // Create notification
+                    const post = this.posts.find(p => p.id === postId);
+                    if (post && post.author_id !== this.currentUser.id) {
+                        await this.supabase
+                            .from('notifications')
+                            .insert([{
+                                from_user_id: this.currentUser.id,
+                                to_user_id: post.author_id,
+                                type: 'comment',
+                                post_id: postId,
+                                created_at: new Date().toISOString()
+                            }]);
+                    }
+
+                    await this.loadFeed();
+                    input.value = '';
+                    this.showToast('Comment added!', 'success');
+                } catch (error) {
+                    console.error('Error adding comment:', error);
+                    this.showToast('Error adding comment', 'error');
+                }
+            }
+
+            async deleteComment(commentId) {
+                try {
+                    const { error } = await this.supabase
+                        .from('comments')
+                        .delete()
+                        .eq('id', commentId);
+
+                    if (error) throw error;
+
+                    await this.loadFeed();
+                    this.showToast('Comment deleted', 'info');
+                } catch (error) {
+                    console.error('Error deleting comment:', error);
+                    this.showToast('Error deleting comment', 'error');
+                }
+            }
+
+            replyToComment(commentId) {
+                this.showToast('Reply feature coming soon!', 'info');
+            }
+
             sharePost(postId) {
-                this.showToast('Share feature coming soon!', 'info');
+                this.showModal('shareModal');
+                // Store the post ID for sharing
+                this.currentSharePostId = postId;
+            }
+
+            shareToFacebook() {
+                this.showToast('Sharing to Facebook...', 'info');
+                // Implementation would use Facebook SDK
+            }
+
+            shareToTwitter() {
+                this.showToast('Sharing to Twitter...', 'info');
+                // Implementation would use Twitter API
+            }
+
+            shareToWhatsApp() {
+                this.showToast('Sharing to WhatsApp...', 'info');
+                // Implementation would use WhatsApp API
+            }
+
+            shareToLinkedIn() {
+                this.showToast('Sharing to LinkedIn...', 'info');
+                // Implementation would use LinkedIn API
+            }
+
+            copyLink() {
+                navigator.clipboard.writeText(`${window.location.origin}/post/${this.currentSharePostId}`);
+                this.showToast('Link copied to clipboard!', 'success');
+                this.closeModal('shareModal');
+            }
+
+            shareToEmail() {
+                this.showToast('Opening email client...', 'info');
+                // Implementation would use mailto: link
             }
 
             // Message Features
@@ -1973,7 +2720,19 @@
                 container.innerHTML = messages.map(msg => `
                     <div class="message ${msg.sender_id === this.currentUser.id ? 'own' : ''}">
                         <div class="avatar">${msg.profiles.name.charAt(0)}</div>
-                        <div class="message-content">${msg.content}</div>
+                        <div class="message-content">
+                            <div>${msg.content}</div>
+                            ${msg.media_url ? `
+                                <div class="message-media">
+                                    ${msg.media_type.startsWith('image') ? 
+                                        `<img src="${msg.media_url}" alt="Shared image">` : 
+                                        msg.media_type.startsWith('video') ?
+                                        `<video controls><source src="${msg.media_url}" type="video/mp4"></video>` :
+                                        `<a href="${msg.media_url}" target="_blank">Download file</a>`
+                                    }
+                                </div>
+                            ` : ''}
+                        </div>
                     </div>
                 `).join('');
                 container.scrollTop = container.scrollHeight;
@@ -1983,17 +2742,24 @@
                 const input = document.getElementById('chatInput');
                 const content = input.value.trim();
                 
-                if (!content || !this.activeChat) return;
+                if (!content && !this.currentMedia) return;
 
                 try {
+                    const messageData = {
+                        conversation_id: this.activeChat.id,
+                        sender_id: this.currentUser.id,
+                        content: content,
+                        created_at: new Date().toISOString()
+                    };
+
+                    if (this.currentMedia) {
+                        messageData.media_url = URL.createObjectURL(this.currentMedia);
+                        messageData.media_type = this.currentMedia.type;
+                    }
+
                     const { error } = await this.supabase
                         .from('messages')
-                        .insert([{
-                            conversation_id: this.activeChat.id,
-                            sender_id: this.currentUser.id,
-                            content: content,
-                            created_at: new Date().toISOString()
-                        }]);
+                        .insert([messageData]);
 
                     if (error) throw error;
 
@@ -2001,7 +2767,7 @@
                     await this.supabase
                         .from('conversations')
                         .update({
-                            last_message: content,
+                            last_message: content || 'Media shared',
                             updated_at: new Date().toISOString()
                         })
                         .eq('id', this.activeChat.id);
@@ -2009,8 +2775,9 @@
                     // Reload messages
                     await this.loadChatMessages(this.activeChat.id);
                     
-                    // Clear input
+                    // Clear input and media
                     input.value = '';
+                    this.currentMedia = null;
 
                 } catch (error) {
                     console.error('Error sending message:', error);
@@ -2062,6 +2829,224 @@
                 document.getElementById('searchResults').classList.remove('active');
             }
 
+            // Profile Management
+            editProfile() {
+                this.showModal('editProfileModal');
+                document.getElementById('editProfileName').value = this.userProfile.name;
+                document.getElementById('editProfileUsername').value = this.userProfile.username;
+                document.getElementById('editProfileBio').value = this.userProfile.bio;
+            }
+
+            async saveProfile() {
+                const name = document.getElementById('editProfileName').value;
+                const username = document.getElementById('editProfileUsername').value;
+                const bio = document.getElementById('editProfileBio').value;
+
+                try {
+                    const { error } = await this.supabase
+                        .from('profiles')
+                        .update({
+                            name: name,
+                            username: username,
+                            bio: bio
+                        })
+                        .eq('id', this.currentUser.id);
+
+                    if (error) throw error;
+
+                    this.userProfile.name = name;
+                    this.userProfile.username = username;
+                    this.userProfile.bio = bio;
+                    this.updateProfileUI();
+                    this.closeModal('editProfileModal');
+                    this.showToast('Profile updated successfully!', 'success');
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                    this.showToast('Error updating profile', 'error');
+                }
+            }
+
+            editAvatar() {
+                document.getElementById('avatarUpload').click();
+            }
+
+            // Call Features
+            startCall() {
+                this.showToast('Starting audio call...', 'info');
+                // Implementation would use WebRTC
+            }
+
+            startVideoCall() {
+                this.showToast('Starting video call...', 'info');
+                // Implementation would use WebRTC
+            }
+
+            startCallFromProfile() {
+                this.startCall();
+            }
+
+            // Group and Community Features
+            showGroups() {
+                this.showPage('groupsPage');
+                this.hideProfileDropdown();
+            }
+
+            showCommunities() {
+                this.showPage('communitiesPage');
+                this.hideProfileDropdown();
+            }
+
+            async loadGroups() {
+                try {
+                    // In a real app, this would fetch groups from the database
+                    this.groups = [
+                        { id: 1, name: 'Tech Enthusiasts', members: 45 },
+                        { id: 2, name: 'Travel Buddies', members: 32 },
+                        { id: 3, name: 'Food Lovers', members: 28 }
+                    ];
+                    this.renderGroups();
+                } catch (error) {
+                    console.error('Error loading groups:', error);
+                    this.groups = [];
+                    this.renderGroups();
+                }
+            }
+
+            renderGroups() {
+                const container = document.getElementById('groupsContainer');
+                
+                if (this.groups.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <h3>No groups yet</h3>
+                            <p>Create your first group!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.groups.map(group => `
+                    <div class="group-card" onclick="primeMarApp.openGroup('${group.id}')">
+                        <div class="group-avatar">${group.name.charAt(0)}</div>
+                        <div class="group-name">${group.name}</div>
+                        <div class="group-members">${group.members} members</div>
+                    </div>
+                `).join('');
+            }
+
+            async loadCommunities() {
+                try {
+                    // In a real app, this would fetch communities from the database
+                    this.communities = [
+                        { id: 1, name: 'PrimeMar Developers', members: 120, type: 'public' },
+                        { id: 2, name: 'Digital Artists', members: 85, type: 'public' },
+                        { id: 3, name: 'Book Club', members: 42, type: 'private' }
+                    ];
+                    this.renderCommunities();
+                } catch (error) {
+                    console.error('Error loading communities:', error);
+                    this.communities = [];
+                    this.renderCommunities();
+                }
+            }
+
+            renderCommunities() {
+                const container = document.getElementById('communitiesContainer');
+                
+                if (this.communities.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-globe"></i>
+                            <h3>No communities yet</h3>
+                            <p>Create your first community!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.communities.map(community => `
+                    <div class="community-card" onclick="primeMarApp.openCommunity('${community.id}')">
+                        <div class="community-avatar">${community.name.charAt(0)}</div>
+                        <div class="community-name">${community.name}</div>
+                        <div class="community-members">${community.members} members</div>
+                        <div class="community-type">${community.type}</div>
+                    </div>
+                `).join('');
+            }
+
+            createGroup() {
+                this.showModal('createGroupModal');
+            }
+
+            createCommunity() {
+                this.showModal('createCommunityModal');
+            }
+
+            async saveGroup() {
+                const name = document.getElementById('groupName').value;
+                const description = document.getElementById('groupDescription').value;
+
+                if (!name) {
+                    this.showToast('Please enter a group name', 'error');
+                    return;
+                }
+
+                try {
+                    // In a real app, this would save to the database
+                    this.groups.push({
+                        id: Date.now(),
+                        name: name,
+                        description: description,
+                        members: 1
+                    });
+                    
+                    this.renderGroups();
+                    this.closeModal('createGroupModal');
+                    this.showToast('Group created successfully!', 'success');
+                } catch (error) {
+                    console.error('Error creating group:', error);
+                    this.showToast('Error creating group', 'error');
+                }
+            }
+
+            async saveCommunity() {
+                const name = document.getElementById('communityName').value;
+                const description = document.getElementById('communityDescription').value;
+                const type = document.getElementById('communityType').value;
+
+                if (!name) {
+                    this.showToast('Please enter a community name', 'error');
+                    return;
+                }
+
+                try {
+                    // In a real app, this would save to the database
+                    this.communities.push({
+                        id: Date.now(),
+                        name: name,
+                        description: description,
+                        type: type,
+                        members: 1
+                    });
+                    
+                    this.renderCommunities();
+                    this.closeModal('createCommunityModal');
+                    this.showToast('Community created successfully!', 'success');
+                } catch (error) {
+                    console.error('Error creating community:', error);
+                    this.showToast('Error creating community', 'error');
+                }
+            }
+
+            openGroup(groupId) {
+                this.showToast(`Opening group ${groupId}`, 'info');
+            }
+
+            openCommunity(communityId) {
+                this.showToast(`Opening community ${communityId}`, 'info');
+            }
+
             // Additional Features
             viewStory(userId) {
                 this.showToast(`Viewing ${userId}'s story`, 'info');
@@ -2073,7 +3058,7 @@
             }
 
             addImage() {
-                this.showToast('Image upload coming soon!', 'info');
+                document.getElementById('imageUpload').click();
             }
 
             addEmoji() {
@@ -2106,6 +3091,19 @@
                     container.innerHTML = userPosts.map(post => `
                         <div class="post">
                             <div class="post-content">${post.content}</div>
+                            ${post.image_url ? `
+                                <div class="post-media">
+                                    <img src="${post.image_url}" alt="Post image">
+                                </div>
+                            ` : ''}
+                            ${post.video_url ? `
+                                <div class="post-media">
+                                    <video controls>
+                                        <source src="${post.video_url}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            ` : ''}
                             <div class="post-time">${this.formatTime(post.created_at)}</div>
                         </div>
                     `).join('');
@@ -2148,7 +3146,7 @@
                 if (!this.userProfile) return;
 
                 document.getElementById('userAvatar').textContent = this.userProfile.name.charAt(0);
-                document.getElementById('profileAvatar').textContent = this.userProfile.name.charAt(0);
+                document.getElementById('profileAvatarText').textContent = this.userProfile.name.charAt(0);
                 document.getElementById('profileName').textContent = this.userProfile.name;
                 document.getElementById('profileHandle').textContent = `@${this.userProfile.username}`;
                 document.getElementById('profileBio').textContent = this.userProfile.bio;
@@ -2178,6 +3176,14 @@
                 }
 
                 this.hideProfileDropdown();
+            }
+
+            showModal(modalId) {
+                document.getElementById(modalId).classList.remove('hidden');
+            }
+
+            closeModal(modalId) {
+                document.getElementById(modalId).classList.add('hidden');
             }
 
             toggleProfileDropdown() {
@@ -2292,7 +3298,7 @@
                 const postBtn = document.getElementById('postBtn');
 
                 postTextarea.addEventListener('input', () => {
-                    const hasContent = postTextarea.value.trim().length > 0;
+                    const hasContent = postTextarea.value.trim().length > 0 || this.currentMedia;
                     postBtn.disabled = !hasContent;
                 });
 
@@ -2300,8 +3306,21 @@
                     this.createPost(postTextarea.value);
                 });
 
+                // Media upload for posts
+                document.getElementById('imageUpload').addEventListener('change', (e) => {
+                    this.handleMediaUpload(e, 'post');
+                });
+
+                document.getElementById('videoUpload').addEventListener('change', (e) => {
+                    this.handleMediaUpload(e, 'post');
+                });
+
                 // Search
                 document.getElementById('searchInput').addEventListener('input', (e) => {
+                    this.performSearch(e.target.value);
+                });
+
+                document.getElementById('searchPageInput').addEventListener('input', (e) => {
                     this.performSearch(e.target.value);
                 });
 
@@ -2309,6 +3328,15 @@
                     if (!e.target.closest('.search-container')) {
                         this.hideSearchResults();
                     }
+                });
+
+                // Search tabs
+                document.querySelectorAll('.search-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        // In a real app, this would load different content based on the tab
+                    });
                 });
 
                 // Messages
@@ -2321,6 +3349,61 @@
                         this.sendMessage();
                     }
                 });
+
+                // Media upload for chat
+                document.getElementById('chatImageUpload').addEventListener('change', (e) => {
+                    this.handleMediaUpload(e, 'chat');
+                });
+
+                document.getElementById('chatFileUpload').addEventListener('change', (e) => {
+                    this.handleMediaUpload(e, 'chat');
+                });
+
+                // Call controls
+                document.getElementById('callEndBtn').addEventListener('click', () => {
+                    document.getElementById('callInterface').classList.remove('active');
+                });
+            }
+
+            handleMediaUpload(event, type) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                this.currentMedia = file;
+                
+                if (type === 'post') {
+                    const preview = document.getElementById('mediaPreview');
+                    if (file.type.startsWith('image')) {
+                        preview.innerHTML = `
+                            <div style="position: relative;">
+                                <img src="${URL.createObjectURL(file)}" style="max-width: 100%; border-radius: 10px;">
+                                <button class="remove-media" onclick="primeMarApp.removeMedia()">×</button>
+                            </div>
+                        `;
+                    } else if (file.type.startsWith('video')) {
+                        preview.innerHTML = `
+                            <div style="position: relative;">
+                                <video controls style="max-width: 100%; border-radius: 10px;">
+                                    <source src="${URL.createObjectURL(file)}" type="${file.type}">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <button class="remove-media" onclick="primeMarApp.removeMedia()">×</button>
+                            </div>
+                        `;
+                    }
+                    
+                    // Enable post button if there's media
+                    document.getElementById('postBtn').disabled = false;
+                } else if (type === 'chat') {
+                    // For chat, we'll just send the media immediately
+                    this.sendMessage();
+                }
+            }
+
+            removeMedia() {
+                this.currentMedia = null;
+                document.getElementById('mediaPreview').innerHTML = '';
+                document.getElementById('postBtn').disabled = document.getElementById('postTextarea').value.trim().length === 0;
             }
         }
 

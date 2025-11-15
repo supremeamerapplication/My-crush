@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Group - PrimeMar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff9800;
+            --secondary-color: #fdc500;
+            --accent-color: #ff3333;
+            --dark-bg: #111;
+            --light-bg: #fffde4;
+            --text-dark: #fff;
+            --text-light: #333;
+            --card-bg-dark: rgba(30, 30, 40, 0.95);
+            --card-bg-light: rgba(255,255,255,0.90);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 70%, var(--primary-color) 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, var(--light-bg) 60%, #f7b733 100%);
+            color: var(--text-light);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(0,0,0,0.9);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        body.light-mode .header {
+            background: rgba(255,255,255,0.9);
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .group-creation-container {
+            background: var(--card-bg-dark);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        body.light-mode .group-creation-container {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: var(--secondary-color);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+            font-size: 16px;
+        }
+
+        body.light-mode .form-label {
+            color: var(--primary-color);
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        body.light-mode .form-input,
+        body.light-mode .form-textarea,
+        body.light-mode .form-select {
+            border: 2px solid rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.05);
+            color: var(--text-light);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .avatar-upload {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #222;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .upload-text {
+            color: var(--secondary-color);
+            font-size: 14px;
+        }
+
+        .members-section {
+            margin: 30px 0;
+        }
+
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
+        .search-members {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+        }
+
+        body.light-mode .search-input {
+            border: 2px solid rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.05);
+            color: var(--text-light);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg-dark);
+            border-radius: 10px;
+            margin-top: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
+        }
+
+        body.light-mode .search-results {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .search-result-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        body.light-mode .search-result-item {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .search-result-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .selected-members {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .selected-member {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .remove-member {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .privacy-settings {
+            margin: 30px 0;
+        }
+
+        .privacy-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .privacy-option {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode .privacy-option {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .privacy-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(255,152,0,0.2);
+        }
+
+        .privacy-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .privacy-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .privacy-description {
+            font-size: 12px;
+            color: var(--secondary-color);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            color: #222;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-upload {
+            display: none;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(200%);
+            transition: transform 0.3s;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: #4CAF50;
+        }
+
+        .toast.error {
+            background: var(--accent-color);
+        }
+
+        .member-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #222;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--secondary-color);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <button class="back-btn" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="logo">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); display: flex; align-items: center; justify-content: center; color: #222; font-weight: bold; font-size: 16px;">PM</div>
+            <span>Create Group</span>
+        </div>
+        <div style="width: 40px;"></div> <!-- Spacer for alignment -->
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="group-creation-container">
+            <h1 class="page-title">Create New Group</h1>
+            
+            <form id="groupForm">
+                <!-- Group Avatar -->
+                <div class="avatar-upload">
+                    <div class="avatar-preview" onclick="document.getElementById('groupAvatar').click()">
+                        <i class="fas fa-camera"></i>
+                        <img id="avatarPreview" style="display: none;">
+                    </div>
+                    <div class="upload-text">Tap to add group photo</div>
+                    <input type="file" id="groupAvatar" class="file-upload" accept="image/*">
+                </div>
+
+                <!-- Group Name -->
+                <div class="form-group">
+                    <label class="form-label">Group Name</label>
+                    <input type="text" class="form-input" id="groupName" placeholder="Enter group name" required maxlength="100">
+                </div>
+
+                <!-- Group Description -->
+                <div class="form-group">
+                    <label class="form-label">Group Description</label>
+                    <textarea class="form-textarea" id="groupDescription" placeholder="What's this group about?" maxlength="500"></textarea>
+                </div>
+
+                <!-- Add Members -->
+                <div class="members-section">
+                    <h3 class="section-title">Add Members</h3>
+                    
+                    <div class="search-members">
+                        <input type="text" class="search-input" id="memberSearch" placeholder="Search friends to add...">
+                        <div class="search-results" id="searchResults"></div>
+                    </div>
+
+                    <div class="selected-members" id="selectedMembers">
+                        <div class="empty-state" style="padding: 20px;">
+                            <i class="fas fa-users"></i>
+                            <p>No members selected yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Settings -->
+                <div class="privacy-settings">
+                    <h3 class="section-title">Privacy Settings</h3>
+                    <div class="privacy-options">
+                        <div class="privacy-option selected" data-type="private">
+                            <div class="privacy-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="privacy-title">Private</div>
+                            <div class="privacy-description">Only members can see posts and members</div>
+                        </div>
+                        <div class="privacy-option" data-type="public">
+                            <div class="privacy-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="privacy-title">Public</div>
+                            <div class="privacy-description">Anyone can see posts and members</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Settings -->
+                <div class="form-group">
+                    <label class="form-label">Group Settings</label>
+                    <div style="display: grid; gap: 15px; margin-top: 10px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="approveMembers" style="transform: scale(1.2);">
+                            <span>Approve new members</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="membersPost" checked style="transform: scale(1.2);">
+                            <span>Members can post</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="shareContent" checked style="transform: scale(1.2);">
+                            <span>Allow content sharing</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Create Button -->
+                <button type="submit" class="btn" id="createGroupBtn">
+                    <i class="fas fa-users"></i> Create Group
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        class GroupCreator {
+            constructor() {
+                this.selectedMembers = new Set();
+                this.selectedPrivacy = 'private';
+                this.groupAvatar = null;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadFriends();
+            }
+
+            setupEventListeners() {
+                // Form submission
+                document.getElementById('groupForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.createGroup();
+                });
+
+                // Avatar upload
+                document.getElementById('groupAvatar').addEventListener('change', (e) => {
+                    this.handleAvatarUpload(e);
+                });
+
+                // Member search
+                document.getElementById('memberSearch').addEventListener('input', (e) => {
+                    this.searchFriends(e.target.value);
+                });
+
+                // Privacy options
+                document.querySelectorAll('.privacy-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        this.selectPrivacy(option.dataset.type);
+                    });
+                });
+
+                // Close search results when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.search-members')) {
+                        this.hideSearchResults();
+                    }
+                });
+            }
+
+            loadFriends() {
+                // In a real app, this would fetch from your backend
+                this.friends = [
+                    { id: 1, name: 'John Doe', username: 'johndoe', avatar: 'J' },
+                    { id: 2, name: 'Jane Smith', username: 'janesmith', avatar: 'J' },
+                    { id: 3, name: 'Mike Johnson', username: 'mikej', avatar: 'M' },
+                    { id: 4, name: 'Sarah Wilson', username: 'sarahw', avatar: 'S' },
+                    { id: 5, name: 'Alex Brown', username: 'alexb', avatar: 'A' }
+                ];
+            }
+
+            searchFriends(query) {
+                if (!query.trim()) {
+                    this.hideSearchResults();
+                    return;
+                }
+
+                const filteredFriends = this.friends.filter(friend => 
+                    friend.name.toLowerCase().includes(query.toLowerCase()) ||
+                    friend.username.toLowerCase().includes(query.toLowerCase())
+                );
+
+                this.displaySearchResults(filteredFriends);
+            }
+
+            displaySearchResults(friends) {
+                const container = document.getElementById('searchResults');
+                
+                if (friends.length === 0) {
+                    container.innerHTML = '<div class="search-result-item">No friends found</div>';
+                } else {
+                    container.innerHTML = friends.map(friend => `
+                        <div class="search-result-item" onclick="groupCreator.addMember('${friend.id}')">
+                            <div class="member-avatar">${friend.avatar}</div>
+                            <div>
+                                <div style="font-weight: bold;">${friend.name}</div>
+                                <div style="font-size: 12px; color: var(--secondary-color);">@${friend.username}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                container.style.display = 'block';
+            }
+
+            hideSearchResults() {
+                document.getElementById('searchResults').style.display = 'none';
+            }
+
+            addMember(friendId) {
+                const friend = this.friends.find(f => f.id == friendId);
+                if (friend && !this.selectedMembers.has(friendId)) {
+                    this.selectedMembers.add(friendId);
+                    this.renderSelectedMembers();
+                    this.hideSearchResults();
+                    document.getElementById('memberSearch').value = '';
+                }
+            }
+
+            removeMember(friendId) {
+                this.selectedMembers.delete(friendId);
+                this.renderSelectedMembers();
+            }
+
+            renderSelectedMembers() {
+                const container = document.getElementById('selectedMembers');
+                
+                if (this.selectedMembers.size === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="padding: 20px;">
+                            <i class="fas fa-users"></i>
+                            <p>No members selected yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = Array.from(this.selectedMembers).map(friendId => {
+                    const friend = this.friends.find(f => f.id == friendId);
+                    return `
+                        <div class="selected-member">
+                            <div class="member-avatar">${friend.avatar}</div>
+                            <span>${friend.name}</span>
+                            <button type="button" class="remove-member" onclick="groupCreator.removeMember('${friend.id}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            selectPrivacy(type) {
+                this.selectedPrivacy = type;
+                document.querySelectorAll('.privacy-option').forEach(option => {
+                    option.classList.toggle('selected', option.dataset.type === type);
+                });
+            }
+
+            handleAvatarUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    this.groupAvatar = file;
+                    const preview = document.getElementById('avatarPreview');
+                    preview.src = URL.createObjectURL(file);
+                    preview.style.display = 'block';
+                    document.querySelector('.avatar-preview i').style.display = 'none';
+                }
+            }
+
+            async createGroup() {
+                const groupName = document.getElementById('groupName').value.trim();
+                const groupDescription = document.getElementById('groupDescription').value.trim();
+
+                if (!groupName) {
+                    this.showToast('Please enter a group name', 'error');
+                    return;
+                }
+
+                if (this.selectedMembers.size === 0) {
+                    this.showToast('Please add at least one member', 'error');
+                    return;
+                }
+
+                const groupData = {
+                    name: groupName,
+                    description: groupDescription,
+                    privacy: this.selectedPrivacy,
+                    members: Array.from(this.selectedMembers),
+                    settings: {
+                        approveMembers: document.getElementById('approveMembers').checked,
+                        membersPost: document.getElementById('membersPost').checked,
+                        shareContent: document.getElementById('shareContent').checked
+                    },
+                    avatar: this.groupAvatar
+                };
+
+                try {
+                    // Show loading state
+                    const btn = document.getElementById('createGroupBtn');
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Group...';
+
+                    // In a real app, this would send to your backend
+                    await this.saveGroup(groupData);
+
+                    this.showToast('Group created successfully!', 'success');
+                    
+                    // Redirect to group page after success
+                    setTimeout(() => {
+                        window.location.href = 'index.html?page=groups';
+                    }, 1500);
+
+                } catch (error) {
+                    console.error('Error creating group:', error);
+                    this.showToast('Error creating group', 'error');
+                    
+                    // Reset button
+                    const btn = document.getElementById('createGroupBtn');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-users"></i> Create Group';
+                }
+            }
+
+            async saveGroup(groupData) {
+                // Simulate API call
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        console.log('Group created:', groupData);
+                        resolve({ success: true, groupId: Date.now() });
+                    }, 2000);
+                });
+            }
+
+            showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.getElementById('toastContainer').appendChild(toast);
+                
+                setTimeout(() => toast.classList.add('show'), 10);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        // Initialize the group creator
+        document.addEventListener('DOMContentLoaded', () => {
+            window.groupCreator = new GroupCreator();
+        });
+    </script>
+</body>
+</html>

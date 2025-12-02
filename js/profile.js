@@ -1,581 +1,616 @@
-// Profile Component
-class ProfileComponent {
-    constructor(app) {
-        this.app = app;
-        this.viewingProfile = null;
-        this.userPosts = [];
-        this.userAlerts = new Set();
+// Profile Manager
+class ProfileManager {
+    constructor() {
+        this.supabase = window.app?.supabase;
+        this.currentUser = window.app?.currentUser;
+        this.currentProfile = null;
+        this.isFollowing = false;
+        
+        this.init();
     }
 
-    async load() {
-        // If no specific profile is being viewed, show current user's profile
-        if (!this.viewingProfile) {
-            this.viewingProfile = this.app.userProfile;
-        }
-
-        const container = document.getElementById('profilePage');
-        container.innerHTML = this.render();
-        await this.loadProfileData();
-        await this.loadUserPosts();
-        await this.loadUserAlerts();
+    init() {
         this.setupEventListeners();
     }
 
-    render() {
-        const isOwnProfile = this.viewingProfile?.id === this.app.currentUser?.id;
-        
-        return `
-            <div class="profile-header">
-                <img src="${this.viewingProfile?.avatar || ''}" alt="Profile" class="profile-avatar" id="profileAvatar">
-                ${isOwnProfile ? `
-                    <button class="action-btn" id="editProfileBtn" style="position: absolute; bottom: 10px; right: 20px; background: rgba(255,255,255,0.8);">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                ` : ''}
-            </div>
-            <div class="profile-info">
-                <h3 id="profileName">${this.viewingProfile?.name || 'User Name'}</h3>
-                <p class="user-handle" id="profileHandle">@${this.viewingProfile?.username || 'username'}</p>
-                <p class="profile-bio" id="profileBio">${this.viewingProfile?.bio || 'This is a sample bio. Update your profile to add your own bio!'}</p>
-                
-                <div class="profile-stats">
-                    <div style="cursor: pointer;" id="postsCountContainer">
-                        <strong id="postsCount">0</strong>
-                        <div>Posts</div>
-                    </div>
-                    <div style="cursor: pointer;" id="followingCountContainer">
-                        <strong id="followingCount">0</strong>
-                        <div>Following</div>
-                    </div>
-                    <div style="cursor: pointer;" id="followersCountContainer">
-                        <strong id="followersCount">0</strong>
-                        <div>Followers</div>
-                    </div>
-                </div>
-                
-                <div class="profile-actions">
-                    ${!isOwnProfile ? `
-                        <button class="follow-btn" id="followBtn">Follow</button>
-                        <button class="message-btn" id="messageUserBtn">
-                            <i class="fas fa-envelope"></i> Message
-                        </button>
-                        <button class="alert-btn" id="alertBtn">
-                            <i class="fas fa-bell"></i> Alert
-                        </button>
-                    ` : ''}
-                    <button class="profile-share-btn" id="shareProfileBtn">
-                        <i class="fas fa-share-alt"></i> Share
-                    </button>
-                </div>
-            </div>
-            
-            <div id="profilePostsContainer">
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i> Loading posts...
-                </div>
-            </div>
-        `;
+    setupEventListeners() {
+        // Profile tab switching
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('profile-tab')) {
+                const tab = e.target.dataset.tab;
+                this.switchTab(tab);
+            }
+        });
     }
 
-    async loadProfileData() {
-        if (!this.viewingProfile) return;
+    async loadProfile(userId) {
+        try {
+            // Clear previous content
+            document.getElementById('profileContent').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading profile...</div>';
 
-        // Get counts
-        const { count: postsCount } = await this.app.supabase
-            .from('posts')
-            .select('id', { count: 'exact', head: true })
-            .eq('author_id', this.viewingProfile.id);
+            // Load profile data
+            const { data: profile, error } = await this.supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
 
-        const { count: followingCount } = await this.app.supabase
-            .from('follows')
-            .select('id', { count: 'exact', head: true })
-            .eq('follower_id', this.viewingProfile.id);
+            if (error) throw error;
 
-        const { count: followersCount } = await this.app.supabase
-            .from('follows')
-            .select('id', { count: 'exact', head: true })
-            .eq('following_id', this.viewingProfile.id);
+            this.currentProfile = profile;
+            this.updateProfileUI();
 
-        // Update UI
-        document.getElementById('postsCount').textContent = postsCount || 0;
-        document.getElementById('followingCount').textContent = followingCount || 0;
-        document.getElementById('followersCount').textContent = followersCount || 0;
+            // Check if following
+            if (userId !== this.currentUser.id) {
+                await this.checkFollowingStatus(userId);
+            }
 
-        // Check follow status for non-own profiles
-        if (this.viewingProfile.id !== this.app.currentUser.id) {
-            await this.checkFollowStatus();
+            // Load profile content
+            await this.loadProfileContent('posts');
+
+        } catch (error) {
+            console.error('Error loading profile:', error);
+            document.getElementById('profileContent').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <h3>Error loading profile</h3>
+                    <p>Please try again later</p>
+                </div>
+            `;
+        }
+    }
+
+    updateProfileUI() {
+        if (!this.currentProfile) return;
+
+        // Update profile info
+        document.getElementById('profileName').textContent = this.currentProfile.name;
+        document.getElementById('profileHandle').textContent = `@${this.currentProfile.username}`;
+        document.getElementById('profileBio').textContent = this.currentProfile.bio || 'No bio yet';
+        
+        // Update avatar
+        const avatarImg = document.getElementById('profileAvatarImg');
+        avatarImg.src = this.currentProfile.avatar_url || 
+                       `https://ui-avatars.com/api/?name=${encodeURIComponent(this.currentProfile.name)}&background=ff9800&color=fff&size=256`;
+        
+        // Update stats
+        document.getElementById('postsCount').textContent = this.currentProfile.posts_count || 0;
+        document.getElementById('followersCount').textContent = this.currentProfile.followers_count || 0;
+        document.getElementById('followingCount').textContent = this.currentProfile.following_count || 0;
+
+        // Update action buttons
+        this.updateActionButtons();
+    }
+
+    updateActionButtons() {
+        const container = document.getElementById('profileActionButtons');
+        
+        if (this.currentProfile.id === this.currentUser.id) {
+            // Own profile - show edit buttons
+            container.innerHTML = `
+                <button class="edit-profile-btn" onclick="profile.editProfileModal()">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+                <button class="share-profile-btn" onclick="profile.shareProfile()">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+            `;
+        } else {
+            // Other user's profile - show follow/message buttons
+            const followText = this.isFollowing ? 'Following' : 'Follow';
+            const followClass = this.isFollowing ? 'following' : '';
+            
+            container.innerHTML = `
+                <button class="follow-btn ${followClass}" onclick="profile.toggleFollow('${this.currentProfile.id}')">
+                    ${followText}
+                </button>
+                <button class="message-btn" onclick="profile.startChat('${this.currentProfile.id}')">
+                    <i class="fas fa-envelope"></i> Message
+                </button>
+                <button class="call-btn" onclick="profile.startCall('${this.currentProfile.id}')">
+                    <i class="fas fa-phone"></i> Call
+                </button>
+            `;
+        }
+    }
+
+    async checkFollowingStatus(userId) {
+        try {
+            const { data, error } = await this.supabase
+                .from('follows')
+                .select('*')
+                .eq('follower_id', this.currentUser.id)
+                .eq('following_id', userId)
+                .single();
+
+            this.isFollowing = !!data;
+            this.updateActionButtons();
+
+        } catch (error) {
+            if (error.code === 'PGRST116') {
+                this.isFollowing = false;
+            } else {
+                console.error('Error checking follow status:', error);
+            }
+            this.updateActionButtons();
+        }
+    }
+
+    async toggleFollow(userId) {
+        try {
+            if (this.isFollowing) {
+                // Unfollow
+                await this.supabase
+                    .from('follows')
+                    .delete()
+                    .eq('follower_id', this.currentUser.id)
+                    .eq('following_id', userId);
+
+                window.app.showToast('Unfollowed', 'info');
+                this.isFollowing = false;
+            } else {
+                // Follow
+                await this.supabase
+                    .from('follows')
+                    .insert([{
+                        follower_id: this.currentUser.id,
+                        following_id: userId
+                    }]);
+
+                window.app.showToast('Followed!', 'success');
+                this.isFollowing = true;
+
+                // Send notification
+                if (window.notifications) {
+                    window.notifications.createNotification(userId, 'follow');
+                }
+            }
+
+            this.updateActionButtons();
+
+            // Update follower count
+            await this.updateProfileStats();
+
+        } catch (error) {
+            console.error('Error toggling follow:', error);
+            window.app.showToast('Error updating follow status', 'error');
+        }
+    }
+
+    async updateProfileStats() {
+        try {
+            const { data: profile, error } = await this.supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', this.currentProfile.id)
+                .single();
+
+            if (error) throw error;
+
+            this.currentProfile = profile;
+            this.updateProfileUI();
+
+        } catch (error) {
+            console.error('Error updating profile stats:', error);
+        }
+    }
+
+    switchTab(tab) {
+        // Update active tab
+        document.querySelectorAll('.profile-tab').forEach(t => {
+            t.classList.toggle('active', t.dataset.tab === tab);
+        });
+
+        // Load content for tab
+        this.loadProfileContent(tab);
+    }
+
+    async loadProfileContent(type) {
+        if (!this.currentProfile) return;
+
+        const container = document.getElementById('profileContent');
+        container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+        try {
+            switch(type) {
+                case 'posts':
+                    await this.loadUserPosts();
+                    break;
+                case 'media':
+                    await this.loadUserMedia();
+                    break;
+                case 'likes':
+                    await this.loadUserLikes();
+                    break;
+            }
+        } catch (error) {
+            console.error(`Error loading ${type}:`, error);
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>Error loading content</h3>
+                    <p>Please try again later</p>
+                </div>
+            `;
         }
     }
 
     async loadUserPosts() {
-        if (!this.viewingProfile) return;
-
-        const { data: posts } = await this.app.supabase
+        const container = document.getElementById('profileContent');
+        
+        const { data: posts, error } = await this.supabase
             .from('posts')
             .select(`
                 *,
-                profiles:author_id (name, username, avatar),
-                likes_count:likes(count),
-                retweets_count:retweets(count),
-                comments_count:comments(count)
+                profiles:author_id (name, username, avatar_url),
+                likes (user_id),
+                comments (id),
+                shares (user_id)
             `)
-            .eq('author_id', this.viewingProfile.id)
+            .eq('author_id', this.currentProfile.id)
             .order('created_at', { ascending: false });
 
-        this.userPosts = posts || [];
-        this.renderUserPosts();
-    }
+        if (error) throw error;
 
-    renderUserPosts() {
-        const container = document.getElementById('profilePostsContainer');
-        
-        if (this.userPosts.length === 0) {
-            container.innerHTML = '<div class="p-3 text-center">No posts yet.</div>';
+        if (posts.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-feather"></i>
+                    <h3>No posts yet</h3>
+                    <p>${this.currentProfile.id === this.currentUser.id ? 'Share your first post!' : 'This user hasn\'t posted anything yet'}</p>
+                </div>
+            `;
             return;
         }
 
-        const postsHTML = this.userPosts.map(post => {
-            const likes_count = post.likes_count[0]?.count || 0;
-            const retweets_count = post.retweets_count[0]?.count || 0;
-            const comments_count = post.comments_count[0]?.count || 0;
+        // Reuse post rendering from posts.js
+        container.innerHTML = posts.map(post => window.posts?.renderPost(post) || '').join('');
+    }
 
-            return `
-                <div class="post" data-post-id="${post.id}">
-                    <div style="display: flex; gap: 12px;">
-                        <img src="${post.profiles.avatar}" alt="${post.profiles.name}" class="avatar" onerror="this.src='${Utils.generateDefaultAvatar(post.profiles.name)}'">
-                        <div style="flex: 1;">
-                            <div class="post-header">
-                                <span class="user-name">${post.profiles.name}</span>
-                                <span class="user-handle">@${post.profiles.username}</span>
-                                <span>·</span>
-                                <span class="post-time">${Utils.formatTime(post.created_at)}</span>
-                            </div>
-                            <div class="post-content">${Utils.formatPostContent(post.content)}</div>
-                            <div class="post-actions">
-                                <button class="post-action comment-action" data-post-id="${post.id}">
-                                    <i class="far fa-comment"></i>
-                                    <span>${comments_count}</span>
-                                </button>
-                                <button class="post-action retweet-action" data-post-id="${post.id}">
-                                    <i class="fas fa-retweet"></i>
-                                    <span>${retweets_count}</span>
-                                </button>
-                                <button class="post-action like-action" data-post-id="${post.id}">
-                                    <i class="far fa-heart"></i>
-                                    <span>${likes_count}</span>
+    async loadUserMedia() {
+        const container = document.getElementById('profileContent');
+        
+        const { data: posts, error } = await this.supabase
+            .from('posts')
+            .select('*')
+            .eq('author_id', this.currentProfile.id)
+            .not('image_url', 'is', null)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (posts.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-images"></i>
+                    <h3>No media yet</h3>
+                    <p>${this.currentProfile.id === this.currentUser.id ? 'Share your first photo!' : 'This user hasn\'t shared any media yet'}</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="media-grid">
+                ${posts.map(post => `
+                    <div class="media-item" onclick="profile.viewPostMedia('${post.id}')">
+                        <img src="${post.image_url}" alt="Post media">
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    async loadUserLikes() {
+        const container = document.getElementById('profileContent');
+        
+        const { data: likes, error } = await this.supabase
+            .from('likes')
+            .select(`
+                posts (
+                    *,
+                    profiles:author_id (name, username, avatar_url),
+                    likes (user_id),
+                    comments (id),
+                    shares (user_id)
+                )
+            `)
+            .eq('user_id', this.currentProfile.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const likedPosts = likes.map(like => like.posts).filter(Boolean);
+
+        if (likedPosts.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-heart"></i>
+                    <h3>No likes yet</h3>
+                    <p>${this.currentProfile.id === this.currentUser.id ? 'Like some posts to see them here!' : 'This user hasn\'t liked any posts yet'}</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = likedPosts.map(post => window.posts?.renderPost(post) || '').join('');
+    }
+
+    viewPostMedia(postId) {
+        window.posts?.viewPost(postId);
+        window.app.showPage('homePage');
+    }
+
+    editProfileModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal edit-profile-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Edit Profile</h3>
+                    <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProfileForm">
+                        <div class="form-group">
+                            <label>Profile Picture</label>
+                            <div class="avatar-upload">
+                                <img id="editAvatarPreview" src="${this.currentProfile.avatar_url || ''}" alt="Profile">
+                                <button type="button" class="upload-avatar-btn" onclick="profile.uploadAvatar()">
+                                    <i class="fas fa-camera"></i> Change
                                 </button>
                             </div>
                         </div>
-                    </div>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" id="editName" value="${this.currentProfile.name}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="editUsername" value="${this.currentProfile.username}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Bio</label>
+                            <textarea id="editBio" rows="4">${this.currentProfile.bio || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" id="editLocation" value="${this.currentProfile.location || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Website</label>
+                            <input type="url" id="editWebsite" value="${this.currentProfile.website || ''}">
+                        </div>
+                        <button type="submit" class="btn">Save Changes</button>
+                    </form>
                 </div>
-            `;
-        }).join('');
+            </div>
+        `;
 
-        container.innerHTML = postsHTML;
-        this.setupPostEventListeners();
-    }
+        document.body.appendChild(modal);
 
-    setupPostEventListeners() {
-        // Like posts
-        document.querySelectorAll('.like-action').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const postId = btn.dataset.postId;
-                this.app.components.home.likePost(postId);
-            });
-        });
-
-        // Comment on posts
-        document.querySelectorAll('.comment-action').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const postId = btn.dataset.postId;
-                this.app.components.modals.openCommentModal(postId);
-            });
+        // Handle form submission
+        document.getElementById('editProfileForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.saveProfile();
         });
     }
 
-    setupEventListeners() {
-        const isOwnProfile = this.viewingProfile?.id === this.app.currentUser?.id;
-
-        // Edit profile button
-        if (isOwnProfile) {
-            document.getElementById('editProfileBtn').addEventListener('click', () => {
-                this.app.components.modals.openProfileEditModal();
-            });
-        }
-
-        // Follow button
-        if (!isOwnProfile) {
-            document.getElementById('followBtn').addEventListener('click', () => {
-                this.followUser(this.viewingProfile.id);
-            });
-
-            document.getElementById('messageUserBtn').addEventListener('click', () => {
-                this.startChatWithUser();
-            });
-
-            document.getElementById('alertBtn').addEventListener('click', () => {
-                this.toggleUserAlert();
-            });
-        }
-
-        // Share profile button
-        document.getElementById('shareProfileBtn').addEventListener('click', () => {
-            this.shareProfile();
-        });
-
-        // Stats click handlers
-        document.getElementById('postsCountContainer').addEventListener('click', () => {
-            // Already viewing posts
-        });
-
-        document.getElementById('followingCountContainer').addEventListener('click', () => {
-            this.showFollowing();
-        });
-
-        document.getElementById('followersCountContainer').addEventListener('click', () => {
-            this.showFollowers();
-        });
+    uploadAvatar() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => this.handleAvatarUpload(e);
+        input.click();
     }
 
-    async checkFollowStatus() {
-        if (!this.viewingProfile || this.viewingProfile.id === this.app.currentUser.id) return;
+    async handleAvatarUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
 
-        const { data } = await this.app.supabase
-            .from('follows')
-            .select('id')
-            .eq('follower_id', this.app.currentUser.id)
-            .eq('following_id', this.viewingProfile.id)
-            .single();
-
-        this.updateFollowButton(!!data);
-    }
-
-    updateFollowButton(isFollowing) {
-        const btn = document.getElementById('followBtn');
-        if (btn) {
-            btn.textContent = isFollowing ? 'Following' : 'Follow';
-            btn.classList.toggle('following', isFollowing);
-        }
-    }
-
-    async followUser(userId) {
-        const isFollowing = await this.isFollowing(userId);
-        
-        if (isFollowing) {
-            await this.unfollowUser(userId);
-        } else {
-            await this.supabaseFollowUser(userId);
-        }
-    }
-
-    async isFollowing(userId) {
-        const { data } = await this.app.supabase
-            .from('follows')
-            .select('id')
-            .eq('follower_id', this.app.currentUser.id)
-            .eq('following_id', userId)
-            .single();
-        
-        return !!data;
-    }
-
-    async supabaseFollowUser(userId) {
         try {
-            const { error } = await this.app.supabase
-                .from('follows')
-                .insert({
-                    follower_id: this.app.currentUser.id,
-                    following_id: userId,
-                    follower_name: this.app.userProfile.name
-                });
+            const preview = document.getElementById('editAvatarPreview');
+            preview.src = URL.createObjectURL(file);
 
-            if (!error) {
-                this.updateFollowButton(true);
-                Utils.showToast('Followed user');
-                
-                // Send notification
-                await this.app.supabase
-                    .from('notifications')
-                    .insert({
-                        user_id: userId,
-                        type: 'follow',
-                        source_user_id: this.app.currentUser.id,
-                        message: `${this.app.userProfile.name} started following you`
-                    });
-                    
-            } else {
-                Utils.showError('Failed to follow user');
-            }
+            // Upload to Supabase Storage
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${this.currentUser.id}/avatar.${fileExt}`;
+            const filePath = `avatars/${fileName}`;
+
+            const { data: uploadData, error: uploadError } = await this.supabase
+                .storage
+                .from('media')
+                .upload(filePath, file, { upsert: true });
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = this.supabase
+                .storage
+                .from('media')
+                .getPublicUrl(filePath);
+
+            // Save avatar URL temporarily for form submission
+            this.newAvatarUrl = publicUrl;
+
         } catch (error) {
-            console.error('Error following user:', error);
-            Utils.showError('Failed to follow user');
+            console.error('Error uploading avatar:', error);
+            window.app.showToast('Error uploading avatar', 'error');
         }
     }
 
-    async unfollowUser(userId) {
+    async saveProfile() {
         try {
-            const { error } = await this.app.supabase
-                .from('follows')
-                .delete()
-                .eq('follower_id', this.app.currentUser.id)
-                .eq('following_id', userId);
+            const updates = {
+                name: document.getElementById('editName').value.trim(),
+                username: document.getElementById('editUsername').value.trim(),
+                bio: document.getElementById('editBio').value.trim(),
+                location: document.getElementById('editLocation').value.trim(),
+                website: document.getElementById('editWebsite').value.trim(),
+                updated_at: new Date().toISOString()
+            };
 
-            if (!error) {
-                this.updateFollowButton(false);
-                Utils.showToast('Unfollowed user');
-            } else {
-                Utils.showError('Failed to unfollow user');
+            // Add avatar URL if changed
+            if (this.newAvatarUrl) {
+                updates.avatar_url = this.newAvatarUrl;
             }
-        } catch (error) {
-            console.error('Error unfollowing user:', error);
-            Utils.showError('Failed to unfollow user');
-        }
-    }
 
-    async loadUserAlerts() {
-        if (!this.viewingProfile || this.viewingProfile.id === this.app.currentUser.id) return;
-
-        const { data: alerts } = await this.app.supabase
-            .from('alerts')
-            .select('user_id')
-            .eq('follower_id', this.app.currentUser.id)
-            .eq('user_id', this.viewingProfile.id);
-
-        if (alerts && alerts.length > 0) {
-            this.userAlerts.add(this.viewingProfile.id);
-            this.updateAlertButton(true);
-        } else {
-            this.updateAlertButton(false);
-        }
-    }
-
-    updateAlertButton(isAlerting) {
-        const btn = document.getElementById('alertBtn');
-        if (btn) {
-            btn.classList.toggle('active', isAlerting);
-            btn.innerHTML = isAlerting ? 
-                '<i class="fas fa-bell-slash"></i> Unalert' : 
-                '<i class="fas fa-bell"></i> Alert';
-        }
-    }
-
-    async toggleUserAlert() {
-        if (!this.viewingProfile || this.viewingProfile.id === this.app.currentUser.id) return;
-
-        const userId = this.viewingProfile.id;
-        const isAlerting = this.userAlerts.has(userId);
-        
-        try {
-            if (isAlerting) {
-                await this.app.supabase
-                    .from('alerts')
-                    .delete()
-                    .eq('follower_id', this.app.currentUser.id)
-                    .eq('user_id', userId);
-                
-                this.userAlerts.delete(userId);
-                this.updateAlertButton(false);
-                Utils.showToast('Alerts turned off for this user');
-            } else {
-                await this.app.supabase
-                    .from('alerts')
-                    .insert({
-                        follower_id: this.app.currentUser.id,
-                        user_id: userId
-                    });
-                
-                this.userAlerts.add(userId);
-                this.updateAlertButton(true);
-                Utils.showToast('You will receive alerts for this user');
-            }
-            
-        } catch (error) {
-            console.error('Error toggling user alert:', error);
-            Utils.showError('Failed to update alerts');
-        }
-    }
-
-    async startChatWithUser() {
-        if (!this.viewingProfile) return;
-
-        await this.app.components.messages.loadChat(this.viewingProfile);
-        this.app.showPage('messagesPage');
-    }
-
-    async shareProfile() {
-        if (!this.viewingProfile) return;
-
-        const profileUrl = `${window.location.origin}?profile=${this.viewingProfile.id}`;
-        
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: `Check out ${this.viewingProfile.name} on PrimeMar`,
-                    url: profileUrl
-                });
-            } catch (error) {
-                await Utils.copyToClipboard(profileUrl);
-                Utils.showToast('Profile link copied to clipboard');
-            }
-        } else {
-            await Utils.copyToClipboard(profileUrl);
-            Utils.showToast('Profile link copied to clipboard');
-        }
-    }
-
-    async showFollowers() {
-        if (!this.viewingProfile) return;
-
-        const { data: followers } = await this.app.supabase
-            .from('follows')
-            .select(`
-                follower_id,
-                profiles:followers (name, username, avatar)
-            `)
-            .eq('following_id', this.viewingProfile.id);
-
-        this.app.components.modals.openFollowersModal(followers || [], 'Followers');
-    }
-
-    async showFollowing() {
-        if (!this.viewingProfile) return;
-
-        const { data: following } = await this.app.supabase
-            .from('follows')
-            .select(`
-                following_id,
-                profiles:following (name, username, avatar)
-            `)
-            .eq('follower_id', this.viewingProfile.id);
-
-        this.app.components.modals.openFollowersModal(following || [], 'Following');
-    }
-
-    async searchUsers(query) {
-        if (query.length < 2) {
-            document.getElementById('peopleContainer').innerHTML = '';
-            return;
-        }
-
-        try {
-            const { data: users, error } = await this.app.supabase
+            const { error } = await this.supabase
                 .from('profiles')
-                .select('*')
-                .or(`username.ilike.%${query}%,name.ilike.%${query}%`)
-                .limit(10);
+                .update(updates)
+                .eq('id', this.currentUser.id);
 
             if (error) throw error;
 
-            const container = document.getElementById('peopleContainer');
+            // Update local profile
+            Object.assign(this.currentProfile, updates);
             
-            if (users && users.length > 0) {
-                const usersHTML = await Promise.all(users.map(async (user) => {
-                    const isFollowing = await this.isFollowing(user.id);
-                    const isAlerting = this.userAlerts.has(user.id);
-                    
-                    return `
-                        <div class="search-result-item" data-user-id="${user.id}">
-                            <img src="${user.avatar}" alt="${user.name}" class="avatar">
-                            <div class="search-result-info">
-                                <div class="user-name">${user.name}</div>
-                                <div class="user-handle">@${user.username}</div>
-                            </div>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <button class="follow-btn ${isFollowing ? 'following' : ''}" 
-                                        data-user-id="${user.id}">
-                                    ${isFollowing ? 'Following' : 'Follow'}
-                                </button>
-                                <button class="message-btn" data-user-id="${user.id}">
-                                    <i class="fas fa-envelope"></i>
-                                </button>
-                                <button class="alert-btn ${isAlerting ? 'active' : ''}" 
-                                        data-user-id="${user.id}">
-                                    <i class="fas fa-bell${isAlerting ? '-slash' : ''}"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }));
-
-                container.innerHTML = usersHTML.join('');
-                this.setupSearchResultEventListeners();
-                
-            } else {
-                container.innerHTML = '<div class="p-3 text-center">No users found</div>';
+            // Update UI
+            this.updateProfileUI();
+            
+            // Update app's user profile
+            if (window.app?.userProfile) {
+                Object.assign(window.app.userProfile, updates);
+                window.app.updateProfileUI();
             }
-            
+
+            // Close modal
+            document.querySelector('.edit-profile-modal').remove();
+
+            window.app.showToast('Profile updated successfully!', 'success');
+
         } catch (error) {
-            console.error('Error searching users:', error);
-            document.getElementById('peopleContainer').innerHTML = 
-                '<div class="p-3 text-center">Error searching users</div>';
+            console.error('Error saving profile:', error);
+            window.app.showToast('Error updating profile', 'error');
         }
     }
 
-    setupSearchResultEventListeners() {
-        // Follow buttons in search results
-        document.querySelectorAll('#peopleContainer .follow-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const userId = btn.dataset.userId;
-                this.followUser(userId);
-                // Refresh search results
-                const currentQuery = document.getElementById('searchInput')?.value;
-                if (currentQuery) {
-                    this.searchUsers(currentQuery);
-                }
+    shareProfile() {
+        const profileUrl = `${window.location.origin}/profile/${this.currentProfile.id}`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: `${this.currentProfile.name}'s Profile`,
+                text: `Check out ${this.currentProfile.name}'s profile on PrimeMar`,
+                url: profileUrl
             });
-        });
-
-        // Message buttons in search results
-        document.querySelectorAll('#peopleContainer .message-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const userId = btn.dataset.userId;
-                const { data: user } = await this.app.supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', userId)
-                    .single();
-
-                if (user) {
-                    await this.app.components.messages.loadChat(user);
-                    this.app.showPage('messagesPage');
-                }
-            });
-        });
-
-        // View profile from search results
-        document.querySelectorAll('#peopleContainer .search-result-item').forEach(item => {
-            item.addEventListener('click', async () => {
-                const userId = item.dataset.userId;
-                const { data: user } = await this.app.supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', userId)
-                    .single();
-
-                if (user) {
-                    this.viewingProfile = user;
-                    await this.load();
-                    this.app.showPage('profilePage');
-                }
-            });
-        });
+        } else {
+            navigator.clipboard.writeText(profileUrl);
+            window.app.showToast('Profile link copied to clipboard!', 'success');
+        }
     }
 
-    async viewUserProfile(userId) {
-        const { data: user } = await this.app.supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .single();
+    startChat(userId) {
+        window.app.showPage('messagesPage');
+        // TODO: Open conversation with this user
+    }
 
-        if (user) {
-            this.viewingProfile = user;
-            await this.load();
-            this.app.showPage('profilePage');
+    startCall(userId) {
+        window.calls?.startCall(userId, 'audio');
+    }
+
+    async showFollowers() {
+        await this.showUserList('followers');
+    }
+
+    async showFollowing() {
+        await this.showUserList('following');
+    }
+
+    async showUserList(type) {
+        const modal = document.createElement('div');
+        modal.className = 'modal user-list-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>${type === 'followers' ? 'Followers' : 'Following'}</h3>
+                    <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="user-list" id="userListContent">
+                        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        await this.loadUserList(type);
+    }
+
+    async loadUserList(type) {
+        try {
+            let query;
+            
+            if (type === 'followers') {
+                query = this.supabase
+                    .from('follows')
+                    .select(`
+                        follower:profiles!follows_follower_id_fkey(*)
+                    `)
+                    .eq('following_id', this.currentProfile.id);
+            } else {
+                query = this.supabase
+                    .from('follows')
+                    .select(`
+                        following:profiles!follows_following_id_fkey(*)
+                    `)
+                    .eq('follower_id', this.currentProfile.id);
+            }
+
+            const { data: relationships, error } = await query;
+            if (error) throw error;
+
+            const users = relationships.map(rel => 
+                type === 'followers' ? rel.follower : rel.following
+            );
+
+            const container = document.getElementById('userListContent');
+            
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <h3>No ${type} yet</h3>
+                        <p>${this.currentProfile.id === this.currentUser.id ? 
+                            `You don't have any ${type} yet` : 
+                            `This user doesn't have any ${type} yet`}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = users.map(user => `
+                <div class="user-list-item">
+                    <img src="${user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=ff9800&color=fff&size=256`}" 
+                         alt="${user.name}" class="user-list-avatar">
+                    <div class="user-list-info">
+                        <div class="user-list-name">${user.name}</div>
+                        <div class="user-list-username">@${user.username}</div>
+                    </div>
+                    <button class="user-list-action" onclick="profile.viewUserProfile('${user.id}')">
+                        View
+                    </button>
+                </div>
+            `).join('');
+
+        } catch (error) {
+            console.error(`Error loading ${type}:`, error);
+            document.getElementById('userListContent').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>Error loading ${type}</h3>
+                    <p>Please try again later</p>
+                </div>
+            `;
         }
+    }
+
+    viewUserProfile(userId) {
+        document.querySelector('.user-list-modal')?.remove();
+        window.app.showPage('profilePage');
+        this.loadProfile(userId);
     }
 }
+
+window.ProfileManager = ProfileManager;

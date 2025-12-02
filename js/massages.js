@@ -1,115 +1,69 @@
-// Messages Component
-class MessagesComponent {
-    constructor(app) {
-        this.app = app;
+// Message Manager
+class MessageManager {
+    constructor() {
+        this.supabase = window.app?.supabase;
+        this.currentUser = window.app?.currentUser;
+        this.socket = window.app?.socket;
         this.conversations = [];
-        this.activeChat = null;
+        this.activeConversation = null;
         this.messages = [];
+        this.typingTimeouts = new Map();
+        
+        this.init();
     }
 
-    async load() {
-        const container = document.getElementById('messagesPage');
-        container.innerHTML = this.render();
-        await this.loadConversations();
-        this.setupEventListeners();
+    init() {
+        if (this.socket) {
+            this.setupSocketListeners();
+        }
     }
 
-    render() {
-        return `
-            <div class="chat-container">
-                <div class="chat-header hidden" id="activeChatHeader">
-                    <button class="action-btn" id="backToMessages"><i class="fas fa-arrow-left"></i></button>
-                    <img src="" alt="Profile" class="avatar" id="chatUserAvatar">
-                    <div>
-                        <div id="chatUserName">User Name</div>
-                        <div class="typing-indicator hidden" id="typingIndicator">is typing...</div>
-                    </div>
-                    <div style="flex: 1;"></div>
-                    <button class="action-btn" id="voiceCallBtn"><i class="fas fa-phone"></i></button>
-                    <button class="action-btn" id="videoCallBtn"><i class="fas fa-video"></i></button>
-                </div>
-                
-                <div class="messages-list" id="messagesList">
-                    <div class="loading">
-                        <i class="fas fa-spinner fa-spin"></i> Loading conversations...
-                    </div>
-                </div>
-                
-                <div class="chat-messages hidden" id="chatMessages">
-                    <!-- Messages will be loaded here -->
-                </div>
-                <div class="chat-input-container hidden" id="chatInputContainer">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="Type a message...">
-                    <button class="chat-send-btn" id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
-        `;
-    }
-
-    setupEventListeners() {
-        // Back to conversations list
-        document.getElementById('backToMessages').addEventListener('click', () => {
-            this.showConversationsList();
+    setupSocketListeners() {
+        this.socket.on('new-message', (message) => {
+            this.handleNewMessage(message);
         });
 
-        // Send message
-        document.getElementById('chatSendBtn').addEventListener('click', () => {
-            this.sendMessage(document.getElementById('chatInput').value);
+        this.socket.on('typing', (data) => {
+            this.showTypingIndicator(data.senderId, data.isTyping);
         });
 
-        // Send message on Enter key
-        document.getElementById('chatInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.sendMessage(e.target.value);
-            }
+        this.socket.on('message-seen', (data) => {
+            this.updateMessageSeen(data.messageId);
         });
 
-        // Call buttons
-        document.getElementById('voiceCallBtn').addEventListener('click', () => {
-            if (this.activeChat) {
-                this.app.components.calls.startCall(this.activeChat.id, 'voice');
-            }
-        });
-
-        document.getElementById('videoCallBtn').addEventListener('click', () => {
-            if (this.activeChat) {
-                this.app.components.calls.startCall(this.activeChat.id, 'video');
-            }
+        this.socket.on('incoming-call', (data) => {
+            window.calls?.handleIncomingCall(data);
         });
     }
 
     async loadConversations() {
-        const { data: messages } = await this.app.supabase
-            .from('messages')
-            .select(`
-                *,
-                sender:profiles!sender_id(name, username, avatar),
-                receiver:profiles!receiver_id(name, username, avatar)
-            `)
-            .or(`sender_id.eq.${this.app.currentUser.id},receiver_id.eq.${this.app.currentUser.id}`)
-            .order('created_at', { ascending: false });
+        try {
+            const container = document.getElementById('messagesList');
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading conversations...</div>';
 
-        if (messages) {
-            // Group messages by conversation
-            const conversationsMap = new Map();
-            
-            messages.forEach(message => {
-                const otherUserId = message.sender_id === this.app.currentUser.id ? 
-                    message.receiver_id : message.sender_id;
-                const otherUser = message.sender_id === this.app.currentUser.id ? 
-                    message.receiver : message.sender;
-                    
-                if (!conversationsMap.has(otherUserId)) {
-                    conversationsMap.set(otherUserId, {
-                        user: otherUser,
-                        lastMessage: message,
-                        unread: 0
-                    });
-                }
-            });
-            
-            this.conversations = Array.from(conversationsMap.values());
+            const { data: conversations, error } = await this.supabase
+                .from('conversations')
+                .select(`
+                    *,
+                    user1:profiles!conversations_user1_id_fkey(id, name, username, avatar_url),
+                    user2:profiles!conversations_user2_id_fkey(id, name, username, avatar_url)
+                `)
+                .or(`user1_id.eq.${this.currentUser.id},user2_id.eq.${this.currentUser.id}`)
+                .order('updated_at', { ascending: false });
+
+            if (error) throw error;
+
+            this.conversations = conversations || [];
             this.renderConversations();
+        } catch (error) {
+            console.error('Error loading conversations:', error);
+            document.getElementById('messagesList').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-comments"></i>
+                    <h3>Error loading conversations</h3>
+                    <p>Please try again later</p>
+                </div>
+            `;
         }
     }
 
@@ -117,139 +71,454 @@ class MessagesComponent {
         const container = document.getElementById('messagesList');
         
         if (this.conversations.length === 0) {
-            container.innerHTML = '<div class="p-3 text-center">No messages yet. Start a conversation!</div>';
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-comments"></i>
+                    <h3>No conversations</h3>
+                    <p>Start a conversation with someone!</p>
+                </div>
+            `;
             return;
         }
 
-        const conversationsHTML = this.conversations.map(conv => `
-            <div class="message-item" data-user-id="${conv.user.id}">
-                <img src="${conv.user.avatar}" alt="${conv.user.name}" class="avatar">
-                <div class="message-item-info">
-                    <div class="user-name">${conv.user.name}</div>
-                    <div class="message-preview">${conv.lastMessage.content}</div>
+        container.innerHTML = this.conversations.map(conv => {
+            const otherUser = conv.user1_id === this.currentUser.id ? conv.user2 : conv.user1;
+            const unreadCount = conv.user1_id === this.currentUser.id ? 
+                              conv.unread_count_user1 : conv.unread_count_user2;
+
+            return `
+                <div class="message-item" onclick="messages.openConversation('${conv.id}', '${otherUser.id}')">
+                    <img src="${otherUser.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(otherUser.name)}&background=ff9800&color=fff&size=256`}" 
+                         alt="${otherUser.name}" class="message-item-avatar">
+                    <div class="message-item-info">
+                        <div class="message-item-name">${otherUser.name}</div>
+                        <div class="message-item-preview">${conv.last_message || 'Start a conversation'}</div>
+                    </div>
+                    <div class="message-item-time">${this.formatTime(conv.updated_at)}</div>
+                    ${unreadCount > 0 ? `
+                        <div class="message-item-unread">${unreadCount}</div>
+                    ` : ''}
                 </div>
-                <div class="message-time">${Utils.formatTime(conv.lastMessage.created_at)}</div>
-            </div>
-        `).join('');
-
-        container.innerHTML = conversationsHTML;
-
-        // Add click listeners
-        document.querySelectorAll('.message-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const userId = item.dataset.userId;
-                const conversation = this.conversations.find(c => c.user.id === userId);
-                if (conversation) {
-                    this.loadChat(conversation.user);
-                }
-            });
-        });
+            `;
+        }).join('');
     }
 
-    async loadChat(user) {
-        this.activeChat = user;
-        
-        // Show chat interface
-        this.showChatInterface();
-        
-        document.getElementById('chatUserName').textContent = user.name;
-        document.getElementById('chatUserAvatar').src = user.avatar;
-        
-        // Load messages
-        const { data: messages } = await this.app.supabase
-            .from('messages')
-            .select('*')
-            .or(`and(sender_id.eq.${this.app.currentUser.id},receiver_id.eq.${user.id}),and(sender_id.eq.${user.id},receiver_id.eq.${this.app.currentUser.id})`)
-            .order('created_at', { ascending: true });
-        
-        this.messages = messages || [];
-        this.renderMessages();
-        this.scrollToBottom();
+    async openConversation(conversationId, userId) {
+        try {
+            // Get user info
+            const { data: user, error: userError } = await this.supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (userError) throw userError;
+
+            this.activeConversation = {
+                id: conversationId,
+                user: user
+            };
+
+            // Show chat view
+            document.getElementById('messagesList').style.display = 'none';
+            document.getElementById('chatView').classList.add('active');
+
+            // Update chat header
+            document.getElementById('chatHeader').innerHTML = `
+                <div class="chat-user-info">
+                    <img src="${user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=ff9800&color=fff&size=256`}" 
+                         alt="${user.name}" class="chat-user-avatar">
+                    <div>
+                        <div class="chat-user-name">${user.name}</div>
+                        <div class="chat-user-status" id="userStatus-${userId}">Online</div>
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="chat-header-btn" onclick="messages.startAudioCall('${userId}')">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                    <button class="chat-header-btn" onclick="messages.startVideoCall('${userId}')">
+                        <i class="fas fa-video"></i>
+                    </button>
+                </div>
+            `;
+
+            // Load messages
+            await this.loadMessages(conversationId);
+
+            // Mark as read
+            await this.markAsRead(conversationId);
+
+        } catch (error) {
+            console.error('Error opening conversation:', error);
+            window.app.showToast('Error opening conversation', 'error');
+        }
     }
 
-    showChatInterface() {
-        document.getElementById('messagesList').classList.add('hidden');
-        document.getElementById('activeChatHeader').classList.remove('hidden');
-        document.getElementById('chatMessages').classList.remove('hidden');
-        document.getElementById('chatInputContainer').classList.remove('hidden');
-    }
+    async loadMessages(conversationId) {
+        try {
+            const { data: messages, error } = await this.supabase
+                .from('messages')
+                .select('*')
+                .or(`sender_id.eq.${this.currentUser.id},receiver_id.eq.${this.currentUser.id}`)
+                .order('created_at', { ascending: true });
 
-    showConversationsList() {
-        this.activeChat = null;
-        document.getElementById('messagesList').classList.remove('hidden');
-        document.getElementById('activeChatHeader').classList.add('hidden');
-        document.getElementById('chatMessages').classList.add('hidden');
-        document.getElementById('chatInputContainer').classList.add('hidden');
+            if (error) throw error;
+
+            this.messages = messages || [];
+            this.renderMessages();
+        } catch (error) {
+            console.error('Error loading messages:', error);
+            this.messages = [];
+            this.renderMessages();
+        }
     }
 
     renderMessages() {
         const container = document.getElementById('chatMessages');
-        const messagesHTML = this.messages.map(message => {
-            const isOwn = message.sender_id === this.app.currentUser.id;
+        container.innerHTML = this.messages.map(msg => {
+            const isOwn = msg.sender_id === this.currentUser.id;
+            
             return `
-                <div class="message ${isOwn ? 'own' : ''}">
-                    ${!isOwn ? `<img src="${this.activeChat.avatar}" class="avatar">` : ''}
+                <div class="message ${isOwn ? 'own' : ''}" data-id="${msg.id}">
+                    ${!isOwn ? `
+                        <img src="${this.activeConversation?.user?.avatar_url || ''}" 
+                             alt="Avatar" class="message-avatar">
+                    ` : ''}
                     <div class="message-content">
-                        <div>${Utils.formatMessageContent(message.content)}</div>
-                        <div class="message-time">${Utils.formatTime(message.created_at)}</div>
+                        ${msg.content ? `
+                            <div class="message-text">${msg.content}</div>
+                        ` : ''}
+                        ${msg.image_url ? `
+                            <div class="message-media">
+                                <img src="${msg.image_url}" alt="Image" onclick="messages.viewImage('${msg.image_url}')">
+                            </div>
+                        ` : ''}
+                        ${msg.video_url ? `
+                            <div class="message-media">
+                                <video controls>
+                                    <source src="${msg.video_url}" type="video/mp4">
+                                </video>
+                            </div>
+                        ` : ''}
+                        ${msg.file_url ? `
+                            <div class="message-file">
+                                <i class="fas fa-file"></i>
+                                <a href="${msg.file_url}" target="_blank">${msg.file_name || 'Download file'}</a>
+                            </div>
+                        ` : ''}
+                        <div class="message-time">
+                            ${this.formatTime(msg.created_at)}
+                            ${isOwn && msg.is_read ? ' ✓✓' : isOwn ? ' ✓' : ''}
+                        </div>
                     </div>
-                    ${isOwn ? `<img src="${this.app.userProfile.avatar}" class="avatar">` : ''}
                 </div>
             `;
         }).join('');
 
-        container.innerHTML = messagesHTML;
+        container.scrollTop = container.scrollHeight;
     }
 
-    async sendMessage(content) {
-        if (!content.trim() || !this.activeChat) return;
+    async sendMessage() {
+        const input = document.getElementById('chatInput');
+        const content = input.value.trim();
+        
+        if (!content) return;
 
         try {
-            const { data, error } = await this.app.supabase
-                .from('messages')
-                .insert({
-                    sender_id: this.app.currentUser.id,
-                    receiver_id: this.activeChat.id,
-                    content: content
-                });
+            const messageData = {
+                sender_id: this.currentUser.id,
+                receiver_id: this.activeConversation.user.id,
+                content: content,
+                created_at: new Date().toISOString()
+            };
 
-            if (!error) {
-                document.getElementById('chatInput').value = '';
-                // The real-time subscription will handle updating the UI
-            } else {
-                Utils.showError('Failed to send message');
-            }
+            const { data: message, error } = await this.supabase
+                .from('messages')
+                .insert([messageData])
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            // Send via socket
+            this.socket.emit('send-message', {
+                receiverId: this.activeConversation.user.id,
+                message: messageData
+            });
+
+            // Add to messages array
+            this.messages.push(message);
+            this.renderMessages();
+
+            // Clear input
+            input.value = '';
+
+            // Update conversation
+            await this.updateConversation(message);
+
+            window.app.showToast('Message sent', 'success');
+
         } catch (error) {
             console.error('Error sending message:', error);
-            Utils.showError('Failed to send message');
+            window.app.showToast('Error sending message', 'error');
         }
     }
 
-    renderMessage(message) {
-        if (!this.activeChat || (message.sender_id !== this.activeChat.id && message.receiver_id !== this.activeChat.id)) {
-            return;
+    async updateConversation(message) {
+        try {
+            const { data: conversation, error } = await this.supabase
+                .from('conversations')
+                .select('*')
+                .or(`user1_id.eq.${this.currentUser.id}.and.user2_id.eq.${this.activeConversation.user.id},
+                     user1_id.eq.${this.activeConversation.user.id}.and.user2_id.eq.${this.currentUser.id}`)
+                .single();
+
+            if (error && error.code === 'PGRST116') {
+                // Create new conversation
+                await this.supabase
+                    .from('conversations')
+                    .insert([{
+                        user1_id: this.currentUser.id,
+                        user2_id: this.activeConversation.user.id,
+                        last_message: message.content,
+                        last_message_at: new Date().toISOString()
+                    }]);
+            } else if (!error) {
+                // Update existing conversation
+                await this.supabase
+                    .from('conversations')
+                    .update({
+                        last_message: message.content,
+                        last_message_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        unread_count_user1: conversation.user1_id === this.activeConversation.user.id ? 
+                                          conversation.unread_count_user1 + 1 : conversation.unread_count_user1,
+                        unread_count_user2: conversation.user2_id === this.activeConversation.user.id ? 
+                                          conversation.unread_count_user2 + 1 : conversation.unread_count_user2
+                    })
+                    .eq('id', conversation.id);
+            }
+
+            // Reload conversations list
+            await this.loadConversations();
+
+        } catch (error) {
+            console.error('Error updating conversation:', error);
+        }
+    }
+
+    handleNewMessage(message) {
+        if (message.sender_id === this.activeConversation?.user?.id) {
+            this.messages.push(message);
+            this.renderMessages();
+            
+            // Mark as read
+            this.markMessageAsRead(message.id);
+        }
+    }
+
+    async markMessageAsRead(messageId) {
+        try {
+            await this.supabase
+                .from('messages')
+                .update({ is_read: true })
+                .eq('id', messageId);
+
+            // Notify sender
+            this.socket.emit('message-seen', {
+                messageId: messageId,
+                senderId: this.currentUser.id
+            });
+
+        } catch (error) {
+            console.error('Error marking message as read:', error);
+        }
+    }
+
+    async markAsRead(conversationId) {
+        try {
+            const conversation = this.conversations.find(c => c.id === conversationId);
+            if (!conversation) return;
+
+            if (conversation.user1_id === this.currentUser.id) {
+                await this.supabase
+                    .from('conversations')
+                    .update({ unread_count_user1: 0 })
+                    .eq('id', conversationId);
+            } else {
+                await this.supabase
+                    .from('conversations')
+                    .update({ unread_count_user2: 0 })
+                    .eq('id', conversationId);
+            }
+
+            await this.loadConversations();
+
+        } catch (error) {
+            console.error('Error marking as read:', error);
+        }
+    }
+
+    updateMessageSeen(messageId) {
+        const messageElement = document.querySelector(`.message[data-id="${messageId}"]`);
+        if (messageElement) {
+            const timeElement = messageElement.querySelector('.message-time');
+            if (timeElement) {
+                timeElement.textContent = timeElement.textContent.replace('✓', '✓✓');
+            }
+        }
+    }
+
+    showTypingIndicator(userId, isTyping) {
+        if (userId === this.activeConversation?.user?.id) {
+            const statusElement = document.getElementById(`userStatus-${userId}`);
+            if (statusElement) {
+                statusElement.textContent = isTyping ? 'Typing...' : 'Online';
+            }
+        }
+    }
+
+    startTyping() {
+        if (!this.activeConversation) return;
+
+        this.socket.emit('typing', {
+            receiverId: this.activeConversation.user.id,
+            isTyping: true
+        });
+
+        // Clear previous timeout
+        if (this.typingTimeouts.has(this.activeConversation.user.id)) {
+            clearTimeout(this.typingTimeouts.get(this.activeConversation.user.id));
         }
 
-        const isOwn = message.sender_id === this.app.currentUser.id;
-        const messageElement = document.createElement('div');
-        messageElement.className = `message ${isOwn ? 'own' : ''}`;
-        messageElement.innerHTML = `
-            ${!isOwn ? `<img src="${this.activeChat.avatar}" class="avatar">` : ''}
-            <div class="message-content">
-                <div>${Utils.formatMessageContent(message.content)}</div>
-                <div class="message-time">${Utils.formatTime(message.created_at)}</div>
-            </div>
-            ${isOwn ? `<img src="${this.app.userProfile.avatar}" class="avatar">` : ''}
-        `;
+        // Set timeout to stop typing indicator
+        const timeout = setTimeout(() => {
+            this.socket.emit('typing', {
+                receiverId: this.activeConversation.user.id,
+                isTyping: false
+            });
+            this.typingTimeouts.delete(this.activeConversation.user.id);
+        }, 2000);
+
+        this.typingTimeouts.set(this.activeConversation.user.id, timeout);
+    }
+
+    startNewChat() {
+        // Show user search modal for new chat
+        window.app.showToast('Search for a user to start chatting', 'info');
+    }
+
+    attachImage() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => this.sendMedia(e, 'image');
+        input.click();
+    }
+
+    attachFile() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.onchange = (e) => this.sendMedia(e, 'file');
+        input.click();
+    }
+
+    async sendMedia(event, type) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${this.currentUser.id}/${Date.now()}.${fileExt}`;
+            const filePath = `messages/${fileName}`;
+
+            const { data: uploadData, error: uploadError } = await this.supabase
+                .storage
+                .from('media')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = this.supabase
+                .storage
+                .from('media')
+                .getPublicUrl(filePath);
+
+            const messageData = {
+                sender_id: this.currentUser.id,
+                receiver_id: this.activeConversation.user.id,
+                created_at: new Date().toISOString()
+            };
+
+            if (type === 'image') {
+                messageData.image_url = publicUrl;
+            } else if (type === 'file') {
+                messageData.file_url = publicUrl;
+                messageData.file_name = file.name;
+            }
+
+            const { data: message, error } = await this.supabase
+                .from('messages')
+                .insert([messageData])
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            // Send via socket
+            this.socket.emit('send-message', {
+                receiverId: this.activeConversation.user.id,
+                message: messageData
+            });
+
+            // Add to messages
+            this.messages.push(message);
+            this.renderMessages();
+
+            // Update conversation
+            await this.updateConversation(message);
+
+            window.app.showToast('Media sent', 'success');
+
+        } catch (error) {
+            console.error('Error sending media:', error);
+            window.app.showToast('Error sending media', 'error');
+        }
+    }
+
+    startAudioCall(userId) {
+        window.calls?.startCall(userId, 'audio');
+    }
+
+    startVideoCall(userId) {
+        window.calls?.startCall(userId, 'video');
+    }
+
+    viewImage(imageUrl) {
+        const viewer = document.getElementById('imageViewer');
+        const image = document.getElementById('viewerImage');
+        image.src = imageUrl;
+        window.app.showModal('imageViewer');
+    }
+
+    formatTime(timestamp) {
+        const now = new Date();
+        const time = new Date(timestamp);
+        const diff = now - time;
         
-        document.getElementById('chatMessages').appendChild(messageElement);
-        this.scrollToBottom();
-    }
-
-    scrollToBottom() {
-        const container = document.getElementById('chatMessages');
-        if (container) {
-            container.scrollTop = container.scrollHeight;
-        }
+        const seconds = Math.floor(diff / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        
+        if (seconds < 60) return 'now';
+        if (minutes < 60) return `${minutes}m ago`;
+        if (hours < 24) return `${hours}h ago`;
+        if (days < 7) return `${days}d ago`;
+        
+        return time.toLocaleDateString();
     }
 }
+
+window.MessageManager = MessageManager;
